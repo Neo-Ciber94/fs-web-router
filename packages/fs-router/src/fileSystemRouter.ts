@@ -1,9 +1,9 @@
 import path from "path";
 import { existsSync } from "fs";
-import createFileSystemRouter from "./createFileSystemRouter";
-import { MatchingPattern, nextJsPatternMatching } from "./matchingPattern";
-import { Locals, MaybePromise, Middleware, RequestEvent } from "./types";
 import url from "url";
+import createFileSystemRouter from "./createFileSystemRouter";
+import { type MatchingPattern, nextJsPatternMatching } from "./matchingPattern";
+import type { Locals, MaybePromise, Middleware, RequestEvent } from "./types";
 
 export type FileSystemRouterOptions = {
   /**

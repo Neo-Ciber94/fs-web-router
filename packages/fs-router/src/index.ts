@@ -1,4 +1,4 @@
-import { MaybePromise, Middleware, RequestEvent } from "./types";
+import type { MaybePromise, Middleware, RequestEvent } from "./types";
 
 /**
  * Creates a request handler.

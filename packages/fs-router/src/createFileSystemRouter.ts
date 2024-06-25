@@ -1,7 +1,7 @@
 import { globSync } from "glob";
-import { MatchingPattern } from "./matchingPattern";
+import { type MatchingPattern } from "./matchingPattern";
+import { type Handler } from "./types";
 import { createRouter } from "radix3";
-import { Handler } from "./types";
 import { posix as path } from "path";
 import url from "url";
 

@@ -20,7 +20,6 @@ app.use(
     initializeLocals() {
       return {
         num: 1,
-        text: "adios",
       };
     },
   })
