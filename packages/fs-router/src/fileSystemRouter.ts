@@ -81,7 +81,7 @@ export function initializeFileSystemRouter(options?: FileSystemRouterOptions) {
 
   if (middleware) {
     const globExts = extensions.join(",");
-    ignoreFiles.push(`**/${middleware}.{${globExts}}`);
+    ignoreFiles.push(`**/**/${middleware}.{${globExts}}`);
   }
 
   if (origin == null) {

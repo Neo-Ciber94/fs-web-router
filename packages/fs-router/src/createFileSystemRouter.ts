@@ -78,7 +78,7 @@ export default async function createFileSystemRouter(options: CreateRouterOption
 
   for (const [routePath, segments] of routesMap.entries()) {
     for (const p of createRoutePaths(segments)) {
-      const importPath = url.pathToFileURL(path.join(routesDirPath, p)).href;
+      const importPath = url.pathToFileURL(path.join(cwd, routePath)).href;
 
       if (p in routes) {
         throw new Error(`Route '${p}' already exists`);
