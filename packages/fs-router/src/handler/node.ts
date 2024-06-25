@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { type FileSystemRouterOptions, initializeFileSystemRouter } from "../fileSystemRouter";
 import { createRequest, setResponse } from "../nodeHelpers";
 import http from "http";

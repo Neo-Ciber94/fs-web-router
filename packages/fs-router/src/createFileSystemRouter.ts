@@ -10,17 +10,17 @@ type RouteSegment =
   | { type: "dynamic"; path: string; optional: boolean }
   | { type: "catch-all"; path: string; optional: boolean };
 
-type CreateRouterOptions = {
+interface CreateRouterOptions {
   cwd: string;
   routesDirPath: string;
   ignoreFiles?: string[];
   ignorePrefix: string;
   matchingPattern: MatchingPattern;
-};
+}
 
-type Route = {
+export interface Route {
   handler: Handler;
-};
+}
 
 export default async function createFileSystemRouter(options: CreateRouterOptions) {
   const { cwd, routesDirPath, ignoreFiles, ignorePrefix, matchingPattern } = options;

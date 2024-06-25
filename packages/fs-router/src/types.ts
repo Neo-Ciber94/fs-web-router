@@ -17,7 +17,7 @@ export type Locals = Register extends {
 /**
  * The incoming request event.
  */
-export type RequestEvent = {
+export interface RequestEvent {
   /**
    * The request.
    */
@@ -32,7 +32,7 @@ export type RequestEvent = {
    * Request locals.
    */
   locals: Locals;
-};
+}
 
 /**
  * A request handler.

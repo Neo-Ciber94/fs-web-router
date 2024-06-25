@@ -1,9 +1,9 @@
 import type http from "node:http";
 
-type CreateRequestArgs = {
+interface CreateRequestArgs {
   baseUrl: string;
   req: http.IncomingMessage;
-};
+}
 
 export async function createRequest({ baseUrl, req }: CreateRequestArgs) {
   const headers = new Headers();
@@ -37,7 +37,7 @@ export async function createRequest({ baseUrl, req }: CreateRequestArgs) {
     headers,
     body,
 
-    // @ts-ignore
+    // @ts-expect-error expected
     duplex: "half",
   });
 }
@@ -116,6 +116,7 @@ export function setResponse(response: Response, target: http.ServerResponse) {
     return;
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   function onCancel(error?: any) {
     reader.cancel(error).catch(() => {});
 

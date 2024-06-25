@@ -5,7 +5,7 @@ import createFileSystemRouter from "./createFileSystemRouter";
 import { type MatchingPattern, nextJsPatternMatching } from "./matchingPattern";
 import type { Locals, MaybePromise, Middleware, RequestEvent } from "./types";
 
-export type FileSystemRouterOptions = {
+export interface FileSystemRouterOptions {
   /**
    * Origin used for the request.
    *
@@ -68,7 +68,7 @@ export type FileSystemRouterOptions = {
    * Handle a 404 request.
    */
   onNotFound?: (event: RequestEvent) => MaybePromise<Response>;
-};
+}
 
 const extensions = ["js", "jsx", "cjs", "mjs", "ts", "tsx", "cts", "mts"];
 

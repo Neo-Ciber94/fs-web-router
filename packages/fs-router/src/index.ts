@@ -1,9 +1,9 @@
-import type { MaybePromise, Middleware, RequestEvent } from "./types";
+import type { Handler, Middleware } from "./types";
 
 /**
  * Creates a request handler.
  */
-export function defineHandler(f: (event: RequestEvent) => MaybePromise<Response>) {
+export function defineHandler(f: Handler) {
   return f;
 }
 
@@ -19,6 +19,7 @@ export function defineMiddleware(f: Middleware) {
  */
 export function sequence(...middlewares: Middleware[]): Middleware {
   return async (event, next) => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const handle = async (index: number): Promise<any> => {
       if (index < middlewares.length) {
         const m = middlewares[index];

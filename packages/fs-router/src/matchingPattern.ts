@@ -1,16 +1,13 @@
-export type MatchingPattern = {
+export interface MatchingPattern {
   matchDynamic: MatchPatternFunction;
   matchCatchAll: MatchPatternFunction;
   matchOptionalDynamic: MatchPatternFunction;
   matchOptionalCatchAll: MatchPatternFunction;
-};
+}
 
 type Falsy = undefined | null | false;
 
-type MatchPatternFunction = (
-  segment: string,
-  pathSegments: string[]
-) => string | Falsy;
+type MatchPatternFunction = (segment: string, pathSegments: string[]) => string | Falsy;
 
 /**
  * Returns a pattern matching for:
