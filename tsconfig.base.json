@@ -1,0 +1,12 @@
+{
+    "compilerOptions": {
+        "skipLibCheck": true,
+        "esModuleInterop": true,
+        "target": "ES2022",
+        "module": "ESNext",
+        "moduleResolution": "Bundler",
+        "noEmitOnError": true,
+        "strict": true,
+        "strictNullChecks": true
+    }
+}
