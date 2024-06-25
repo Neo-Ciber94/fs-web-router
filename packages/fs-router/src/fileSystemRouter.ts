@@ -2,7 +2,7 @@ import path from "path";
 import { existsSync } from "fs";
 import createFileSystemRouter from "./createFileSystemRouter";
 import { MatchingPattern, nextJsPatternMatching } from "./matchingPattern";
-import { MaybePromise, Middleware, RequestEvent } from "./types";
+import { Locals, MaybePromise, Middleware, RequestEvent } from "./types";
 import url from "url";
 
 export type FileSystemRouterOptions = {
@@ -60,6 +60,11 @@ export type FileSystemRouterOptions = {
   ignoreFiles?: string[];
 
   /**
+   * A function that initialize request locals.
+   */
+  initializeLocals?: (event: RequestEvent) => MaybePromise<Locals>;
+
+  /**
    * Handle a 404 request.
    */
   onNotFound?: (event: RequestEvent) => MaybePromise<Response>;
@@ -77,6 +82,7 @@ export function initializeFileSystemRouter(options?: FileSystemRouterOptions) {
     middleware = "middleware",
     matchingPattern = nextJsPatternMatching(),
     onNotFound = handle404,
+    initializeLocals = initLocals,
   } = options || {};
 
   if (middleware) {
@@ -136,6 +142,7 @@ export function initializeFileSystemRouter(options?: FileSystemRouterOptions) {
     routerPromise,
     middlewarePromise,
     onNotFound,
+    initializeLocals,
     origin,
   };
 }
@@ -149,6 +156,10 @@ function findFile(dir: string, name: string, extensions: string[]) {
   }
 
   return null;
+}
+
+function initLocals() {
+  return {};
 }
 
 function handle404() {

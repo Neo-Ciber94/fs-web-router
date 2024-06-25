@@ -1,7 +1,8 @@
 import { type FileSystemRouterOptions, initializeFileSystemRouter } from "../fileSystemRouter";
 
 export default function fileSystemRouter(options?: FileSystemRouterOptions) {
-  const { onNotFound, routerPromise, middlewarePromise } = initializeFileSystemRouter(options);
+  const { onNotFound, initializeLocals, routerPromise, middlewarePromise } =
+    initializeFileSystemRouter(options);
 
   return async (request: Request) => {
     const router = await routerPromise;
@@ -12,7 +13,9 @@ export default function fileSystemRouter(options?: FileSystemRouterOptions) {
     const match = router.lookup(reqUrl);
 
     const { handler = onNotFound, params = {} } = match || {};
-    const requestEvent = { request, params };
+    const preEvent = { request, params, locals: {} };
+    const locals = await Promise.resolve(initializeLocals(preEvent));
+    const requestEvent = { ...preEvent, locals };
 
     if (middleware) {
       return middleware(requestEvent, handler);

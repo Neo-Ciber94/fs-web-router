@@ -3,7 +3,7 @@ import { createRequest, setResponse } from "../nodeHelpers";
 import http from "http";
 
 export default function fileSystemRouter(options?: FileSystemRouterOptions) {
-  const { onNotFound, origin, routerPromise, middlewarePromise } =
+  const { onNotFound, origin, initializeLocals, routerPromise, middlewarePromise } =
     initializeFileSystemRouter(options);
 
   return async (req: http.IncomingMessage, res: http.ServerResponse, next: (err?: any) => void) => {
@@ -16,7 +16,9 @@ export default function fileSystemRouter(options?: FileSystemRouterOptions) {
     try {
       const request = await createRequest({ req, baseUrl: origin });
       const { handler = onNotFound, params = {} } = match || {};
-      const requestEvent = { request, params };
+      const preEvent = { request, params, locals: {} };
+      const locals = await Promise.resolve(initializeLocals(preEvent));
+      const requestEvent = { ...preEvent, locals };
 
       if (middleware) {
         response = await middleware(requestEvent, handler);
