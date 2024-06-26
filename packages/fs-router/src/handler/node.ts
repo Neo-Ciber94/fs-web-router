@@ -1,13 +1,74 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { type FileSystemRouterOptions, initializeFileSystemRouter } from "../fileSystemRouter";
-import { createRequest, setResponse } from "../nodeHelpers";
+import { posix as path } from "path";
+import url from "url";
+import { getRouterMap } from "../createFileSystemRouter.js";
+import { type FileSystemRouterOptions, initializeFileSystemRouter } from "../fileSystemRouter.js";
+import { nextJsPatternMatching } from "../matchingPattern.js";
+import { createRequest, setResponse } from "../nodeHelpers.js";
 import http from "http";
+import { WorkerRouterData } from "../worker.mjs";
+import { handleWorkerRequest } from "../workers/handleWorkerRequest.js";
+import { WorkerPool } from "../workers/workerPool.js";
+import { EXTENSIONS } from "../utils.js";
+
+const __dirname = path.dirname(url.fileURLToPath(import.meta.url));
 
 export default function fileSystemRouter(options?: FileSystemRouterOptions) {
   const fsRouter = initializeFileSystemRouter(options);
 
   if (fsRouter.type === "worker") {
-    throw new Error();
+    const {
+      cwd = process.cwd(),
+      ignorePrefix = "_",
+      routesDir = "src/routes",
+      ignoreFiles = [],
+      matchingPattern = nextJsPatternMatching(),
+    } = options || {};
+
+    const middleware = options?.middleware ?? "middleware";
+    const routesDirPath = path.join(cwd, routesDir);
+    const middlewareFilePath = fsRouter.middlewareFilePath;
+
+    if (middlewareFilePath) {
+      const globExts = EXTENSIONS.join(",");
+      ignoreFiles.push(`**/**/${middleware}.{${globExts}}`);
+    }
+
+    const routesFilePaths = getRouterMap({
+      cwd,
+      ignorePrefix,
+      matchingPattern,
+      routesDirPath,
+      ignoreFiles,
+    });
+
+    const workerFilePath = path.join(__dirname, "..", "worker.mjs");
+
+    const pool = new WorkerPool(fsRouter.workerCount, workerFilePath, {
+      workerData: {
+        routesFilePaths,
+        middlewareFilePath,
+      } as WorkerRouterData,
+    });
+
+    return async (
+      req: http.IncomingMessage,
+      res: http.ServerResponse,
+      next: (err?: any) => void
+    ) => {
+      const worker = await pool.get();
+
+      try {
+        const request = await createRequest({ req, baseUrl: origin });
+        const response: Response = await handleWorkerRequest(worker, request);
+        setResponse(response, res);
+      } catch (err) {
+        console.error(err);
+        return next(err);
+      } finally {
+        pool.return(worker);
+      }
+    };
   }
 
   const { onNotFound, origin, initializeLocals, routerPromise, middlewarePromise } = fsRouter;

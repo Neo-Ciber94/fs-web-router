@@ -1,4 +1,4 @@
-import { nextJsPatternMatching } from "./matchingPattern";
+import { nextJsPatternMatching } from "./matchingPattern.js";
 
 describe("Default pattern matching", () => {
   test("Match dynamic segment", () => {

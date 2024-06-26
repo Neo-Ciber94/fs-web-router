@@ -1,4 +1,4 @@
-import type { Handler, Middleware } from "./types";
+import type { Handler, Middleware } from "./types.js";
 
 /**
  * Creates a request handler.

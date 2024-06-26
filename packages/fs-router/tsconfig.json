@@ -6,10 +6,13 @@
         ],
         "declaration": true,
         "declarationMap": true,
-        "outDir": "./dist"
+        "outDir": "./dist",
+        "module": "Node16",
+        "moduleResolution": "Node16"
     },
     "include": [
-        "src/**/*.ts"
+        "src/**/*.ts",
+        "src/worker.mts"
     ],
     "exclude": [
         "node_modules"

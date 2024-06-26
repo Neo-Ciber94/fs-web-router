@@ -1,10 +1,14 @@
-import { getRouterMap } from "../createFileSystemRouter";
-import { type FileSystemRouterOptions, initializeFileSystemRouter } from "../fileSystemRouter";
-import { nextJsPatternMatching } from "../matchingPattern";
-import { RequestParts, ResponseParts, WorkerRouterData } from "../worker";
-import { WorkerPool } from "../workers/workerPool";
+import { getRouterMap } from "../createFileSystemRouter.js";
+import { type FileSystemRouterOptions, initializeFileSystemRouter } from "../fileSystemRouter.js";
+import { nextJsPatternMatching } from "../matchingPattern.js";
+import { WorkerRouterData } from "../worker.mjs";
+import { WorkerPool } from "../workers/workerPool.js";
 import { posix as path } from "path";
-import { Worker } from "worker_threads";
+import url from "url";
+import { handleWorkerRequest } from "../workers/handleWorkerRequest.js";
+import { EXTENSIONS } from "../utils.js";
+
+const __dirname = path.dirname(url.fileURLToPath(import.meta.url));
 
 export default function fileSystemRouter(options?: FileSystemRouterOptions) {
   const fsRouter = initializeFileSystemRouter(options);
@@ -18,7 +22,15 @@ export default function fileSystemRouter(options?: FileSystemRouterOptions) {
       matchingPattern = nextJsPatternMatching(),
     } = options || {};
 
+    const middleware = options?.middleware ?? "middleware";
     const routesDirPath = path.join(cwd, routesDir);
+    const middlewareFilePath = fsRouter.middlewareFilePath;
+
+    if (middlewareFilePath) {
+      const globExts = EXTENSIONS.join(",");
+      ignoreFiles.push(`**/**/${middleware}.{${globExts}}`);
+    }
+
     const routesFilePaths = getRouterMap({
       cwd,
       ignorePrefix,
@@ -27,8 +39,9 @@ export default function fileSystemRouter(options?: FileSystemRouterOptions) {
       ignoreFiles,
     });
 
-    const middlewareFilePath = fsRouter.middlewareFilePath;
-    const pool = new WorkerPool(fsRouter.workerCount, "../worker.js", {
+    const workerFilePath = path.join(__dirname, "..", "worker.mjs");
+
+    const pool = new WorkerPool(fsRouter.workerCount, workerFilePath, {
       workerData: {
         routesFilePaths,
         middlewareFilePath,
@@ -67,92 +80,4 @@ export default function fileSystemRouter(options?: FileSystemRouterOptions) {
       return handler(requestEvent);
     }
   };
-}
-
-function handleWorkerRequest(worker: Worker, request: Request) {
-  const bodyStream = new TransformStream<Uint8Array, Uint8Array>();
-  let response: Response | undefined = undefined;
-
-  return new Promise<Response>((resolve, reject) => {
-    const requestHeaders: Record<string, string | string[]> = {};
-
-    for (const [key, value] of request.headers) {
-      const h = requestHeaders[key];
-      if (Array.isArray(h)) {
-        requestHeaders[key] = [...h, value];
-      } else {
-        requestHeaders[key] = [value];
-      }
-    }
-
-    // Wait until request is ready
-    worker.on("message", (responseParts: ResponseParts) => {
-      switch (responseParts.type) {
-        case "trailers": {
-          const headers = new Headers();
-          for (const [key, value] of Object.entries(responseParts.headers)) {
-            if (Array.isArray(value)) {
-              value.forEach((v) => headers.append(key, v));
-            } else {
-              headers.append(key, value);
-            }
-          }
-
-          response = new Response(bodyStream.readable, {
-            status: responseParts.status,
-            statusText: responseParts.statusText,
-            headers,
-          });
-          break;
-        }
-        case "body": {
-          bodyStream.writable.getWriter().write(responseParts.data);
-          break;
-        }
-        case "done": {
-          if (!response) {
-            return reject("Response was not ready");
-          } else {
-            resolve(response);
-          }
-          break;
-        }
-      }
-    });
-
-    // Send request parts
-    worker.postMessage({
-      type: "trailers",
-      url: request.url,
-      method: request.method,
-      headers: requestHeaders,
-    } as RequestParts);
-
-    const body = request.body;
-
-    if (body) {
-      const reader = body.getReader();
-
-      function drain() {
-        reader.read().then(({ value, done }) => {
-          if (done) {
-            return;
-          }
-
-          worker.postMessage({
-            type: "body",
-            data: value,
-          } as RequestParts);
-
-          return drain();
-        });
-      }
-
-      void drain();
-    }
-
-    worker.postMessage({
-      type: "done",
-    } as RequestParts);
-  });
 }

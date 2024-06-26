@@ -1,5 +1,7 @@
-import type { Route } from "./createFileSystemRouter";
-import type { Middleware } from "./types";
+import type { Route } from "./createFileSystemRouter.js";
+import type { Middleware } from "./types.js";
+
+export const EXTENSIONS = Object.freeze(["js", "jsx", "cjs", "mjs", "ts", "tsx", "cts", "mts"]);
 
 export async function createRoute(filePath: string): Promise<Route> {
   const mod = await import(filePath);

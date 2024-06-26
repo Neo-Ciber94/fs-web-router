@@ -1,7 +1,7 @@
 import { createRouter } from "radix3";
 import { parentPort, workerData } from "worker_threads";
-import type { Route } from "./createFileSystemRouter";
-import { createMiddleware, createRoute } from "./utils";
+import type { Route } from "./createFileSystemRouter.js";
+import { createMiddleware, createRoute } from "./utils.js";
 
 export type RequestParts =
   | {

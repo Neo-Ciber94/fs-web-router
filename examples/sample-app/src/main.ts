@@ -17,6 +17,7 @@ const app = polka();
 app.use(
   fileSystemRouter({
     origin,
+    workers: true,
     initializeLocals() {
       return {
         num: 1,

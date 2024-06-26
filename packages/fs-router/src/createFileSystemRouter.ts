@@ -1,10 +1,10 @@
 import { globSync } from "glob";
-import { type MatchingPattern } from "./matchingPattern";
-import { type Handler } from "./types";
+import { type MatchingPattern } from "./matchingPattern.js";
+import { type Handler } from "./types.js";
 import { createRouter } from "radix3";
 import { posix as path } from "path";
 import url from "url";
-import { createRoute } from "./utils";
+import { createRoute } from "./utils.js";
 
 type RouteSegment =
   | { type: "static"; path: string }
@@ -57,12 +57,12 @@ export function getRouterMap(options: CreateRouterOptions) {
   const files = globSync(`${dir}/**`, {
     posix: true,
     nodir: true,
-    dotRelative: true,
     ignore: ignoreFiles,
   });
 
   const routesMap = new Map<string, RouteSegment[]>();
 
+  console.log({ files  });
   for (const file of files) {
     if (isIgnored(file, ignorePrefix)) {
       continue;
@@ -110,6 +110,7 @@ export function getRouterMap(options: CreateRouterOptions) {
     }
   }
 
+  console.log(routes);
   return routes;
 }
 

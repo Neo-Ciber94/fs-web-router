@@ -2,10 +2,10 @@ import path from "path";
 import { existsSync } from "fs";
 import os from "os";
 import url from "url";
-import createFileSystemRouter from "./createFileSystemRouter";
-import { type MatchingPattern, nextJsPatternMatching } from "./matchingPattern";
-import type { Locals, MaybePromise, Middleware, RequestEvent } from "./types";
-import { createMiddleware } from "./utils";
+import createFileSystemRouter from "./createFileSystemRouter.js";
+import { type MatchingPattern, nextJsPatternMatching } from "./matchingPattern.js";
+import type { Locals, MaybePromise, Middleware, RequestEvent } from "./types.js";
+import { createMiddleware, EXTENSIONS } from "./utils.js";
 
 export interface FileSystemRouterOptions {
   /**
@@ -81,8 +81,6 @@ export interface WorkersRoutingOptions {
   workerCount?: number;
 }
 
-const extensions = ["js", "jsx", "cjs", "mjs", "ts", "tsx", "cts", "mts"];
-
 export function initializeFileSystemRouter(options?: FileSystemRouterOptions) {
   const {
     cwd = process.cwd(),
@@ -98,7 +96,7 @@ export function initializeFileSystemRouter(options?: FileSystemRouterOptions) {
   } = options || {};
 
   if (middleware) {
-    const globExts = extensions.join(",");
+    const globExts = EXTENSIONS.join(",");
     ignoreFiles.push(`**/**/${middleware}.{${globExts}}`);
   }
 
@@ -126,7 +124,7 @@ export function initializeFileSystemRouter(options?: FileSystemRouterOptions) {
     const cpuCount = os.cpus().length;
     const workerCount = typeof workers === "boolean" ? cpuCount : workers.workerCount ?? cpuCount;
     const middlewareFilePath = middleware
-      ? findFile(routesDirPath, middleware, extensions)
+      ? findFile(routesDirPath, middleware, EXTENSIONS)
       : undefined;
 
     return {
@@ -139,7 +137,7 @@ export function initializeFileSystemRouter(options?: FileSystemRouterOptions) {
   let middlewarePromise: Promise<Middleware> | undefined = undefined;
 
   if (middleware) {
-    const middlewareFile = findFile(routesDirPath, middleware, extensions);
+    const middlewareFile = findFile(routesDirPath, middleware, EXTENSIONS);
 
     if (middlewareFile) {
       const importPath = url.pathToFileURL(middlewareFile).href;
@@ -165,7 +163,7 @@ export function initializeFileSystemRouter(options?: FileSystemRouterOptions) {
   };
 }
 
-function findFile(dir: string, name: string, extensions: string[]) {
+function findFile(dir: string, name: string, extensions: readonly string[]) {
   for (const ext of extensions) {
     const p = path.join(dir, `${name}.${ext}`);
     if (existsSync(p)) {
