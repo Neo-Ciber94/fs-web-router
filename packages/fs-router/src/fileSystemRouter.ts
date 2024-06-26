@@ -74,7 +74,7 @@ export interface FileSystemRouterOptions {
   /**
    * Enable workers.
    */
-  workers?: WorkersRoutingOptions | true;
+  workers?: WorkersRoutingOptions | boolean;
 }
 
 export interface WorkersRoutingOptions {

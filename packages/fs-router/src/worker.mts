@@ -81,8 +81,6 @@ async function handleWorkerResponse(request: Request) {
     throw new Error("Handler was not executed as a worker");
   }
 
-  console.log(request);
-
   const url = new URL(request.url);
   const match = router.lookup(url.pathname);
   const { handler = onNotFound, params = {} } = match || {};

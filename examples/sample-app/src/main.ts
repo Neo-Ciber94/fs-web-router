@@ -1,4 +1,4 @@
-import 'tsx/esm'
+import "tsx/esm";
 import polka from "polka";
 import fileSystemRouter from "fs-router/node";
 
@@ -10,7 +10,12 @@ declare module "fs-router/types" {
   }
 }
 
-const port = Number(process.env.PORT || 5000);
+const useWorker = process.argv.some((s) => s === "--use-workers");
+const portArg = (() => {
+  const idx = process.argv.indexOf("--port");
+  return idx >= 0 ? process.argv[idx + 1] : null;
+})();
+const port = Number(process.env.PORT ?? portArg ?? 5000);
 const origin = `http://localhost:${port}`;
 
 const app = polka();
@@ -18,7 +23,8 @@ const app = polka();
 app.use(
   fileSystemRouter({
     origin,
-    workers: true,
+    middleware: false,
+    workers: useWorker,
     initializeLocals() {
       return {
         num: 1,

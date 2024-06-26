@@ -3,11 +3,8 @@ import { type MatchingPattern } from "./matchingPattern.js";
 import { type Handler } from "./types.js";
 import { createRouter } from "radix3";
 import { posix as path } from "path";
-import { dirname } from "path";
 import url from "url";
-import { createRoute, normalizePath } from "./utils.js";
-
-const __dirname = normalizePath(dirname(url.fileURLToPath(import.meta.url)));
+import { createRoute } from "./utils.js";
 
 type RouteSegment =
   | { type: "static"; path: string }
@@ -41,7 +38,6 @@ export default async function createFileSystemRouter(options: CreateRouterOption
   }
 
   await Promise.all(routePromises);
-  console.log(routes);
 
   const router = createRouter<Route>({ routes });
   return router;
@@ -65,7 +61,6 @@ export function getRouterMap(options: CreateRouterOptions) {
 
   const routesMap = new Map<string, RouteSegment[]>();
 
-  console.log({ files });
   for (const file of files) {
     if (isIgnored(file, ignorePrefix)) {
       continue;
@@ -121,7 +116,6 @@ export function getRouterMap(options: CreateRouterOptions) {
     }
   }
 
-  console.log({ __dirname, routes });
   return routes;
 }
 

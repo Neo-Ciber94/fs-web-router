@@ -1,11 +1,24 @@
 import { type Worker } from "worker_threads";
 import { ResponseParts, RequestParts } from "../worker.mjs";
 
-export function handleWorkerRequest(worker: Worker, request: Request) {
-  const bodyStream = new TransformStream<Uint8Array, Uint8Array>();
-  let response: Response | undefined = undefined;
+function deferred<T>() {
+  let resolve = (value: T) => {};
+  let reject = (err?: any) => {};
 
-  return new Promise<Response>((resolve, reject) => {
+  const promise = new Promise<T>((resolveFunction, rejectFunction) => {
+    resolve = resolveFunction;
+    reject = rejectFunction;
+  });
+
+  return { promise, resolve, reject };
+}
+
+export function handleWorkerRequest(worker: Worker, request: Request) {
+  // let streamController: ReadableStreamDefaultController<Uint8Array> | undefined = undefined;
+  const streamControllerDefer = deferred<ReadableStreamDefaultController<Uint8Array>>();
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  return new Promise<Response>((resolve, _reject) => {
     const requestHeaders: Record<string, string | string[]> = {};
 
     for (const [key, value] of request.headers) {
@@ -17,10 +30,7 @@ export function handleWorkerRequest(worker: Worker, request: Request) {
       }
     }
 
-    // Wait until request is ready
-    worker.on("message", async (responseParts: ResponseParts) => {
-      console.log(responseParts);
-
+    async function recieveResponseParts(responseParts: ResponseParts) {
       switch (responseParts.type) {
         case "trailers": {
           const headers = new Headers();
@@ -32,29 +42,37 @@ export function handleWorkerRequest(worker: Worker, request: Request) {
             }
           }
 
-          response = new Response(bodyStream.readable, {
-            status: responseParts.status,
-            statusText: responseParts.statusText,
-            headers,
+          const bodyStream = new ReadableStream<Uint8Array>({
+            start(controller) {
+              streamControllerDefer.resolve(controller);
+            },
           });
+
+          resolve(
+            new Response(bodyStream, {
+              status: responseParts.status,
+              statusText: responseParts.statusText,
+              headers,
+            })
+          );
           break;
         }
         case "body": {
-          await bodyStream.writable.getWriter().write(responseParts.data);
+          const streamController = await streamControllerDefer.promise;
+          streamController.enqueue(responseParts.data);
           break;
         }
         case "done": {
-          await bodyStream.writable.close();
-
-          if (!response) {
-            return reject("Response was not ready");
-          } else {
-            resolve(response);
-          }
+          const streamController = await streamControllerDefer.promise;
+          streamController.close();
+          worker.off("message", recieveResponseParts);
           break;
         }
       }
-    });
+    }
+
+    // Wait until request is ready
+    worker.on("message", recieveResponseParts);
 
     // Send request parts
     worker.postMessage({

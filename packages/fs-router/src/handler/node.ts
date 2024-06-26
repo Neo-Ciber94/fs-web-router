@@ -45,7 +45,6 @@ export default function fileSystemRouter(options?: FileSystemRouterOptions) {
     });
 
     const workerFilePath = path.join(__dirname, "..", "worker.mjs");
-    console.log({ __dirname, workerFilePath });
 
     const pool = new WorkerPool(fsRouter.workerCount, workerFilePath, {
       workerData: {
