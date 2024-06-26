@@ -12,31 +12,44 @@ export function handleRequestOnWorker(worker: Worker, request: Request) {
       switch (responseParts.type) {
         case "response": {
           const responseHeaders = objectToHeaders(responseParts.headers);
-          const bodyStream = new ReadableStream<Uint8Array>({
-            start(controller) {
-              streamControllerDefer.resolve(controller);
-            },
-          });
 
-          resolve(
-            new Response(bodyStream, {
-              status: responseParts.status,
-              statusText: responseParts.statusText,
-              headers: responseHeaders,
-            })
-          );
+          if (responseParts.body) {
+            resolve(
+              new Response(responseParts.body, {
+                status: responseParts.status,
+                statusText: responseParts.statusText,
+                headers: responseHeaders,
+              })
+            );
+
+            worker.off("message", recieveResponseParts);
+          } else {
+            const bodyStream = new ReadableStream<Uint8Array>({
+              start(controller) {
+                streamControllerDefer.resolve(controller);
+              },
+            });
+
+            resolve(
+              new Response(bodyStream, {
+                status: responseParts.status,
+                statusText: responseParts.statusText,
+                headers: responseHeaders,
+              })
+            );
+          }
+
           break;
         }
-        case "body": {
-          const streamController = await streamControllerDefer.promise;
-          streamController.enqueue(responseParts.data);
-          break;
-        }
-        case "done": {
-          const streamController = await streamControllerDefer.promise;
-          streamController.close();
-          worker.off("message", recieveResponseParts);
-          break;
+        case "chunk": {
+          if (!responseParts.done) {
+            const streamController = await streamControllerDefer.promise;
+            streamController.enqueue(responseParts.data);
+          } else {
+            const streamController = await streamControllerDefer.promise;
+            streamController.close();
+            worker.off("message", recieveResponseParts);
+          }
         }
       }
     }

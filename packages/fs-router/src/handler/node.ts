@@ -24,7 +24,13 @@ export default function fileSystemRouter(options?: FileSystemRouterOptions) {
     });
   }
 
-  const { onNotFound, initializeLocals, routerPromise, middlewarePromise } = fsRouterOptions;
+  const {
+    onNotFound,
+    initializeLocals,
+    initialOptions: { origin },
+    routerPromise,
+    middlewarePromise,
+  } = fsRouterOptions;
 
   return async (req: http.IncomingMessage, res: http.ServerResponse, next: (err?: any) => void) => {
     const router = await routerPromise;
