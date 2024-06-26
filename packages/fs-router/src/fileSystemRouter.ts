@@ -66,11 +66,17 @@ export interface FileSystemRouterOptions {
 
   /**
    * A function that initialize request locals.
+   *
+   * @conflicts
+   * Cannot be used with `workers`
    */
   initializeLocals?: (event: RequestEvent) => MaybePromise<Locals>;
 
   /**
    * Handle a 404 request.
+   *
+   * @conflicts
+   * Cannot be used with `workers`
    */
   onNotFound?: (event: RequestEvent) => MaybePromise<Response>;
 
@@ -129,6 +135,10 @@ export function initializeFileSystemRouter(options?: FileSystemRouterOptions) {
 
   if (!path.isAbsolute(cwd)) {
     throw new Error("cwd must be an absolute path");
+  }
+
+  if (workers && (!!onNotFound || !!initializeLocals)) {
+    throw new Error(`workers option cannot be used with 'onNotFound' or 'initializeLocals'`);
   }
 
   const routesDirPath = path.posix.join(cwd, routesDir);
