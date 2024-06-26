@@ -37,7 +37,9 @@ export interface FileSystemRouterOptions {
   routesDir?: string;
 
   /**
-   * The path of the middleware relative to the routesDir. Use `false` to disable middleware.
+   * The path of the middleware relative to the routesDir. 
+   * 
+   * Use `false` to disable middleware.
    */
   middleware?: string | false;
 
@@ -84,7 +86,7 @@ export interface FileSystemRouterOptions {
    * Use node worker threads for handling the requests.
    *
    * We recommend benchmarking your endpoints to ensure if using multiple threads is beneficial for your app,
-   * using multiple thread may reduce the request/second your server can handle around 10% if the work being done is already fast enough.
+   * using multiple thread may reduce the `request/second` your server can handle around `10%` if the work being done is already fast enough.
    *
    * For handling multiple request in multiple threads we spawn multiple workers and serialize the request, then we deserialize the response
    * send from the worker and send it to client.
