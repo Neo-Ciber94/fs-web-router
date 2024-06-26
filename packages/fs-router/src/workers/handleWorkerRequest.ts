@@ -18,7 +18,9 @@ export function handleWorkerRequest(worker: Worker, request: Request) {
     }
 
     // Wait until request is ready
-    worker.on("message", (responseParts: ResponseParts) => {
+    worker.on("message", async (responseParts: ResponseParts) => {
+      console.log(responseParts);
+
       switch (responseParts.type) {
         case "trailers": {
           const headers = new Headers();
@@ -38,10 +40,12 @@ export function handleWorkerRequest(worker: Worker, request: Request) {
           break;
         }
         case "body": {
-          bodyStream.writable.getWriter().write(responseParts.data);
+          await bodyStream.writable.getWriter().write(responseParts.data);
           break;
         }
         case "done": {
+          await bodyStream.writable.close();
+
           if (!response) {
             return reject("Response was not ready");
           } else {

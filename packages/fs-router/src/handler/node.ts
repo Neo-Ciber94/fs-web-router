@@ -9,12 +9,14 @@ import http from "http";
 import { WorkerRouterData } from "../worker.mjs";
 import { handleWorkerRequest } from "../workers/handleWorkerRequest.js";
 import { WorkerPool } from "../workers/workerPool.js";
-import { EXTENSIONS } from "../utils.js";
+import { EXTENSIONS, normalizePath } from "../utils.js";
+import { dirname } from "path";
 
-const __dirname = path.dirname(url.fileURLToPath(import.meta.url));
+const __dirname = normalizePath(dirname(url.fileURLToPath(import.meta.url)));
 
 export default function fileSystemRouter(options?: FileSystemRouterOptions) {
   const fsRouter = initializeFileSystemRouter(options);
+  const origin = fsRouter.origin;
 
   if (fsRouter.type === "worker") {
     const {
@@ -43,6 +45,7 @@ export default function fileSystemRouter(options?: FileSystemRouterOptions) {
     });
 
     const workerFilePath = path.join(__dirname, "..", "worker.mjs");
+    console.log({ __dirname, workerFilePath });
 
     const pool = new WorkerPool(fsRouter.workerCount, workerFilePath, {
       workerData: {
@@ -71,7 +74,7 @@ export default function fileSystemRouter(options?: FileSystemRouterOptions) {
     };
   }
 
-  const { onNotFound, origin, initializeLocals, routerPromise, middlewarePromise } = fsRouter;
+  const { onNotFound, initializeLocals, routerPromise, middlewarePromise } = fsRouter;
 
   return async (req: http.IncomingMessage, res: http.ServerResponse, next: (err?: any) => void) => {
     const router = await routerPromise;

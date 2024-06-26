@@ -1,3 +1,4 @@
+import 'tsx/esm'
 import polka from "polka";
 import fileSystemRouter from "fs-router/node";
 

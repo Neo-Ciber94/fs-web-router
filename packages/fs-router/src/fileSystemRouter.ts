@@ -129,6 +129,7 @@ export function initializeFileSystemRouter(options?: FileSystemRouterOptions) {
 
     return {
       type: "worker" as const,
+      origin,
       workerCount,
       middlewareFilePath,
     };
@@ -165,7 +166,7 @@ export function initializeFileSystemRouter(options?: FileSystemRouterOptions) {
 
 function findFile(dir: string, name: string, extensions: readonly string[]) {
   for (const ext of extensions) {
-    const p = path.join(dir, `${name}.${ext}`);
+    const p = path.posix.join(dir, `${name}.${ext}`);
     if (existsSync(p)) {
       return p;
     }

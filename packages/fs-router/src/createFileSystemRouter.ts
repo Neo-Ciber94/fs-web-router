@@ -3,8 +3,11 @@ import { type MatchingPattern } from "./matchingPattern.js";
 import { type Handler } from "./types.js";
 import { createRouter } from "radix3";
 import { posix as path } from "path";
+import { dirname } from "path";
 import url from "url";
-import { createRoute } from "./utils.js";
+import { createRoute, normalizePath } from "./utils.js";
+
+const __dirname = normalizePath(dirname(url.fileURLToPath(import.meta.url)));
 
 type RouteSegment =
   | { type: "static"; path: string }
@@ -62,7 +65,7 @@ export function getRouterMap(options: CreateRouterOptions) {
 
   const routesMap = new Map<string, RouteSegment[]>();
 
-  console.log({ files  });
+  console.log({ files });
   for (const file of files) {
     if (isIgnored(file, ignorePrefix)) {
       continue;
@@ -106,11 +109,19 @@ export function getRouterMap(options: CreateRouterOptions) {
         throw new Error(`Route '${p}' already exists`);
       }
       const importPath = url.pathToFileURL(path.join(cwd, routePath)).href;
+
+      // const idir = normalizePath(path.join(cwd, routePath));
+      // const rel = path.relative(__dirname, path.join(cwd, routePath));
+      // const importP = path
+      //   .resolve(rel, path.join(cwd, routePath))
+      //   .replace(/\.(js|jsx|cjs|mjs|ts|tsx|cts|mts)$/g, "");
+
+      // console.log({ __dirname, idir, importP, rel });
       routes[p] = importPath;
     }
   }
 
-  console.log(routes);
+  console.log({ __dirname, routes });
   return routes;
 }
 

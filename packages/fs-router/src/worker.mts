@@ -2,6 +2,7 @@ import { createRouter } from "radix3";
 import { parentPort, workerData } from "worker_threads";
 import type { Route } from "./createFileSystemRouter.js";
 import { createMiddleware, createRoute } from "./utils.js";
+import url from "url";
 
 export type RequestParts =
   | {
@@ -51,9 +52,10 @@ async function handleWorkerRequest(requestParts: RequestParts) {
         }
       }
 
+      const hasBody = !["get", "head"].includes(requestParts.method.toLowerCase());
       const request = new Request(requestParts.url, {
         method: requestParts.method,
-        body: stream.readable,
+        body: hasBody ? stream.readable : null,
         headers: requestHeaders,
 
         // @ts-expect-error This is required because the request may have a body
@@ -64,11 +66,11 @@ async function handleWorkerRequest(requestParts: RequestParts) {
       break;
     }
     case "body": {
-      stream.writable.getWriter().write(requestParts.data);
+      await stream.writable.getWriter().write(requestParts.data);
       break;
     }
     case "done": {
-      stream.writable.close();
+      await stream.writable.close();
       break;
     }
   }
@@ -78,6 +80,8 @@ async function handleWorkerResponse(request: Request) {
   if (!parentPort) {
     throw new Error("Handler was not executed as a worker");
   }
+
+  console.log(request);
 
   const url = new URL(request.url);
   const match = router.lookup(url.pathname);
@@ -110,6 +114,7 @@ async function handleWorkerResponse(request: Request) {
     statusText: response.statusText,
     headers: responseHeaders,
   } satisfies ResponseParts);
+
   if (response.body) {
     const reader = response.body.getReader();
     while (true) {
@@ -120,6 +125,7 @@ async function handleWorkerResponse(request: Request) {
       parentPort.postMessage({ type: "body", data } satisfies ResponseParts);
     }
   }
+
   parentPort.postMessage({ type: "done" } satisfies ResponseParts);
 }
 
@@ -137,7 +143,10 @@ async function createWorkerRouter() {
   }
 
   const router = createRouter<Route>({ routes });
-  const middleware = middlewareFilePath ? await createMiddleware(middlewareFilePath) : undefined;
+  const middleware = middlewareFilePath
+    ? await createMiddleware(url.pathToFileURL(middlewareFilePath).href)
+    : undefined;
+
   return { router, middleware };
 }
 
