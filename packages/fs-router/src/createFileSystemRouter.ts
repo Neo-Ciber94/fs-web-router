@@ -104,14 +104,6 @@ export function getRouterMap(options: CreateRouterOptions) {
         throw new Error(`Route '${p}' already exists`);
       }
       const importPath = url.pathToFileURL(path.join(cwd, routePath)).href;
-
-      // const idir = normalizePath(path.join(cwd, routePath));
-      // const rel = path.relative(__dirname, path.join(cwd, routePath));
-      // const importP = path
-      //   .resolve(rel, path.join(cwd, routePath))
-      //   .replace(/\.(js|jsx|cjs|mjs|ts|tsx|cts|mts)$/g, "");
-
-      // console.log({ __dirname, idir, importP, rel });
       routes[p] = importPath;
     }
   }

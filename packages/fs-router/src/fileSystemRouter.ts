@@ -7,6 +7,9 @@ import { type MatchingPattern, nextJsPatternMatching } from "./matchingPattern.j
 import type { Locals, MaybePromise, Middleware, RequestEvent } from "./types.js";
 import { createMiddleware, EXTENSIONS } from "./utils.js";
 
+/**
+ * File system router options.
+ */
 export interface FileSystemRouterOptions {
   /**
    * Origin used for the request.
@@ -72,15 +75,33 @@ export interface FileSystemRouterOptions {
   onNotFound?: (event: RequestEvent) => MaybePromise<Response>;
 
   /**
-   * Enable workers.
+   * Use node worker threads for handling the requests.
+   *
+   * We recommend benchmarking your endpoints to ensure if using multiple threads is beneficial for your app,
+   * using multiple thread may reduce the request/second your server can handle around 10% if the work being done is already fast enough.
+   *
+   * For handling multiple request in multiple threads we spawn multiple workers and serialize the request, then we deserialize the response
+   * send from the worker and send it to client.
    */
   workers?: WorkersRoutingOptions | boolean;
 }
 
+/**
+ * Options for worker threads.
+ */
 export interface WorkersRoutingOptions {
+  /**
+   * Number of worker threads to spawn.
+   *
+   * @default
+   * Number of logical processors.
+   */
   workerCount?: number;
 }
 
+/**
+ * @internal
+ */
 export function initializeFileSystemRouter(options?: FileSystemRouterOptions) {
   const {
     cwd = process.cwd(),

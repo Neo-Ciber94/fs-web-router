@@ -6,7 +6,7 @@ import path from "path";
 export const EXTENSIONS = Object.freeze(["js", "jsx", "cjs", "mjs", "ts", "tsx", "cts", "mts"]);
 
 export async function createRoute(filePath: string): Promise<Route> {
-  const mod = await tsImport(filePath, import.meta.url);
+  const mod = await importModule(filePath);
 
   if (!mod || typeof mod.default !== "function") {
     throw new Error(
@@ -18,7 +18,7 @@ export async function createRoute(filePath: string): Promise<Route> {
 }
 
 export async function createMiddleware(filePath: string): Promise<Middleware> {
-  const mod = await tsImport(filePath, import.meta.url);
+  const mod = await importModule(filePath);
 
   if (!mod || typeof mod.default !== "function") {
     throw new Error(
@@ -57,4 +57,8 @@ export function objectToHeaders(obj: Record<string, string[]>) {
   }
 
   return headers;
+}
+
+function importModule(specifier: string) {
+  return tsImport(specifier, import.meta.url);
 }

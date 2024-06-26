@@ -1,66 +1,22 @@
-import { getRouterMap } from "../createFileSystemRouter.js";
 import { type FileSystemRouterOptions, initializeFileSystemRouter } from "../fileSystemRouter.js";
-import { nextJsPatternMatching } from "../matchingPattern.js";
-import { WorkerRouterData } from "../worker.mjs";
-import { WorkerPool } from "../workers/workerPool.js";
-import { posix as path } from "path";
-import url from "url";
-import { handleRequestOnWorker } from "../workers/handleRequestOnWorker.js";
-import { EXTENSIONS } from "../utils.js";
+import { workerFileSystemRouter } from "./worker.js";
 
-const __dirname = path.dirname(url.fileURLToPath(import.meta.url));
-
+/**
+ * Creates a file system router web middleware.
+ * @param options The file system router options.
+ */
 export default function fileSystemRouter(options?: FileSystemRouterOptions) {
-  const fsRouter = initializeFileSystemRouter(options);
+  const fsRouterOptions = initializeFileSystemRouter(options);
 
-  if (fsRouter.type === "worker") {
-    const {
-      cwd = process.cwd(),
-      ignorePrefix = "_",
-      routesDir = "src/routes",
-      ignoreFiles = [],
-      matchingPattern = nextJsPatternMatching(),
-    } = options || {};
-
-    const middleware = options?.middleware ?? "middleware";
-    const routesDirPath = path.join(cwd, routesDir);
-    const middlewareFilePath = fsRouter.middlewareFilePath;
-
-    if (middlewareFilePath) {
-      const globExts = EXTENSIONS.join(",");
-      ignoreFiles.push(`**/**/${middleware}.{${globExts}}`);
-    }
-
-    const routesFilePaths = getRouterMap({
-      cwd,
-      ignorePrefix,
-      matchingPattern,
-      routesDirPath,
-      ignoreFiles,
+  if (fsRouterOptions.type === "worker") {
+    return workerFileSystemRouter({
+      ...fsRouterOptions.initialOptions,
+      workerCount: fsRouterOptions.workerCount,
+      middlewareFilePath: fsRouterOptions.middlewareFilePath,
     });
-
-    const workerFilePath = path.join(__dirname, "..", "worker.mjs");
-
-    const pool = new WorkerPool(fsRouter.workerCount, workerFilePath, {
-      workerData: {
-        routesFilePaths,
-        middlewareFilePath,
-      } as WorkerRouterData,
-    });
-
-    return async (request: Request) => {
-      const worker = await pool.get();
-
-      try {
-        const response: Response = await handleRequestOnWorker(worker, request);
-        return response;
-      } finally {
-        pool.return(worker);
-      }
-    };
   }
 
-  const { onNotFound, initializeLocals, routerPromise, middlewarePromise } = fsRouter;
+  const { onNotFound, initializeLocals, routerPromise, middlewarePromise } = fsRouterOptions;
 
   return async (request: Request) => {
     const router = await routerPromise;

@@ -1,7 +1,25 @@
+/**
+ * Define how to match the path segments.
+ */
 export interface MatchingPattern {
+  /**
+   * Match a dynamic path segment.
+   */
   matchDynamic: MatchPatternFunction;
+
+  /**
+   * Match a catch-all path segment.
+   */
   matchCatchAll: MatchPatternFunction;
+
+  /**
+   * Match an optional catch-all path segment.
+   */
   matchOptionalDynamic: MatchPatternFunction;
+
+  /**
+   * Match an optional catch-all path segment.
+   */
   matchOptionalCatchAll: MatchPatternFunction;
 }
 
