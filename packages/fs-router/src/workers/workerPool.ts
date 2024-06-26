@@ -21,7 +21,7 @@ export class WorkerPool {
     this.#queue = [];
   }
 
-  get() {
+  take() {
     return new Promise<Worker>((resolve) => {
       const worker = this.#workers.pop();
       if (worker) {

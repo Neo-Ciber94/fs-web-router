@@ -54,7 +54,7 @@ export function workerFileSystemRouter(options: WorkerFileSystemRouterOptions) {
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   return async (req: http.IncomingMessage, res: http.ServerResponse, next: (err?: any) => void) => {
-    const worker = await pool.get();
+    const worker = await pool.take();
 
     try {
       const request = await createRequest({ req, baseUrl: origin });
