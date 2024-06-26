@@ -4,6 +4,7 @@ import { type Handler } from "./types";
 import { createRouter } from "radix3";
 import { posix as path } from "path";
 import url from "url";
+import { createRoute } from "./utils";
 
 type RouteSegment =
   | { type: "static"; path: string }
@@ -23,6 +24,30 @@ export interface Route {
 }
 
 export default async function createFileSystemRouter(options: CreateRouterOptions) {
+  const routesMap = getRouterMap(options);
+  const routes: Record<string, Route> = {};
+  const routePromises: Promise<Route>[] = [];
+
+  for (const [key, routeFilePath] of Object.entries(routesMap)) {
+    routePromises.push(
+      createRoute(routeFilePath).then((route) => {
+        routes[key] = route;
+        return route;
+      })
+    );
+  }
+
+  await Promise.all(routePromises);
+  console.log(routes);
+
+  const router = createRouter<Route>({ routes });
+  return router;
+}
+
+/**
+ * @internal
+ */
+export function getRouterMap(options: CreateRouterOptions) {
   const { cwd, routesDirPath, ignoreFiles, ignorePrefix, matchingPattern } = options;
 
   const dir = routesDirPath.endsWith("/")
@@ -73,40 +98,19 @@ export default async function createFileSystemRouter(options: CreateRouterOption
     routesMap.set(file, segments);
   }
 
-  const routes: Record<string, Route> = {};
-  const routePromises: Promise<Route>[] = [];
+  const routes: Record<string, string> = {};
 
   for (const [routePath, segments] of routesMap.entries()) {
     for (const p of createRoutePaths(segments)) {
-      const importPath = url.pathToFileURL(path.join(cwd, routePath)).href;
-
       if (p in routes) {
         throw new Error(`Route '${p}' already exists`);
       }
-
-      routePromises.push(
-        import(importPath).then(async (mod) => {
-          if (!mod || typeof mod.default !== "function") {
-            throw new Error(
-              `Unable to get route handler in '${routePath}', expected default exported function`
-            );
-          }
-
-          const handler = mod.default;
-
-          routes[p] = { handler };
-
-          return handler;
-        })
-      );
+      const importPath = url.pathToFileURL(path.join(cwd, routePath)).href;
+      routes[p] = importPath;
     }
   }
 
-  await Promise.all(routePromises);
-  console.log(routes);
-
-  const router = createRouter<Route>({ routes });
-  return router;
+  return routes;
 }
 
 function createRoutePaths(segments: RouteSegment[]) {

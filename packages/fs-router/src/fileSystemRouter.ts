@@ -1,9 +1,11 @@
 import path from "path";
 import { existsSync } from "fs";
+import os from "os";
 import url from "url";
 import createFileSystemRouter from "./createFileSystemRouter";
 import { type MatchingPattern, nextJsPatternMatching } from "./matchingPattern";
 import type { Locals, MaybePromise, Middleware, RequestEvent } from "./types";
+import { createMiddleware } from "./utils";
 
 export interface FileSystemRouterOptions {
   /**
@@ -68,6 +70,15 @@ export interface FileSystemRouterOptions {
    * Handle a 404 request.
    */
   onNotFound?: (event: RequestEvent) => MaybePromise<Response>;
+
+  /**
+   * Enable workers.
+   */
+  workers?: WorkersRoutingOptions | true;
+}
+
+export interface WorkersRoutingOptions {
+  workerCount?: number;
 }
 
 const extensions = ["js", "jsx", "cjs", "mjs", "ts", "tsx", "cts", "mts"];
@@ -83,6 +94,7 @@ export function initializeFileSystemRouter(options?: FileSystemRouterOptions) {
     matchingPattern = nextJsPatternMatching(),
     onNotFound = handle404,
     initializeLocals = initLocals,
+    workers,
   } = options || {};
 
   if (middleware) {
@@ -110,6 +122,20 @@ export function initializeFileSystemRouter(options?: FileSystemRouterOptions) {
     throw new Error(`'${routesDirPath}' don't exists`);
   }
 
+  if (workers) {
+    const cpuCount = os.cpus().length;
+    const workerCount = typeof workers === "boolean" ? cpuCount : workers.workerCount ?? cpuCount;
+    const middlewareFilePath = middleware
+      ? findFile(routesDirPath, middleware, extensions)
+      : undefined;
+
+    return {
+      type: "worker" as const,
+      workerCount,
+      middlewareFilePath,
+    };
+  }
+
   let middlewarePromise: Promise<Middleware> | undefined = undefined;
 
   if (middleware) {
@@ -117,16 +143,7 @@ export function initializeFileSystemRouter(options?: FileSystemRouterOptions) {
 
     if (middlewareFile) {
       const importPath = url.pathToFileURL(middlewareFile).href;
-      middlewarePromise = import(importPath).then((mod) => {
-        if (!mod || typeof mod.default !== "function") {
-          throw new Error(
-            `Unable to get middleware handler in '${middlewareFile}', expected default exported function`
-          );
-        }
-
-        const handler = mod.default;
-        return handler;
-      });
+      middlewarePromise = createMiddleware(importPath);
     }
   }
 
@@ -139,6 +156,7 @@ export function initializeFileSystemRouter(options?: FileSystemRouterOptions) {
   });
 
   return {
+    type: "handler" as const,
     routerPromise,
     middlewarePromise,
     onNotFound,

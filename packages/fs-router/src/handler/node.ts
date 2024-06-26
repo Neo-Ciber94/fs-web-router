@@ -4,8 +4,13 @@ import { createRequest, setResponse } from "../nodeHelpers";
 import http from "http";
 
 export default function fileSystemRouter(options?: FileSystemRouterOptions) {
-  const { onNotFound, origin, initializeLocals, routerPromise, middlewarePromise } =
-    initializeFileSystemRouter(options);
+  const fsRouter = initializeFileSystemRouter(options);
+
+  if (fsRouter.type === "worker") {
+    throw new Error();
+  }
+
+  const { onNotFound, origin, initializeLocals, routerPromise, middlewarePromise } = fsRouter;
 
   return async (req: http.IncomingMessage, res: http.ServerResponse, next: (err?: any) => void) => {
     const router = await routerPromise;
@@ -24,7 +29,7 @@ export default function fileSystemRouter(options?: FileSystemRouterOptions) {
       if (middleware) {
         response = await middleware(requestEvent, handler);
       } else {
-        response = await onNotFound(requestEvent);
+        response = await handler(requestEvent);
       }
 
       setResponse(response, res);

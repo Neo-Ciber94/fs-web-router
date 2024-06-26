@@ -15,6 +15,11 @@ export type Locals = Register extends {
   : Record<string, unknown>;
 
 /**
+ * Request params.
+ */
+export type Params = Record<string, string | string[]>;
+
+/**
  * The incoming request event.
  */
 export interface RequestEvent {
@@ -26,7 +31,7 @@ export interface RequestEvent {
   /**
    * Parameters of the route match.
    */
-  params: Record<string, string | string[]>;
+  params: Params;
 
   /**
    * Request locals.
