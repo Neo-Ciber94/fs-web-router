@@ -17,7 +17,6 @@ export class WorkerPool {
       workers.push(new Worker(filename, options));
     }
 
-    console.log(`Created ${workers.length} worker threads`);
     this.#workers = workers;
     this.#queue = [];
   }
