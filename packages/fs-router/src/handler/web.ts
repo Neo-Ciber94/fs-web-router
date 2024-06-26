@@ -5,7 +5,7 @@ import { WorkerRouterData } from "../worker.mjs";
 import { WorkerPool } from "../workers/workerPool.js";
 import { posix as path } from "path";
 import url from "url";
-import { handleWorkerRequest } from "../workers/handleWorkerRequest.js";
+import { handleRequestOnWorker } from "../workers/handleRequestOnWorker.js";
 import { EXTENSIONS } from "../utils.js";
 
 const __dirname = path.dirname(url.fileURLToPath(import.meta.url));
@@ -52,7 +52,7 @@ export default function fileSystemRouter(options?: FileSystemRouterOptions) {
       const worker = await pool.get();
 
       try {
-        const response: Response = await handleWorkerRequest(worker, request);
+        const response: Response = await handleRequestOnWorker(worker, request);
         return response;
       } finally {
         pool.return(worker);

@@ -6,7 +6,7 @@ import url from "url";
 
 export type RequestParts =
   | {
-      type: "trailers";
+      type: "request";
       url: string;
       method: string;
       headers: Record<string, string | string[]>;
@@ -21,7 +21,7 @@ export type RequestParts =
 
 export type ResponseParts =
   | {
-      type: "trailers";
+      type: "response";
       status: number;
       statusText: string;
       headers: Record<string, string | string[]>;
@@ -42,7 +42,7 @@ async function handleWorkerRequest(requestParts: RequestParts) {
   const stream = new TransformStream<Uint8Array, Uint8Array>();
 
   switch (requestParts.type) {
-    case "trailers": {
+    case "request": {
       const requestHeaders = new Headers();
       for (const [key, value] of Object.entries(requestParts.headers)) {
         if (Array.isArray(value)) {
@@ -107,7 +107,7 @@ async function handleWorkerResponse(request: Request) {
   }
 
   parentPort.postMessage({
-    type: "trailers",
+    type: "response",
     status: response.status,
     statusText: response.statusText,
     headers: responseHeaders,

@@ -1,24 +1,10 @@
 import { type Worker } from "worker_threads";
 import { ResponseParts, RequestParts } from "../worker.mjs";
 
-function deferred<T>() {
-  let resolve = (value: T) => {};
-  let reject = (err?: any) => {};
-
-  const promise = new Promise<T>((resolveFunction, rejectFunction) => {
-    resolve = resolveFunction;
-    reject = rejectFunction;
-  });
-
-  return { promise, resolve, reject };
-}
-
-export function handleWorkerRequest(worker: Worker, request: Request) {
-  // let streamController: ReadableStreamDefaultController<Uint8Array> | undefined = undefined;
+export function handleRequestOnWorker(worker: Worker, request: Request) {
   const streamControllerDefer = deferred<ReadableStreamDefaultController<Uint8Array>>();
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  return new Promise<Response>((resolve, _reject) => {
+  return new Promise<Response>((resolve) => {
     const requestHeaders: Record<string, string | string[]> = {};
 
     for (const [key, value] of request.headers) {
@@ -32,7 +18,7 @@ export function handleWorkerRequest(worker: Worker, request: Request) {
 
     async function recieveResponseParts(responseParts: ResponseParts) {
       switch (responseParts.type) {
-        case "trailers": {
+        case "response": {
           const headers = new Headers();
           for (const [key, value] of Object.entries(responseParts.headers)) {
             if (Array.isArray(value)) {
@@ -76,7 +62,7 @@ export function handleWorkerRequest(worker: Worker, request: Request) {
 
     // Send request parts
     worker.postMessage({
-      type: "trailers",
+      type: "request",
       url: request.url,
       method: request.method,
       headers: requestHeaders,
@@ -109,4 +95,18 @@ export function handleWorkerRequest(worker: Worker, request: Request) {
       type: "done",
     } as RequestParts);
   });
+}
+
+function deferred<T>() {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  let resolve = (value: T) => {};
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unused-vars
+  let reject = (err?: any) => {};
+
+  const promise = new Promise<T>((resolveFunction, rejectFunction) => {
+    resolve = resolveFunction;
+    reject = rejectFunction;
+  });
+
+  return { promise, resolve, reject };
 }

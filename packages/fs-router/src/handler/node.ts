@@ -7,7 +7,7 @@ import { nextJsPatternMatching } from "../matchingPattern.js";
 import { createRequest, setResponse } from "../nodeHelpers.js";
 import http from "http";
 import { WorkerRouterData } from "../worker.mjs";
-import { handleWorkerRequest } from "../workers/handleWorkerRequest.js";
+import { handleRequestOnWorker } from "../workers/handleRequestOnWorker.js";
 import { WorkerPool } from "../workers/workerPool.js";
 import { EXTENSIONS, normalizePath } from "../utils.js";
 import { dirname } from "path";
@@ -62,7 +62,7 @@ export default function fileSystemRouter(options?: FileSystemRouterOptions) {
 
       try {
         const request = await createRequest({ req, baseUrl: origin });
-        const response: Response = await handleWorkerRequest(worker, request);
+        const response: Response = await handleRequestOnWorker(worker, request);
         setResponse(response, res);
       } catch (err) {
         console.error(err);
