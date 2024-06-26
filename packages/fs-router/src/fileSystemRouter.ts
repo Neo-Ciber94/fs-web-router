@@ -37,9 +37,11 @@ export interface FileSystemRouterOptions {
   routesDir?: string;
 
   /**
-   * The path of the middleware relative to the routesDir. 
-   * 
+   * The path of the middleware relative to the routesDir.
+   *
    * Use `false` to disable middleware.
+   *
+   * @default "middleware"
    */
   middleware?: string | false;
 
