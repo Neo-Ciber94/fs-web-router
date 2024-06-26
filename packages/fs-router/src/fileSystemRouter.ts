@@ -120,6 +120,16 @@ export function initializeFileSystemRouter(options?: FileSystemRouterOptions) {
     throw new Error(`'${routesDirPath}' don't exists`);
   }
 
+  const initialOptions = {
+    cwd,
+    origin,
+    ignorePrefix,
+    routesDir,
+    ignoreFiles,
+    middleware,
+    matchingPattern,
+  };
+
   if (workers) {
     const cpuCount = os.cpus().length;
     const workerCount = typeof workers === "boolean" ? cpuCount : workers.workerCount ?? cpuCount;
@@ -132,6 +142,7 @@ export function initializeFileSystemRouter(options?: FileSystemRouterOptions) {
       origin,
       workerCount,
       middlewareFilePath,
+      initialOptions,
     };
   }
 
@@ -160,7 +171,7 @@ export function initializeFileSystemRouter(options?: FileSystemRouterOptions) {
     middlewarePromise,
     onNotFound,
     initializeLocals,
-    origin,
+    initialOptions,
   };
 }
 

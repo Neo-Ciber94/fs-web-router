@@ -1,7 +1,7 @@
 import { createRouter } from "radix3";
 import { parentPort, workerData } from "worker_threads";
 import type { Route } from "./createFileSystemRouter.js";
-import { createMiddleware, createRoute } from "./utils.js";
+import { createMiddleware, createRoute, headersToObject, objectToHeaders } from "./utils.js";
 import url from "url";
 
 export type RequestParts =
@@ -9,7 +9,7 @@ export type RequestParts =
       type: "request";
       url: string;
       method: string;
-      headers: Record<string, string | string[]>;
+      headers: Record<string, string[]>;
     }
   | {
       type: "body";
@@ -24,7 +24,7 @@ export type ResponseParts =
       type: "response";
       status: number;
       statusText: string;
-      headers: Record<string, string | string[]>;
+      headers: Record<string, string[]>;
     }
   | {
       type: "body";
@@ -43,15 +43,7 @@ async function handleWorkerRequest(requestParts: RequestParts) {
 
   switch (requestParts.type) {
     case "request": {
-      const requestHeaders = new Headers();
-      for (const [key, value] of Object.entries(requestParts.headers)) {
-        if (Array.isArray(value)) {
-          value.forEach((v) => requestHeaders.append(key, v));
-        } else {
-          requestHeaders.append(key, value);
-        }
-      }
-
+      const requestHeaders = objectToHeaders(requestParts.headers);
       const hasBody = !["get", "head"].includes(requestParts.method.toLowerCase());
       const request = new Request(requestParts.url, {
         method: requestParts.method,
@@ -96,16 +88,7 @@ async function handleWorkerResponse(request: Request) {
   }
 
   const response = await handleRequest();
-  const responseHeaders: Record<string, string | string[]> = {};
-  for (const [key, value] of response.headers) {
-    const h = responseHeaders[key];
-    if (Array.isArray(h)) {
-      responseHeaders[key] = [...h, value];
-    } else {
-      responseHeaders[key] = [value];
-    }
-  }
-
+  const responseHeaders = headersToObject(response.headers);
   parentPort.postMessage({
     type: "response",
     status: response.status,

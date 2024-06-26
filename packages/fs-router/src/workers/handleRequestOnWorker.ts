@@ -1,33 +1,17 @@
 import { type Worker } from "worker_threads";
 import { ResponseParts, RequestParts } from "../worker.mjs";
+import { headersToObject, objectToHeaders } from "../utils.js";
 
 export function handleRequestOnWorker(worker: Worker, request: Request) {
   const streamControllerDefer = deferred<ReadableStreamDefaultController<Uint8Array>>();
 
   return new Promise<Response>((resolve) => {
-    const requestHeaders: Record<string, string | string[]> = {};
-
-    for (const [key, value] of request.headers) {
-      const h = requestHeaders[key];
-      if (Array.isArray(h)) {
-        requestHeaders[key] = [...h, value];
-      } else {
-        requestHeaders[key] = [value];
-      }
-    }
+    const requestHeaders = headersToObject(request.headers);
 
     async function recieveResponseParts(responseParts: ResponseParts) {
       switch (responseParts.type) {
         case "response": {
-          const headers = new Headers();
-          for (const [key, value] of Object.entries(responseParts.headers)) {
-            if (Array.isArray(value)) {
-              value.forEach((v) => headers.append(key, v));
-            } else {
-              headers.append(key, value);
-            }
-          }
-
+          const responseHeaders = objectToHeaders(responseParts.headers);
           const bodyStream = new ReadableStream<Uint8Array>({
             start(controller) {
               streamControllerDefer.resolve(controller);
@@ -38,7 +22,7 @@ export function handleRequestOnWorker(worker: Worker, request: Request) {
             new Response(bodyStream, {
               status: responseParts.status,
               statusText: responseParts.statusText,
-              headers,
+              headers: responseHeaders,
             })
           );
           break;

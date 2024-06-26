@@ -32,3 +32,29 @@ export async function createMiddleware(filePath: string): Promise<Middleware> {
 export function normalizePath(p: string) {
   return p.replaceAll(path.win32.sep, path.posix.sep);
 }
+
+export function headersToObject(headers: Headers) {
+  const obj: Record<string, string[]> = {};
+
+  for (const [key, value] of headers) {
+    const headerValues = obj[key] || [];
+
+    if (Array.isArray(value)) {
+      headerValues.push(...value);
+    } else {
+      headerValues.push(value);
+    }
+  }
+
+  return obj;
+}
+
+export function objectToHeaders(obj: Record<string, string[]>) {
+  const headers = new Headers();
+
+  for (const [key, value] of Object.entries(obj)) {
+    value.forEach((v) => headers.append(key, v));
+  }
+
+  return headers;
+}
