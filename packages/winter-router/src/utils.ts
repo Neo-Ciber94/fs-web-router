@@ -1,20 +1,36 @@
-import { tsImport } from "tsx/esm/api";
 import type { Route } from "./createFileSystemRouter.js";
 import type { Middleware } from "./types.js";
 import path from "node:path";
 
 export const EXTENSIONS = Object.freeze(["js", "jsx", "cjs", "mjs", "ts", "tsx", "cts", "mts"]);
+export const HTTP_METHODS = ["GET", "POST", "PUT", "PATCH", "DELETE", "HEAD", "OPTIONS"] as const;
+
+export type HttpMethod = (typeof HTTP_METHODS)[number];
 
 export async function createRoute(filePath: string): Promise<Route> {
   const mod = await importModule(filePath);
 
-  if (!mod || typeof mod.default !== "function") {
-    throw new Error(
-      `Unable to get route handler in '${filePath}', expected default exported function`
-    );
+  if (!mod) {
+    throw new Error(`Unable to load module from '${filePath}'`);
   }
 
-  return { handler: mod.default };
+  const route: Route = {};
+
+  if (mod.default) {
+    invariant(typeof mod.default === "function", `'${filePath}' default export is not a function`);
+    route.default = mod.default;
+  }
+
+  for (const method of HTTP_METHODS) {
+    const handler = mod[method];
+
+    if (handler) {
+      invariant(typeof handler === "function", `'${filePath}' ${method} export is not a function`);
+      route[method] = handler;
+    }
+  }
+
+  return route;
 }
 
 export async function createMiddleware(filePath: string): Promise<Middleware> {
@@ -27,6 +43,13 @@ export async function createMiddleware(filePath: string): Promise<Middleware> {
   }
 
   return mod.default;
+}
+
+export function getRouteHandler(request: Request, route: Route) {
+  const defaultHandler = route.default;
+  const method = request.method.toUpperCase() as HttpMethod;
+  const httpMethodHandler = route[method];
+  return httpMethodHandler ?? defaultHandler;
 }
 
 export function normalizePath(p: string) {
@@ -60,5 +83,11 @@ export function objectToHeaders(obj: Record<string, string[]>) {
 }
 
 function importModule(specifier: string) {
-  return tsImport(specifier, import.meta.url);
+  return import(specifier);
+}
+
+function invariant(value: unknown, message: string): asserts value {
+  if (!value) {
+    throw new Error(`Invariant failed: ${message}`);
+  }
 }

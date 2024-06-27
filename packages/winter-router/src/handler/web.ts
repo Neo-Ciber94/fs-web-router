@@ -1,7 +1,7 @@
 import { type FileSystemRouterOptions, initializeFileSystemRouter } from "../fileSystemRouter.js";
 import { posix as path } from "node:path";
 import { getRouterMap } from "../createFileSystemRouter.js";
-import { EXTENSIONS } from "../utils.js";
+import { EXTENSIONS, getRouteHandler } from "../utils.js";
 import { WorkerRouterData } from "../worker.mjs";
 import { handleRequestOnWorker } from "../workers/handleRequestOnWorker.js";
 import { WorkerPool } from "../workers/workerPool.js";
@@ -33,7 +33,8 @@ export default function fileSystemRouter(options?: FileSystemRouterOptions): Req
     const url = new URL(request.url);
     const match = router.lookup(url.pathname);
 
-    const { handler = onNotFound, params = {} } = match || {};
+    const { params = {}, ...route } = match || {};
+    const handler = getRouteHandler(request, route) || onNotFound;
     const preEvent = { request, params, locals: {} };
     const locals = await Promise.resolve(initializeLocals(preEvent));
     const requestEvent = { ...preEvent, locals };

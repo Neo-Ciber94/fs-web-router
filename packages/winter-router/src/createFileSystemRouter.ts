@@ -4,7 +4,7 @@ import { type Handler } from "./types.js";
 import { createRouter } from "radix3";
 import { posix as path } from "node:path";
 import url from "node:url";
-import { createRoute } from "./utils.js";
+import { createRoute, type HttpMethod } from "./utils.js";
 
 type RouteSegment =
   | { type: "static"; path: string }
@@ -19,9 +19,13 @@ interface CreateRouterOptions {
   matchingPattern: MatchingPattern;
 }
 
-export interface Route {
-  handler: Handler;
-}
+type RouteHttpMethodHandler = {
+  [M in HttpMethod]?: Handler;
+};
+
+export type Route = RouteHttpMethodHandler & {
+  default?: Handler;
+};
 
 export default async function createFileSystemRouter(options: CreateRouterOptions) {
   const routesMap = getRouterMap(options);

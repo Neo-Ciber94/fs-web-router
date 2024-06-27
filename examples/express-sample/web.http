@@ -1,0 +1,26 @@
+### Get all todos
+GET http://localhost:5000
+
+### Get todo by id
+GET http://localhost:5000/20e8b14d-c9bb-4e98-a498-e7dd514f3566
+
+### Create todo
+POST http://localhost:5000
+Content-Type: application/json
+
+{
+    "content": "Post 4"
+}
+
+### Update todo
+PUT http://localhost:5000
+Content-Type: application/json
+
+{
+    "id": "c829add3-d319-412a-8732-7c34ea92d054",
+    "content": "Update Post 4"
+}
+
+
+### Delete post
+DELETE http://localhost:5000/20e8b14d-c9bb-4e98-a498-e7dd514f3566

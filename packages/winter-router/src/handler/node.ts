@@ -4,11 +4,14 @@ import { createRequest, setResponse } from "../nodeHelpers.js";
 import type http from "node:http";
 import { posix as path } from "node:path";
 import { getRouterMap } from "../createFileSystemRouter.js";
-import { EXTENSIONS } from "../utils.js";
+import { EXTENSIONS, getRouteHandler, normalizePath } from "../utils.js";
 import { WorkerRouterData } from "../worker.mjs";
 import { handleRequestOnWorker } from "../workers/handleRequestOnWorker.js";
 import { WorkerPool } from "../workers/workerPool.js";
 import { MaybePromise } from "../types.js";
+import url from "node:url";
+
+const __dirname = path.dirname(normalizePath(url.fileURLToPath(import.meta.url)));
 
 type RequestHandler = (
   req: http.IncomingMessage,
@@ -49,7 +52,9 @@ export default function fileSystemRouter(options?: FileSystemRouterOptions): Req
 
     try {
       const request = await createRequest({ req, baseUrl: origin });
-      const { handler = onNotFound, params = {} } = match || {};
+      const { params = {}, ...route } = match || {};
+
+      const handler = getRouteHandler(request, route) || onNotFound;
       const preEvent = { request, params, locals: {} };
       const locals = await Promise.resolve(initializeLocals(preEvent));
       const requestEvent = { ...preEvent, locals };

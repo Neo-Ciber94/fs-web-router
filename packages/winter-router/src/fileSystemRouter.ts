@@ -141,10 +141,6 @@ export function initializeFileSystemRouter(options?: FileSystemRouterOptions) {
     throw new Error("cwd must be an absolute path");
   }
 
-  if (workers && (!!onNotFound || !!initializeLocals)) {
-    throw new Error(`workers option cannot be used with 'onNotFound' or 'initializeLocals'`);
-  }
-
   const routesDirPath = path.posix.join(cwd, routesDir);
 
   if (path.posix.relative(cwd, routesDirPath).includes("..")) {

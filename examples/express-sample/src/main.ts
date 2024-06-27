@@ -6,7 +6,7 @@ const origin = `http://localhost:${port}`;
 
 const app = express();
 
-app.use(fileSystemRouter({ origin }));
+app.use(fileSystemRouter({ origin, workers: true }));
 
 app.listen(port, () => {
   console.log(`Listening on ${origin}`);
