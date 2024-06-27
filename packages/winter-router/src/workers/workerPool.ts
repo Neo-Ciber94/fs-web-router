@@ -38,7 +38,7 @@ export class WorkerPool {
       const resolve = this.#queue.pop()!;
       resolve(worker);
     } else {
-      this.#workers.push(worker);
+      this.#workers.unshift(worker);
     }
   }
 }
