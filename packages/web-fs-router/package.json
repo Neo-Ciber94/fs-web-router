@@ -1,6 +1,6 @@
 {
-  "name": "fs-router",
-  "version": "0.1.0",
+  "name": "web-fs-router",
+  "version": "0.1.0-beta1",
   "type": "module",
   "scripts": {
     "build": "rimraf dist && tsc -p tsconfig.build.json",
@@ -8,7 +8,14 @@
     "lint": "eslint ./src",
     "test": "vitest --run"
   },
-  "keywords": [],
+  "keywords": [
+    "node",
+    "wintergc",
+    "file-system-routing",
+    "routing",
+    "fetch",
+    "middleware"
+  ],
   "author": "",
   "license": "ISC",
   "dependencies": {

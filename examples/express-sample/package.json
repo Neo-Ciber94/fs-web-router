@@ -1,5 +1,5 @@
 {
-  "name": "sample-app",
+  "name": "express-app",
   "version": "1.0.0",
   "main": "index.js",
   "type": "module",
@@ -18,6 +18,6 @@
   },
   "dependencies": {
     "polka": "^0.5.2",
-    "fs-router": "*"
+    "web-fs-router": "*"
   }
 }
