@@ -2,8 +2,8 @@ import { globSync } from "glob";
 import { type MatchingPattern } from "./matchingPattern.js";
 import { type Handler } from "./types.js";
 import { createRouter } from "radix3";
-import { posix as path } from "path";
-import url from "url";
+import { posix as path } from "node:path";
+import url from "node:url";
 import { createRoute } from "./utils.js";
 
 type RouteSegment =

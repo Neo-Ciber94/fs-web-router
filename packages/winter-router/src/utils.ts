@@ -1,7 +1,7 @@
 import { tsImport } from "tsx/esm/api";
 import type { Route } from "./createFileSystemRouter.js";
 import type { Middleware } from "./types.js";
-import path from "path";
+import path from "node:path";
 
 export const EXTENSIONS = Object.freeze(["js", "jsx", "cjs", "mjs", "ts", "tsx", "cts", "mts"]);
 

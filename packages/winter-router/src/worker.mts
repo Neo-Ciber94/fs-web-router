@@ -1,8 +1,8 @@
 import { createRouter } from "radix3";
-import { parentPort, workerData, threadId } from "worker_threads";
+import { parentPort, workerData, threadId } from "node:worker_threads";
 import type { Route } from "./createFileSystemRouter.js";
 import { createMiddleware, createRoute, headersToObject, objectToHeaders } from "./utils.js";
-import url from "url";
+import url from "node:url";
 
 export type RequestParts =
   | {

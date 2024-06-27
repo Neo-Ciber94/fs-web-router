@@ -1,4 +1,4 @@
-import { defineMiddleware } from "fs-router";
+import { defineMiddleware } from "winter-router";
 
 const loggerMiddleware = defineMiddleware(async (event, next) => {
   const start = Date.now();

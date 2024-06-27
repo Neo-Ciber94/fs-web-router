@@ -1,4 +1,4 @@
-import { type Worker } from "worker_threads";
+import { type Worker } from "node:worker_threads";
 import { ResponseParts, RequestParts } from "../worker.mjs";
 import { headersToObject, objectToHeaders } from "../utils.js";
 

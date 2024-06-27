@@ -1,7 +1,5 @@
-import { defineHandler } from "fs-router";
-import { doWork } from "../lib/doWork";
+import { defineHandler } from "winter-router";
 
 export default defineHandler(async () => {
-  await doWork(1000_000);
-  return new Response("Hello World");
+  return new Response("Hello world!");
 });
