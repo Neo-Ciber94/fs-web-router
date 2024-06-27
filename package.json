@@ -1,5 +1,5 @@
 {
-  "name": "fs-router-mono",
+  "name": "winter-router-mono",
   "private": true,
   "workspaces": [
     "packages/*",
