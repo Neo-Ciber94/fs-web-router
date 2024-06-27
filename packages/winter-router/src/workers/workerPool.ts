@@ -1,5 +1,27 @@
 import { Worker, type WorkerOptions } from "node:worker_threads";
 
+const jsWorker = /* JavaScript */ `
+  import { createRequire } from "node:module";
+  import { workerData, threadId } from "node:worker_threads";
+
+  const filename = "${import.meta.url}";
+  const require = createRequire(filename);
+  const { tsImport } = require("tsx/esm/api");
+  
+  console.log("Loading worker: ", threadId);
+  tsImport(workerData.__ts_worker_filename, filename).finally(() => {
+    console.log("Worker loaded successfully: ", threadId)
+  })
+`;
+
+class TsxWorker extends Worker {
+  constructor(filename: string | URL, options: WorkerOptions = {}) {
+    options.workerData ??= {};
+    options.workerData.__ts_worker_filename = filename.toString();
+    super(new URL(`data:text/javascript,${jsWorker}`), options);
+  }
+}
+
 type QueueWorker = (worker: Worker) => void;
 
 export class WorkerPool {
@@ -14,9 +36,10 @@ export class WorkerPool {
     const workers: Worker[] = [];
 
     for (let i = 0; i < workerCount; i++) {
-      workers.push(new Worker(filename, options));
+      workers.push(new TsxWorker(filename, options));
     }
 
+    console.log(`Spawned ${workerCount} workers`)
     this.#workers = workers;
     this.#queue = [];
   }

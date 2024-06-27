@@ -108,6 +108,8 @@ async function handleWorkerResponse(request: Request) {
 
   if (isPlainText(response.headers)) {
     const body = await response.text();
+
+    // Send response and body
     parentPort.postMessage({
       type: "response",
       status: response.status,
@@ -116,6 +118,15 @@ async function handleWorkerResponse(request: Request) {
       body,
     } satisfies ResponseParts);
   } else {
+    // Send response headers
+    parentPort.postMessage({
+      type: "response",
+      status: response.status,
+      statusText: response.statusText,
+      headers: responseHeaders,
+    } satisfies ResponseParts);
+
+    // Send response chunks
     if (response.body) {
       const reader = response.body.getReader();
 

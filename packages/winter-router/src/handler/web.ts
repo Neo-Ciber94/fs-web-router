@@ -84,7 +84,7 @@ function workerFileSystemRouter(options: WorkerFileSystemRouterOptions) {
     ignoreFiles,
   });
 
-  const workerFilePath = path.join(__dirname, "..", "worker.mjs");
+  const workerFilePath = "file://" + path.join(__dirname, "..", "worker.mjs");
 
   const pool = new WorkerPool(workerCount, workerFilePath, {
     workerData: {
