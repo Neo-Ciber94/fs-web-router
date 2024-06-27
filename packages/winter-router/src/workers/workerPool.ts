@@ -8,10 +8,7 @@ const jsWorker = /* JavaScript */ `
   const require = createRequire(filename);
   const { tsImport } = require("tsx/esm/api");
   
-  console.log("Loading worker: ", threadId);
-  tsImport(workerData.__ts_worker_filename, filename).finally(() => {
-    console.log("Worker loaded successfully: ", threadId)
-  })
+  tsImport(workerData.__ts_worker_filename, filename);
 `;
 
 class TsxWorker extends Worker {
@@ -39,7 +36,6 @@ export class WorkerPool {
       workers.push(new TsxWorker(filename, options));
     }
 
-    console.log(`Spawned ${workerCount} workers`)
     this.#workers = workers;
     this.#queue = [];
   }

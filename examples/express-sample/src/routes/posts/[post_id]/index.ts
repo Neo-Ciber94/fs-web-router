@@ -1,9 +1,8 @@
 import { defineHandler } from "winter-router";
-import { posts } from "../lib/db";
+import { posts } from "@/lib/db";
 
 export const GET = defineHandler(async ({ params }) => {
   const result = await posts.get(String(params.post_id));
-  console.log(params, String(params.post_id), result);
 
   if (!result) {
     return Response.json({ error: "Post not found" }, { status: 404 });

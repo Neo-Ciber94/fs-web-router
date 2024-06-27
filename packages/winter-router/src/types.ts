@@ -17,7 +17,7 @@ export type Locals = Register extends {
 /**
  * Request params.
  */
-export type Params = Record<string, string | string[]>;
+export type Params = Partial<Record<string, string>>;
 
 /**
  * The incoming request event.
@@ -32,6 +32,11 @@ export interface RequestEvent {
    * Parameters of the route match.
    */
   params: Params;
+
+  /**
+   * Request url.
+   */
+  url: URL;
 
   /**
    * Request locals.

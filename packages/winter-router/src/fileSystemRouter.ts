@@ -74,7 +74,7 @@ export interface FileSystemRouterOptions {
    * @conflicts
    * Cannot be used with `workers`
    */
-  initializeLocals?: (event: RequestEvent) => MaybePromise<Locals>;
+  getLocals?: (event: RequestEvent) => MaybePromise<Locals>;
 
   /**
    * Handle a 404 request.
@@ -122,7 +122,7 @@ export function initializeFileSystemRouter(options?: FileSystemRouterOptions) {
     middleware = "middleware",
     matchingPattern = nextJsPatternMatching(),
     onNotFound = handle404,
-    initializeLocals = initLocals,
+    getLocals = initLocals,
     workers,
   } = options || {};
 
@@ -201,7 +201,7 @@ export function initializeFileSystemRouter(options?: FileSystemRouterOptions) {
     routerPromise,
     middlewarePromise,
     onNotFound,
-    initializeLocals,
+    getLocals,
     initialOptions,
   };
 }

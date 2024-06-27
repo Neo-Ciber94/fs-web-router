@@ -9,5 +9,6 @@
         "strict": true,
         "strictNullChecks": true,
         "alwaysStrict": true,
+        "allowJs": true
     }
 }

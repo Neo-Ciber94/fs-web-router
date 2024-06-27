@@ -27,7 +27,6 @@ class PostService {
     };
 
     this.#db.set(newPost.id, newPost);
-    console.log(this.#db);
     return Promise.resolve(newPost);
   }
 

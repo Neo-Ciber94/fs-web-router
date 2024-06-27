@@ -1,5 +1,5 @@
 import { defineHandler } from "winter-router";
-import { posts } from "../lib/db";
+import { posts } from "@/lib/db";
 
 export const GET = defineHandler(async () => {
   const result = await posts.all();

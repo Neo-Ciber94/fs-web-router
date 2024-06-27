@@ -10,6 +10,7 @@ import { handleRequestOnWorker } from "../workers/handleRequestOnWorker.js";
 import { WorkerPool } from "../workers/workerPool.js";
 import { MaybePromise } from "../types.js";
 import url from "node:url";
+import { createRequestEvent } from "./utils.js";
 
 const __dirname = path.dirname(normalizePath(url.fileURLToPath(import.meta.url)));
 
@@ -36,7 +37,7 @@ export default function fileSystemRouter(options?: FileSystemRouterOptions): Req
 
   const {
     onNotFound,
-    initializeLocals,
+    getLocals,
     initialOptions: { origin },
     routerPromise,
     middlewarePromise,
@@ -55,9 +56,7 @@ export default function fileSystemRouter(options?: FileSystemRouterOptions): Req
       const { params = {}, ...route } = match || {};
 
       const handler = getRouteHandler(request, route) || onNotFound;
-      const preEvent = { request, params, locals: {} };
-      const locals = await Promise.resolve(initializeLocals(preEvent));
-      const requestEvent = { ...preEvent, locals };
+      const requestEvent = await createRequestEvent({ request, params, getLocals });
 
       if (middleware) {
         response = await middleware(requestEvent, handler);
