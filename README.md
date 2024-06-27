@@ -1,4 +1,4 @@
-# web-fs-router
+# winter-router
 
 A file-system routing compatible with [WinterGC](https://wintercg.org/).
 

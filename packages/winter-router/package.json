@@ -1,5 +1,5 @@
 {
-  "name": "web-fs-router",
+  "name": "winter-router",
   "version": "0.1.0-beta1",
   "type": "module",
   "scripts": {
@@ -16,8 +16,8 @@
     "fetch",
     "middleware"
   ],
-  "author": "",
-  "license": "ISC",
+  "author": "Neo-Ciber94",
+  "license": "MIT",
   "dependencies": {
     "glob": "^10.4.2",
     "radix3": "^1.1.2"
