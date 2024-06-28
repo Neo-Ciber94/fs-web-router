@@ -48,7 +48,7 @@ export default function fileSystemRouter(options?: FileSystemRouterOptions): Req
     const router = await routerPromise;
     const middleware = await middlewarePromise;
 
-    const match = router.lookup(req.url ?? "");
+    const match = req.url ? router.lookup(new URL(req.url, origin).pathname) : null;
     let response: Response;
 
     try {
