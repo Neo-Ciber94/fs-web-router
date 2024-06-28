@@ -9,6 +9,7 @@ import {
   objectToHeaders,
 } from "./utils.js";
 import url from "node:url";
+import { createRequestEvent } from "./handler/utils.js";
 
 export type RequestParts =
   | {
@@ -91,7 +92,7 @@ async function handleWorkerResponse(request: Request) {
   const handler = getRouteHandler(request, route) || onNotFound;
 
   const response = await (async () => {
-    const requestEvent = { request, params, locals: {} };
+    const requestEvent = await createRequestEvent({ request, params });
 
     if (middleware) {
       return middleware(requestEvent, handler);
