@@ -74,21 +74,22 @@ export async function getPost(postId: string) {
         post.categoryId,
         (CASE
             WHEN post.categoryId IS NOT NULL THEN json_object(
-            'id', category.id,
-            'name', category.name
+            'id', c.id,
+            'name', c.name
             )
             ELSE NULL
         END) as category
         FROM post 
+        LEFT JOIN category c ON c.id = post.categoryId
         WHERE post.id = ?`,
     postId
   );
 
   if (!post) {
-    throw new ApplicationError("Post not found", { status: 404 });
+    return null;
   }
 
-  return mapEntityToPost(post);
+  return mapEntityToPostWithCategory(post);
 }
 
 export async function createPost(post: Pick<Post, "content"> & { categoryId: string }) {
@@ -103,7 +104,7 @@ export async function createPost(post: Pick<Post, "content"> & { categoryId: str
   await db.exec("BEGIN TRANSACTION;");
 
   try {
-    await assertCategoryExists(post.categoryId);
+    await checkCategoryExists(post.categoryId);
 
     await db.run(
       "INSERT INTO post (id, content, createdAt, updatedAt, categoryId) VALUES (?, ?, ?, ?, ?)",
@@ -234,7 +235,7 @@ function mapEntityToPostWithCategory(entity: PostWithCategoryRow): Post {
   };
 }
 
-async function assertCategoryExists(categoryId: string) {
+async function checkCategoryExists(categoryId: string) {
   if (!categoryId) {
     return;
   }

@@ -5,14 +5,14 @@ GET http://localhost:5000/posts
 GET http://localhost:5000/posts?category=pure&limit=4
 
 ### Get todo by id
-GET http://localhost:5000/posts/20e8b14d-c9bb-4e98-a498-e7dd514f3566
+GET http://localhost:5000/posts/3bf5db57-59b7-4e5f-98c8-40d43d04afa4
 
-### Create todo
+### Create new todo
 POST http://localhost:5000/posts
 Content-Type: application/json
 
 {
-    "content": "Post 3"
+    "content": "This is how the World World 4 started"
 }
 
 ### Update todo
@@ -21,9 +21,21 @@ Content-Type: application/json
 
 {
     "id": "c829add3-d319-412a-8732-7c34ea92d054",
-    "content": "Update Post 4"
+    "content": "The blue eyes he have drain my soul"
 }
 
 
 ### Delete post
 DELETE http://localhost:5000/posts/20e8b14d-c9bb-4e98-a498-e7dd514f3566
+
+
+### Get all categories
+GET http://localhost:5000/categories
+
+### Create new category
+POST http://localhost:5000/categories
+Content-Type: application/json
+
+{
+    "name": "Technology"
+}
