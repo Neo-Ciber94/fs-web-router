@@ -11,6 +11,7 @@ import { WorkerPool } from "../workers/workerPool.js";
 import { MaybePromise } from "../types.js";
 import url from "node:url";
 import { createRequestEvent } from "./utils.js";
+import { invariant } from "../invariant.js";
 
 const __dirname = path.dirname(normalizePath(url.fileURLToPath(import.meta.url)));
 
@@ -42,6 +43,8 @@ export default function fileSystemRouter(options?: FileSystemRouterOptions): Req
     routerPromise,
     middlewarePromise,
   } = fsRouterOptions;
+
+  invariant(origin, "Origin is not set");
 
   /* eslint-disable @typescript-eslint/no-explicit-any */
   return async (req: http.IncomingMessage, res: http.ServerResponse, next: (err?: any) => void) => {
@@ -91,6 +94,8 @@ function workerFileSystemRouter(options: WorkerFileSystemRouterOptions) {
     origin,
     routesDir,
   } = options;
+
+  invariant(origin, "Origin is not set");
 
   const routesDirPath = path.join(cwd, routesDir);
 

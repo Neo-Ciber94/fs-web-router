@@ -1,0 +1,16 @@
+{
+  "name": "bun-sample",
+  "version": "1.0.0",
+  "type": "module",
+  "license": "MIT",
+  "scripts": {
+    "dev": "bun --watch ./src/main.ts"
+  },
+  "dependencies": {
+    "winter-router": "0.1.0-beta1"
+  },
+  "devDependencies": {
+    "@types/bun": "^1.1.6",
+    "typescript": "^5.5.2"
+  }
+}

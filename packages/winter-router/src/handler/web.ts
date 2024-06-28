@@ -18,7 +18,10 @@ type RequestHandler = (request: Request) => MaybePromise<Response>;
  * @param options The file system router options.
  */
 export default function fileSystemRouter(options?: FileSystemRouterOptions): RequestHandler {
-  const fsRouterOptions = initializeFileSystemRouter(options);
+  const fsRouterOptions = initializeFileSystemRouter({
+    ...options,
+    skipOriginCheck: true,
+  });
 
   if (fsRouterOptions.type === "worker") {
     return workerFileSystemRouter({

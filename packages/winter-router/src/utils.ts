@@ -1,4 +1,5 @@
 import type { Route } from "./createFileSystemRouter.js";
+import { invariant } from "./invariant.js";
 import type { Middleware } from "./types.js";
 import path from "node:path";
 
@@ -84,10 +85,4 @@ export function objectToHeaders(obj: Record<string, string[]>) {
 
 function importModule(specifier: string) {
   return import(specifier);
-}
-
-function invariant(value: unknown, message: string): asserts value {
-  if (!value) {
-    throw new Error(`Invariant failed: ${message}`);
-  }
 }

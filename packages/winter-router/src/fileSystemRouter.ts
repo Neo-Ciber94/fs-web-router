@@ -109,10 +109,14 @@ export interface WorkersRoutingOptions {
   workerCount?: number;
 }
 
+interface InternalOptions {
+  skipOriginCheck?: boolean;
+}
+
 /**
  * @internal
  */
-export function initializeFileSystemRouter(options?: FileSystemRouterOptions) {
+export function initializeFileSystemRouter(options?: FileSystemRouterOptions & InternalOptions) {
   const {
     cwd = process.cwd(),
     origin = process.env.ORIGIN,
@@ -124,6 +128,9 @@ export function initializeFileSystemRouter(options?: FileSystemRouterOptions) {
     onNotFound = handle404,
     getLocals = initLocals,
     workers,
+
+    // internal only
+    skipOriginCheck = false,
   } = options || {};
 
   if (middleware) {
@@ -131,9 +138,9 @@ export function initializeFileSystemRouter(options?: FileSystemRouterOptions) {
     ignoreFiles.push(`**/**/${middleware}.{${globExts}}`);
   }
 
-  if (origin == null) {
+  if (!skipOriginCheck && origin == null) {
     throw new Error(
-      "Unable to determine origin, set the `process.env.ORIGIN` or pass an explicit origin in the 'fileSystemRouter' function environment variable"
+      "Unable to determine the origin, set `ORIGIN` environment variable or pass the `origin` in the options of the 'fileSystemRouter'"
     );
   }
 
