@@ -1,4 +1,5 @@
-import { defineMiddleware } from "winter-router";
+import { ApplicationError } from "@/lib/error";
+import { defineMiddleware, sequence } from "winter-router";
 
 const loggerMiddleware = defineMiddleware(async (event, next) => {
   const start = Date.now();
@@ -9,4 +10,16 @@ const loggerMiddleware = defineMiddleware(async (event, next) => {
   return response;
 });
 
-export default defineMiddleware(loggerMiddleware);
+const errorMiddleware = defineMiddleware(async (event, next) => {
+  try {
+    return await next(event);
+  } catch (err) {
+    if (err instanceof ApplicationError) {
+      return Response.json({ error: err.message }, { status: err.status });
+    }
+
+    throw err;
+  }
+});
+
+export default defineMiddleware(sequence(errorMiddleware, loggerMiddleware));

@@ -1,6 +1,9 @@
 ### Get all todos
 GET http://localhost:5000/posts
 
+### Get all with filter
+GET http://localhost:5000/posts?category=pure&limit=4
+
 ### Get todo by id
 GET http://localhost:5000/posts/20e8b14d-c9bb-4e98-a498-e7dd514f3566
 
@@ -9,7 +12,7 @@ POST http://localhost:5000/posts
 Content-Type: application/json
 
 {
-    "content": "Post 4"
+    "content": "Post 3"
 }
 
 ### Update todo
@@ -24,6 +27,3 @@ Content-Type: application/json
 
 ### Delete post
 DELETE http://localhost:5000/posts/20e8b14d-c9bb-4e98-a498-e7dd514f3566
-
-### Get all todos
-GET http://localhost:5000/posts/ping/a/b/c

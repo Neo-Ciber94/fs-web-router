@@ -9,6 +9,8 @@
         "strict": true,
         "strictNullChecks": true,
         "alwaysStrict": true,
-        "allowJs": true
+        "allowJs": true,
+        "noImplicitAny": true,
+        "noImplicitReturns": true
     }
 }
