@@ -68,4 +68,9 @@ describe("Routing", () => {
     const text = await res.text();
     expect(text).toStrictEqual("/e/");
   });
+
+  test("Return 404", async () => {
+    const res = await fetch(`${origin}/not-exists-route`);
+    expect(res.status).toStrictEqual(404);
+  });
 });
