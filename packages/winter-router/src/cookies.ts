@@ -11,17 +11,24 @@ export interface Cookie {
   options?: CookieSerializeOptions;
 }
 
-type CookieEntry = DeepFreezed<Cookie> & { isDeleted?: boolean };
+type CookieEntry = DeepFreezed<Cookie> & { isInitial?: boolean; isDeleted?: boolean };
 
 /**
  * A container for the cookies.
  */
 export class Cookies {
-  #currentCookies: Record<string, string> = {};
   #cookiesMap = new Map<string, CookieEntry>();
 
   constructor(cookies?: Record<string, string>) {
-    this.#currentCookies = cookies || {};
+    const map = new Map<string, CookieEntry>();
+
+    if (cookies) {
+      for (const [name, value] of Object.entries(cookies)) {
+        map.set(name, { name, value, isInitial: true });
+      }
+    }
+
+    this.#cookiesMap = map;
   }
 
   /**
@@ -39,10 +46,6 @@ export class Cookies {
    * @param name The name of the cookie.
    */
   get(name: string): string | undefined {
-    if (this.#currentCookies[name]) {
-      return this.#currentCookies[name];
-    }
-
     const cookie = this.#cookiesMap.get(name);
     return cookie && !cookie.isDeleted ? cookie.value : undefined;
   }
@@ -62,10 +65,6 @@ export class Cookies {
    * @param options Options for the cookie.
    */
   set(name: string, value: string, options?: CookieSerializeOptions) {
-    if (this.#currentCookies[name]) {
-      delete this.#currentCookies[name];
-    }
-
     const cookie = deepFreeze<Cookie>({
       name,
       value,
@@ -80,14 +79,14 @@ export class Cookies {
    * @param name The name of the cookie to delete.
    */
   delete(name: string): boolean {
-    if (!this.#cookiesMap.has(name) && !this.#currentCookies[name]) {
+    const cookie = this.#cookiesMap.get(name);
+
+    if (!cookie) {
       return false;
     }
 
-    // If the cookie is within the current cookies, we need to later
-    // emit a 'set-cookie' to delete it
-    if (this.#currentCookies[name]) {
-      delete this.#currentCookies[name];
+    // If is an initial cookie, we need to emit a 'set-cookie' to delete it
+    if (cookie.isInitial) {
       const cookie = deepFreeze<CookieEntry>({
         name,
         value: "",
@@ -122,10 +121,6 @@ export class Cookies {
    * Returns an iterator over the cookies.
    */
   *entries(): Generator<[string, string]> {
-    for (const [name, value] of Object.entries(this.#currentCookies)) {
-      yield [name, value] as const;
-    }
-
     for (const [name, cookie] of this.#cookiesMap) {
       if (cookie.isDeleted) {
         continue;

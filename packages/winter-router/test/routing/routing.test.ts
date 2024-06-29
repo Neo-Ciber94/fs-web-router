@@ -12,7 +12,6 @@ function startServer() {
     const app = polka();
     app.use(fileSystemRouter({ origin, routesDir: "test/routing/routes" }));
     app.listen(port, () => {
-      console.log(`Listening on ${origin}`);
       resolve(app);
     });
   });
