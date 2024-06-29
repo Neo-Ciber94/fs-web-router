@@ -1,4 +1,4 @@
-# winter-router
+# keiro
 
 A file-system router compatible with [WinterGC](https://wintercg.org/).
 
@@ -13,7 +13,7 @@ A file-system router compatible with [WinterGC](https://wintercg.org/).
 ```ts
 // src/main.ts
 import express from "express";
-import fileSystemRouter from "winter-router/web";
+import { fileSystemRouter } from "keiro/web";
 
 const port = Number(process.env.PORT ?? 5000);
 
@@ -25,7 +25,7 @@ app.listen(port, () => {
 });
 
 // src/routes/index.ts
-import { defineHandler } from "winter-router";
+import { defineHandler } from "keiro";
 
 export default defineHandler(() => {
   return new Response("Hello World");
@@ -37,7 +37,7 @@ export default defineHandler(() => {
 ```ts
 // src/main.ts
 import express from "express";
-import fileSystemRouter from "winter-router/node";
+import { fileSystemRouter } from "keiro/node";
 
 const port = Number(process.env.PORT ?? 5000);
 const origin = `http://localhost:${port}`;
@@ -50,7 +50,7 @@ app.listen(port, () => {
 });
 
 // src/routes/index.ts
-import { defineHandler } from "winter-router";
+import { defineHandler } from "keiro";
 
 export default defineHandler(() => {
   return new Response("Hello World");

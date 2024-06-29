@@ -1,5 +1,5 @@
 import { deletePost, getPost } from "@/lib/db/queries";
-import { defineHandler } from "winter-router";
+import { defineHandler } from "keiro";
 
 export const GET = defineHandler(async ({ params }) => {
   const postId = params.post_id;

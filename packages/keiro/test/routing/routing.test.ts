@@ -1,5 +1,5 @@
 import polka, { Polka } from "polka";
-import fileSystemRouter from "../../src/handler/node.js";
+import { fileSystemRouter } from "../../src/handler/node.js";
 import { findAvailablePort } from "../utils.js";
 
 let app: Polka | undefined;

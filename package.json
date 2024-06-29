@@ -1,5 +1,5 @@
 {
-  "name": "winter-router-mono",
+  "name": "monorepo",
   "private": true,
   "workspaces": [
     "packages/*",

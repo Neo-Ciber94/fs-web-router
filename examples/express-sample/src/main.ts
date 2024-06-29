@@ -1,5 +1,5 @@
 import express from "express";
-import fileSystemRouter from "winter-router/node";
+import { fileSystemRouter } from "keiro/node";
 
 const port = Number(process.env.PORT ?? 5000);
 const origin = `http://localhost:${port}`;

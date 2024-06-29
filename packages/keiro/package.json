@@ -1,6 +1,7 @@
 {
-  "name": "winter-router",
-  "version": "0.1.0-beta1",
+  "name": "keiro",
+  "description": "A filesystem routing middleware",
+  "version": "0.0.1-beta1",
   "type": "module",
   "scripts": {
     "build": "rimraf dist && tsc -p tsconfig.build.json",

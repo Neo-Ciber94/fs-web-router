@@ -1,6 +1,6 @@
 import { createCategory, getAllCategories } from "@/lib/db/queries";
 import { ApplicationError } from "@/lib/error";
-import { defineHandler } from "winter-router";
+import { defineHandler } from "keiro";
 
 export const POST = defineHandler(async ({ request }) => {
   const json = await request.json();

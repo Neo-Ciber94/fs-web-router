@@ -1,6 +1,6 @@
 import { createPost, getAllPosts, updatePost } from "@/lib/db/queries";
 import { ApplicationError } from "@/lib/error";
-import { defineHandler } from "winter-router";
+import { defineHandler } from "keiro";
 
 export const GET = defineHandler(async ({ url }) => {
   const limitQuery = url.searchParams.get("limit");

@@ -1,33 +1,28 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { type FileSystemRouterOptions, initializeFileSystemRouter } from "../fileSystemRouter.js";
-import { createRequest, setResponse } from "../nodeHelpers.js";
-import type http from "node:http";
 import { posix as path } from "node:path";
 import { getRouterMap } from "../createFileSystemRouter.js";
 import { EXTENSIONS, getRouteHandler, normalizePath } from "../utils.js";
 import { WorkerRouterData } from "../worker.mjs";
 import { handleRequestOnWorker } from "../workers/handleRequestOnWorker.js";
 import { WorkerPool } from "../workers/workerPool.js";
-import { MaybePromise } from "../types.js";
+import type { MaybePromise } from "../types.js";
 import url from "node:url";
 import { createRequestEvent } from "./utils.js";
-import { invariant } from "../invariant.js";
 import { applyResponseCookies } from "../cookies.js";
 
 const __dirname = path.dirname(normalizePath(url.fileURLToPath(import.meta.url)));
 
-type RequestHandler = (
-  req: http.IncomingMessage,
-  res: http.ServerResponse,
-  next: (err?: any) => void
-) => MaybePromise<void>;
+type RequestHandler = (request: Request) => MaybePromise<Response>;
 
 /**
- * Creates a file system router node middleware.
+ * Creates a file system router web middleware.
  * @param options The file system router options.
  */
-export default function fileSystemRouter(options?: FileSystemRouterOptions): RequestHandler {
-  const fsRouterOptions = initializeFileSystemRouter(options);
+export function fileSystemRouter(options?: FileSystemRouterOptions): RequestHandler {
+  const fsRouterOptions = initializeFileSystemRouter({
+    ...options,
+    skipOriginCheck: true,
+  });
 
   if (fsRouterOptions.type === "worker") {
     return workerFileSystemRouter({
@@ -37,43 +32,29 @@ export default function fileSystemRouter(options?: FileSystemRouterOptions): Req
     });
   }
 
-  const {
-    onNotFound,
-    getLocals,
-    initialOptions: { origin },
-    routerPromise,
-    middlewarePromise,
-  } = fsRouterOptions;
+  const { onNotFound, getLocals, routerPromise, middlewarePromise } = fsRouterOptions;
 
-  invariant(origin, "Origin is not set");
-
-  /* eslint-disable @typescript-eslint/no-explicit-any */
-  return async (req: http.IncomingMessage, res: http.ServerResponse, next: (err?: any) => void) => {
+  return async (request: Request) => {
     const router = await routerPromise;
     const middleware = await middlewarePromise;
 
-    const match = req.url ? router.lookup(new URL(req.url, origin).pathname) : null;
+    const url = new URL(request.url);
+    const match = router.lookup(url.pathname);
+
+    const { params = {}, ...route } = match || {};
+    const handler = getRouteHandler(request, route) || onNotFound;
+    const requestEvent = await createRequestEvent({ request, params, getLocals });
+
     let response: Response;
 
-    try {
-      const request = await createRequest({ req, baseUrl: origin });
-      const { params = {}, ...route } = match || {};
-
-      const handler = getRouteHandler(request, route) || onNotFound;
-      const requestEvent = await createRequestEvent({ request, params, getLocals });
-
-      if (middleware) {
-        response = await middleware(requestEvent, handler);
-      } else {
-        response = await handler(requestEvent);
-      }
-
-      applyResponseCookies(response, requestEvent.cookies);
-      setResponse(response, res);
-    } catch (err) {
-      console.error(err);
-      return next(err);
+    if (middleware) {
+      response = await middleware(requestEvent, handler);
+    } else {
+      response = await handler(requestEvent);
     }
+
+    applyResponseCookies(response, requestEvent.cookies);
+    return response;
   };
 }
 
@@ -93,12 +74,9 @@ function workerFileSystemRouter(options: WorkerFileSystemRouterOptions) {
     middleware,
     middlewareFilePath,
     workerCount,
-    extensions,
-    origin,
     routesDir,
+    extensions,
   } = options;
-
-  invariant(origin, "Origin is not set");
 
   const routesDirPath = path.join(cwd, routesDir);
 
@@ -125,16 +103,12 @@ function workerFileSystemRouter(options: WorkerFileSystemRouterOptions) {
     } as WorkerRouterData,
   });
 
-  return async (req: http.IncomingMessage, res: http.ServerResponse, next: (err?: any) => void) => {
+  return async (request: Request) => {
     const worker = await pool.take();
 
     try {
-      const request = await createRequest({ req, baseUrl: origin });
-      const response: Response = await handleRequestOnWorker(worker, request);
-      setResponse(response, res);
-    } catch (err) {
-      console.error(err);
-      return next(err);
+      const response = await handleRequestOnWorker(worker, request);
+      return response;
     } finally {
       pool.return(worker);
     }

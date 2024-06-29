@@ -1,4 +1,4 @@
-import fileSystemRouter from "winter-router/web";
+import { fileSystemRouter } from "keiro/web";
 
 const port = Number(process.env.PORT ?? 5022);
 

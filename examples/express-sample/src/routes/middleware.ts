@@ -1,5 +1,5 @@
 import { ApplicationError } from "@/lib/error";
-import { defineMiddleware, sequence } from "winter-router";
+import { defineMiddleware, sequence } from "keiro";
 
 const loggerMiddleware = defineMiddleware(async (event, next) => {
   const start = Date.now();
