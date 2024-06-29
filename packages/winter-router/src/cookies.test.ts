@@ -5,7 +5,7 @@ describe("Cookies", () => {
     const cookies = new Cookies();
     cookies.set("fruit", "orange");
     const cookieValue = cookies.get("fruit");
-    expect(cookieValue).toBe("orange");
+    expect(cookieValue).toStrictEqual("orange");
   });
 
   test("Delete cookie", () => {
@@ -22,10 +22,10 @@ describe("Cookies", () => {
     headers.set("Cookie", "color=red");
     const cookies = Cookies.fromHeaders(headers);
     const cookieValue = cookies.get("color");
-    expect(cookieValue).toBe("red");
+    expect(cookieValue).toStrictEqual("red");
   });
 
-  test("Entries iterator without deleted cookies", () => {
+  test("Entries iterator", () => {
     const cookies = new Cookies();
 
     cookies.set("fruit", "mango");
@@ -37,53 +37,8 @@ describe("Cookies", () => {
 
     expect(entries).toHaveLength(2);
 
-    expect(entries[0][1]).toMatchObject(
-      expect.objectContaining({
-        name: "fruit",
-        value: "mango",
-      })
-    );
-
-    expect(entries[1][1]).toMatchObject(
-      expect.objectContaining({
-        name: "color",
-        value: "orange",
-      })
-    );
-  });
-
-  test("Entries iterator with deleted cookies", () => {
-    const cookies = new Cookies();
-
-    cookies.set("fruit", "mango");
-    cookies.set("color", "orange");
-    cookies.set("animal", "cat");
-
-    cookies.delete("animal");
-    const entries = Array.from(cookies.entries(false));
-
-    expect(entries).toHaveLength(3);
-
-    expect(entries[0][1]).toMatchObject(
-      expect.objectContaining({
-        name: "fruit",
-        value: "mango",
-      })
-    );
-
-    expect(entries[1][1]).toMatchObject(
-      expect.objectContaining({
-        name: "color",
-        value: "orange",
-      })
-    );
-
-    expect(entries[2][1]).toMatchObject(
-      expect.objectContaining({
-        name: "animal",
-        value: "",
-      })
-    );
+    expect(entries[0][1]).toStrictEqual("mango");
+    expect(entries[1][1]).toStrictEqual("orange");
   });
 
   test("Cookies toJSON", () => {
@@ -100,5 +55,35 @@ describe("Cookies", () => {
       color: "orange",
       animal: "cat",
     });
+  });
+
+  test("Should get cookies from initials", () => {
+    const cookies = new Cookies({ color: "blue", fruit: "mango" });
+    cookies.set("drink", "water");
+
+    expect(cookies.get("color")).toStrictEqual("blue");
+    expect(cookies.get("fruit")).toStrictEqual("mango");
+    expect(cookies.get("drink")).toStrictEqual("water");
+  });
+
+  test("Should get cookies after delete from initials", () => {
+    const cookies = new Cookies({ color: "red", fruit: "pear" });
+    cookies.set("drink", "soda");
+    cookies.delete("color");
+
+    expect(cookies.get("color")).toBeUndefined();
+    expect(cookies.get("fruit")).toStrictEqual("pear");
+    expect(cookies.get("drink")).toStrictEqual("soda");
+  });
+
+  test("Should get cookies after delete and set from initials", () => {
+    const cookies = new Cookies({ color: "red", fruit: "pear" });
+    cookies.set("drink", "soda");
+    cookies.delete("color");
+    cookies.set("color", "magenta");
+
+    expect(cookies.get("color")).toStrictEqual("magenta");
+    expect(cookies.get("fruit")).toStrictEqual("pear");
+    expect(cookies.get("drink")).toStrictEqual("soda");
   });
 });

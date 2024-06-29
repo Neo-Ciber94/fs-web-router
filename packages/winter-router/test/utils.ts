@@ -5,6 +5,7 @@ const MAX_PORT_NUMBER = 1 << 16;
 export async function findAvailablePort(startPort: number) {
   function isPortAvailable(port: number): Promise<boolean> {
     const server = net.createServer();
+    server.unref();
 
     return new Promise<boolean>((resolve, reject) => {
       server.once("error", (err: NodeJS.ErrnoException) => {
@@ -15,12 +16,11 @@ export async function findAvailablePort(startPort: number) {
         }
       });
 
-      server.once("listening", () => {
-        server.close();
-        resolve(true);
+      server.listen(port, () => {
+        server.close(() => {
+          resolve(true);
+        });
       });
-
-      server.listen(port);
     });
   }
 
