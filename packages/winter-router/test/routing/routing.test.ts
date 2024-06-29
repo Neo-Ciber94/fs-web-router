@@ -69,8 +69,19 @@ describe("Routing", () => {
     expect(text).toStrictEqual("/e/");
   });
 
-  test("Return 404", async () => {
+  test("Should return 404", async () => {
     const res = await fetch(`${origin}/not-exists-route`);
     expect(res.status).toStrictEqual(404);
+  });
+
+  test("Should get multiple params: GET f/blue/apple/this/is/the/rest", async () => {
+    const res = await fetch(`${origin}/f/blue/apple/this/is/the/rest`);
+    const json = await res.json();
+
+    expect(json).toStrictEqual({
+      g: "blue",
+      h: "apple",
+      i: "this/is/the/rest",
+    });
   });
 });
