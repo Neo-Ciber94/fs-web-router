@@ -57,6 +57,14 @@ export interface FileSystemRouterOptions {
   matchingPattern?: MatchingPattern;
 
   /**
+   * Extensions of the files to use as routes.
+   *
+   * @default
+   * ["js", "jsx", "cjs", "mjs", "ts", "tsx", "cts", "mts"]
+   */
+  extensions?: string[];
+
+  /**
    * A prefix to detect which files or directories should be ignored.
    *
    * @default "_"
@@ -124,6 +132,7 @@ export function initializeFileSystemRouter(options?: FileSystemRouterOptions & I
     routesDir = "src/routes",
     ignoreFiles = [],
     middleware = "middleware",
+    extensions = EXTENSIONS as string[],
     matchingPattern = nextJsPatternMatching(),
     onNotFound = handle404,
     getLocals = initLocals,
@@ -132,6 +141,10 @@ export function initializeFileSystemRouter(options?: FileSystemRouterOptions & I
     // internal only
     skipOriginCheck = false,
   } = options || {};
+
+  if (!extensions) {
+    throw new Error("No file extensions specified");
+  }
 
   if (middleware) {
     const globExts = EXTENSIONS.join(",");
@@ -166,6 +179,7 @@ export function initializeFileSystemRouter(options?: FileSystemRouterOptions & I
     ignoreFiles,
     middleware,
     matchingPattern,
+    extensions,
   };
 
   if (workers) {
@@ -201,6 +215,7 @@ export function initializeFileSystemRouter(options?: FileSystemRouterOptions & I
     ignoreFiles,
     matchingPattern,
     routesDirPath,
+    extensions,
   });
 
   return {

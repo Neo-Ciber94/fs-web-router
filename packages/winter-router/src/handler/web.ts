@@ -75,6 +75,7 @@ function workerFileSystemRouter(options: WorkerFileSystemRouterOptions) {
     middlewareFilePath,
     workerCount,
     routesDir,
+    extensions,
   } = options;
 
   const routesDirPath = path.join(cwd, routesDir);
@@ -90,6 +91,7 @@ function workerFileSystemRouter(options: WorkerFileSystemRouterOptions) {
     matchingPattern,
     routesDirPath,
     ignoreFiles,
+    extensions,
   });
 
   const workerFilePath = "file://" + path.join(__dirname, "..", "worker.mjs");

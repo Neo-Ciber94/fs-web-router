@@ -16,6 +16,7 @@ interface CreateRouterOptions {
   routesDirPath: string;
   ignoreFiles?: string[];
   ignorePrefix: string;
+  extensions: string[];
   matchingPattern: MatchingPattern;
 }
 
@@ -51,18 +52,13 @@ export default async function createFileSystemRouter(options: CreateRouterOption
  * @internal
  */
 export function getRouterMap(options: CreateRouterOptions) {
-  const { cwd, routesDirPath, ignoreFiles, ignorePrefix, matchingPattern } = options;
+  const { cwd, routesDirPath, extensions, ignoreFiles, ignorePrefix, matchingPattern } = options;
 
   const dir = routesDirPath.endsWith("/")
     ? routesDirPath.substring(0, routesDirPath.length - 1)
     : routesDirPath;
 
-  const files = globSync(`${dir}/**`, {
-    posix: true,
-    nodir: true,
-    ignore: ignoreFiles,
-  });
-
+  const files = scanDirectory(dir, extensions, ignoreFiles);
   const routesMap = new Map<string, RouteSegment[]>();
 
   for (const file of files) {
@@ -113,6 +109,17 @@ export function getRouterMap(options: CreateRouterOptions) {
   }
 
   return routes;
+}
+
+function scanDirectory(dir: string, extensions: string[], ignoreFiles?: string[]) {
+  const files = globSync(`${dir}/**`, {
+    posix: true,
+    nodir: true,
+    ignore: ignoreFiles,
+  });
+
+  const dotExtensions = extensions.map((ext) => `.${ext}`);
+  return files.filter((file) => dotExtensions.includes(path.extname(file)));
 }
 
 function createRoutePaths(segments: RouteSegment[]) {
