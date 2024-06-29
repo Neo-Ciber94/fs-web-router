@@ -141,7 +141,7 @@ function createRoutePaths(segments: RouteSegment[]) {
   );
 
   if (optionalIndex >= 0) {
-    paths.push(reduceSegments(segments.slice(0, optionalIndex - 1)));
+    paths.push(reduceSegments(segments.slice(0, optionalIndex)));
   }
 
   return paths;

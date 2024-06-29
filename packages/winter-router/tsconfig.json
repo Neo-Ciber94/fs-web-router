@@ -11,8 +11,8 @@
         "moduleResolution": "NodeNext"
     },
     "include": [
-        "src/**/*.ts",
-        "src/worker.mts"
+        "src/",
+        "test/"
     ],
     "exclude": [
         "node_modules"
