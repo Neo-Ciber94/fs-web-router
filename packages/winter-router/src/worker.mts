@@ -10,6 +10,7 @@ import {
 } from "./utils.js";
 import url from "node:url";
 import { createRequestEvent } from "./handler/utils.js";
+import { applyResponseCookies } from "./cookies.js";
 
 export type RequestParts =
   | {
@@ -93,12 +94,16 @@ async function handleWorkerResponse(request: Request) {
 
   const response = await (async () => {
     const requestEvent = await createRequestEvent({ request, params });
+    let response: Response;
 
     if (middleware) {
-      return middleware(requestEvent, handler);
+      response = await middleware(requestEvent, handler);
     } else {
-      return handler(requestEvent);
+      response = await handler(requestEvent);
     }
+
+    applyResponseCookies(response, requestEvent.cookies);
+    return response;
   })();
 
   const responseHeaders = headersToObject(response.headers);

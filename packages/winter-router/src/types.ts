@@ -1,3 +1,5 @@
+import { Cookies } from "./cookies.js";
+
 export type MaybePromise<T> = T | Promise<T>;
 
 /**
@@ -26,22 +28,27 @@ export interface RequestEvent {
   /**
    * The request.
    */
-  request: Request;
+  readonly request: Request;
 
   /**
    * Parameters of the route match.
    */
-  params: Params;
+  readonly params: Params;
 
   /**
    * Request url.
    */
-  url: URL;
+  readonly url: URL;
+
+  /**
+   * Request cookies.
+   */
+  readonly cookies: Cookies;
 
   /**
    * Request locals.
    */
-  locals: Locals;
+  readonly locals: Locals;
 }
 
 /**

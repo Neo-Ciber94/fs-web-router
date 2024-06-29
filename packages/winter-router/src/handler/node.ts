@@ -12,6 +12,7 @@ import { MaybePromise } from "../types.js";
 import url from "node:url";
 import { createRequestEvent } from "./utils.js";
 import { invariant } from "../invariant.js";
+import { applyResponseCookies } from "../cookies.js";
 
 const __dirname = path.dirname(normalizePath(url.fileURLToPath(import.meta.url)));
 
@@ -67,6 +68,7 @@ export default function fileSystemRouter(options?: FileSystemRouterOptions): Req
         response = await handler(requestEvent);
       }
 
+      applyResponseCookies(response, requestEvent.cookies);
       setResponse(response, res);
     } catch (err) {
       console.error(err);

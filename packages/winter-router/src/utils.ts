@@ -86,3 +86,36 @@ export function objectToHeaders(obj: Record<string, string[]>) {
 function importModule(specifier: string) {
   return import(specifier);
 }
+
+export type DeepFreezed<T> = T extends Record<string, unknown>
+  ? {
+      readonly [K in keyof T]: DeepFreezed<T[K]>;
+    }
+  : // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  T extends any[]
+  ? ReadonlyArray<DeepFreezed<T[number]>>
+  : T;
+
+export function deepFreeze<T>(value: T): DeepFreezed<T> {
+  if (value === undefined || value === null) {
+    return value as DeepFreezed<T>;
+  }
+
+  if (typeof value !== "object") {
+    return value as DeepFreezed<T>;
+  }
+
+  Object.freeze(value);
+
+  if (Array.isArray(value)) {
+    for (const item of value) {
+      deepFreeze(item);
+    }
+  } else {
+    for (const key in value) {
+      deepFreeze(value[key]);
+    }
+  }
+
+  return value as DeepFreezed<T>;
+}

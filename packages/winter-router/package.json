@@ -19,10 +19,12 @@
   "author": "Neo-Ciber94",
   "license": "MIT",
   "dependencies": {
+    "cookie": "^0.6.0",
     "glob": "^10.4.2",
     "radix3": "^1.1.2"
   },
   "devDependencies": {
+    "@types/cookie": "^0.6.0",
     "@types/node": "^20.14.8",
     "eslint": "9",
     "rimraf": "^5.0.7",

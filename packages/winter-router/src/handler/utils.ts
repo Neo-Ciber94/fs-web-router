@@ -1,3 +1,4 @@
+import { Cookies } from "../cookies.js";
 import { Locals, MaybePromise, Params, type RequestEvent } from "../types.js";
 
 interface CreateRequestEventArgs {
@@ -12,13 +13,14 @@ export function createRequestEvent({
   getLocals,
 }: CreateRequestEventArgs): MaybePromise<RequestEvent> {
   const url = new URL(request.url);
+  const cookies = Cookies.fromHeaders(request.headers);
 
   if (getLocals) {
     return Promise.resolve().then(async () => {
-      const locals = await getLocals({ request, params, url, locals: {} });
-      return { request, params, url, locals };
+      const locals = await getLocals({ request, params, url, cookies, locals: {} });
+      return { request, params, url, cookies, locals };
     });
   }
 
-  return { request, params, url, locals: {} };
+  return { request, params, url, cookies, locals: {} };
 }

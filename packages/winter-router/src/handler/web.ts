@@ -8,6 +8,7 @@ import { WorkerPool } from "../workers/workerPool.js";
 import type { MaybePromise } from "../types.js";
 import url from "node:url";
 import { createRequestEvent } from "./utils.js";
+import { applyResponseCookies } from "../cookies.js";
 
 const __dirname = path.dirname(normalizePath(url.fileURLToPath(import.meta.url)));
 
@@ -44,11 +45,16 @@ export default function fileSystemRouter(options?: FileSystemRouterOptions): Req
     const handler = getRouteHandler(request, route) || onNotFound;
     const requestEvent = await createRequestEvent({ request, params, getLocals });
 
+    let response: Response;
+
     if (middleware) {
-      return middleware(requestEvent, handler);
+      response = await middleware(requestEvent, handler);
     } else {
-      return handler(requestEvent);
+      response = await handler(requestEvent);
     }
+
+    applyResponseCookies(response, requestEvent.cookies);
+    return response;
   };
 }
 
