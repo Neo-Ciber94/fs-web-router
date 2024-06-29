@@ -2,10 +2,10 @@ import path from "node:path";
 import { existsSync } from "node:fs";
 import os from "node:os";
 import url from "node:url";
-import createFileSystemRouter from "./createFileSystemRouter.js";
-import { type MatchingPattern, nextJsPatternMatching } from "./matchingPattern.js";
-import type { Locals, MaybePromise, Middleware, RequestEvent } from "./types.js";
-import { createMiddleware, EXTENSIONS } from "./utils.js";
+import createFileSystemRouter from "./createFileSystemRouter";
+import { type MatchingPattern, nextJsPatternMatching } from "./matchingPattern";
+import type { Locals, MaybePromise, Middleware, RequestEvent } from "./types";
+import { createMiddleware, EXTENSIONS } from "./utils";
 
 /**
  * File system router options.

@@ -3,7 +3,7 @@ import {
   parse as parseCookie,
   serialize as serializeCookie,
 } from "cookie";
-import { deepFreeze, type DeepFreezed } from "./utils.js";
+import { deepFreeze, type DeepFreezed } from "./utils";
 
 export interface Cookie {
   name: string;

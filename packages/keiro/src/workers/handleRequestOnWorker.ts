@@ -1,6 +1,6 @@
 import { type Worker } from "node:worker_threads";
 import { ResponseParts, RequestParts } from "../worker.mjs";
-import { headersToObject, objectToHeaders } from "../utils.js";
+import { headersToObject, objectToHeaders } from "../utils";
 
 export function handleRequestOnWorker(worker: Worker, request: Request) {
   const streamControllerDefer = deferred<ReadableStreamDefaultController<Uint8Array>>();

@@ -1,18 +1,18 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { type FileSystemRouterOptions, initializeFileSystemRouter } from "../fileSystemRouter.js";
-import { createRequest, setResponse } from "../nodeHelpers.js";
+import { type FileSystemRouterOptions, initializeFileSystemRouter } from "../fileSystemRouter";
+import { createRequest, setResponse } from "../nodeHelpers";
 import type http from "node:http";
 import { posix as path } from "node:path";
-import { getRouterMap } from "../createFileSystemRouter.js";
-import { EXTENSIONS, getRouteHandler, normalizePath } from "../utils.js";
+import { getRouterMap } from "../createFileSystemRouter";
+import { EXTENSIONS, getRouteHandler, normalizePath } from "../utils";
 import { WorkerRouterData } from "../worker.mjs";
-import { handleRequestOnWorker } from "../workers/handleRequestOnWorker.js";
-import { WorkerPool } from "../workers/workerPool.js";
-import { MaybePromise } from "../types.js";
+import { handleRequestOnWorker } from "../workers/handleRequestOnWorker";
+import { WorkerPool } from "../workers/workerPool";
+import { MaybePromise } from "../types";
 import url from "node:url";
-import { createRequestEvent } from "./utils.js";
-import { invariant } from "../invariant.js";
-import { applyResponseCookies } from "../cookies.js";
+import { createRequestEvent } from "./utils";
+import { invariant } from "../invariant";
+import { applyResponseCookies } from "../cookies";
 
 const __dirname = path.dirname(normalizePath(url.fileURLToPath(import.meta.url)));
 

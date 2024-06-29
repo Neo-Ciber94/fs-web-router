@@ -1,5 +1,5 @@
-import { Cookies } from "../cookies.js";
-import { Locals, MaybePromise, Params, type RequestEvent } from "../types.js";
+import { Cookies } from "../cookies";
+import { Locals, MaybePromise, Params, type RequestEvent } from "../types";
 
 interface CreateRequestEventArgs {
   request: Request;

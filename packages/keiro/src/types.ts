@@ -1,4 +1,4 @@
-import { Cookies } from "./cookies.js";
+import { Cookies } from "./cookies";
 
 export type MaybePromise<T> = T | Promise<T>;
 

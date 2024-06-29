@@ -4,7 +4,7 @@
   "version": "0.0.1-beta1",
   "type": "module",
   "scripts": {
-    "build": "rimraf dist && tsc -p tsconfig.build.json",
+    "build": "tsup && tsc -p tsconfig.build.json --emitDeclarationOnly --declaration",
     "typecheck": "tsc --noEmit",
     "lint": "eslint ./src",
     "test": "vitest --run"
@@ -31,6 +31,7 @@
     "eslint": "9",
     "polka": "^0.5.2",
     "rimraf": "^5.0.7",
+    "tsup": "^8.1.0",
     "tsx": "^4.15.7",
     "typescript": "^5.5.2",
     "vitest": "^1.6.0"

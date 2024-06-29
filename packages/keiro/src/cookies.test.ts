@@ -1,4 +1,4 @@
-import { Cookies } from "./cookies.js";
+import { Cookies } from "./cookies";
 
 describe("Cookies", () => {
   test("Get and set cookie", () => {

@@ -12,17 +12,16 @@ A file-system router compatible with [WinterGC](https://wintercg.org/).
 
 ```ts
 // src/main.ts
-import express from "express";
 import { fileSystemRouter } from "keiro/web";
 
-const port = Number(process.env.PORT ?? 5000);
+const port = Number(process.env.PORT ?? 5022);
 
-const app = express();
-app.use(fileSystemRouter());
-
-app.listen(port, () => {
-  console.log(`Listening on http://localhost:${port}`);
+const server = Bun.serve({
+  port,
+  fetch: fileSystemRouter(),
 });
+
+console.log(`Listening on http://${server.hostname}:${server.port}`);
 
 // src/routes/index.ts
 import { defineHandler } from "keiro";

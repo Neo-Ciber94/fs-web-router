@@ -1,10 +1,10 @@
 import { globSync } from "glob";
-import { type MatchingPattern } from "./matchingPattern.js";
-import { type Handler } from "./types.js";
+import { type MatchingPattern } from "./matchingPattern";
+import { type Handler } from "./types";
 import { createRouter } from "radix3";
 import { posix as path } from "node:path";
 import url from "node:url";
-import { createRoute, type HttpMethod } from "./utils.js";
+import { createRoute, type HttpMethod } from "./utils";
 
 type RouteSegment =
   | { type: "static"; path: string }

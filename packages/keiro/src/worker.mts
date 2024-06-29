@@ -1,16 +1,16 @@
 import { createRouter } from "radix3";
 import { parentPort, workerData, threadId } from "node:worker_threads";
-import type { Route } from "./createFileSystemRouter.js";
+import type { Route } from "./createFileSystemRouter";
 import {
   createMiddleware,
   createRoute,
   getRouteHandler,
   headersToObject,
   objectToHeaders,
-} from "./utils.js";
+} from "./utils";
 import url from "node:url";
-import { createRequestEvent } from "./handler/utils.js";
-import { applyResponseCookies } from "./cookies.js";
+import { createRequestEvent } from "./handler/utils";
+import { applyResponseCookies } from "./cookies";
 
 export type RequestParts =
   | {

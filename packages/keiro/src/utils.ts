@@ -1,6 +1,6 @@
-import type { Route } from "./createFileSystemRouter.js";
-import { invariant } from "./invariant.js";
-import type { Middleware } from "./types.js";
+import type { Route } from "./createFileSystemRouter";
+import { invariant } from "./invariant";
+import type { Middleware } from "./types";
 import path from "node:path";
 
 export const EXTENSIONS = Object.freeze(["js", "jsx", "cjs", "mjs", "ts", "tsx", "cts", "mts"]);
