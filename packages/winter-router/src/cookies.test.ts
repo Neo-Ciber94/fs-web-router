@@ -4,10 +4,8 @@ describe("Cookies", () => {
   test("Get and set cookie", () => {
     const cookies = new Cookies();
     cookies.set("fruit", "orange");
-    const cookie = cookies.get("fruit");
-
-    expect(cookie?.name).toBe("fruit");
-    expect(cookie?.value).toBe("orange");
+    const cookieValue = cookies.get("fruit");
+    expect(cookieValue).toBe("orange");
   });
 
   test("Delete cookie", () => {
@@ -23,10 +21,8 @@ describe("Cookies", () => {
     const headers = new Headers();
     headers.set("Cookie", "color=red");
     const cookies = Cookies.fromHeaders(headers);
-    const cookie = cookies.get("color");
-
-    expect(cookie?.name).toBe("color");
-    expect(cookie?.value).toBe("red");
+    const cookieValue = cookies.get("color");
+    expect(cookieValue).toBe("red");
   });
 
   test("Entries iterator without deleted cookies", () => {
@@ -88,5 +84,21 @@ describe("Cookies", () => {
         value: "",
       })
     );
+  });
+
+  test("Cookies toJSON", () => {
+    const cookies = new Cookies();
+
+    cookies.set("fruit", "mango");
+    cookies.set("color", "orange");
+    cookies.set("animal", "cat");
+
+    const json = cookies.toJSON();
+
+    expect(json).toStrictEqual({
+      fruit: "mango",
+      color: "orange",
+      animal: "cat",
+    });
   });
 });

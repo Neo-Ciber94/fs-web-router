@@ -7,7 +7,7 @@ export async function findAvailablePort(startPort: number) {
     const server = net.createServer();
 
     return new Promise<boolean>((resolve, reject) => {
-      server.on("error", (err: NodeJS.ErrnoException) => {
+      server.once("error", (err: NodeJS.ErrnoException) => {
         if (err?.code === "EADDRINUSE") {
           resolve(false);
         } else {
@@ -15,11 +15,12 @@ export async function findAvailablePort(startPort: number) {
         }
       });
 
-      server.listen(port, () => {
-        server.close(() => {
-          resolve(true);
-        });
+      server.once("listening", () => {
+        server.close();
+        resolve(true);
       });
+
+      server.listen(port);
     });
   }
 

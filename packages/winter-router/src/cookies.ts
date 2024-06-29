@@ -43,17 +43,17 @@ export class Cookies {
   }
 
   /**
-   * Get a cookie with the given name.
+   * Get a cookie value with the given name.
    * @param name The name of the cookie.
    */
-  get(name: string): DeepFreezed<Cookie> | undefined {
+  get(name: string): string | undefined {
     const cookie = this.#cookieMap.get(name);
 
     if (cookie && cookie.isDeleted) {
       return undefined;
     }
 
-    return cookie;
+    return cookie?.value;
   }
 
   /**
@@ -96,9 +96,24 @@ export class Cookies {
   }
 
   /**
+   * Gets an object with the values.
+   * @param skipDeleted Whether if to skip the deleted cookies, defaults to `true`.
+   * @returns
+   */
+  toJSON(skipDeleted = true): Record<string, string | undefined> {
+    const obj: Record<string, string> = {};
+
+    for (const [name, value] of this.entries(skipDeleted)) {
+      obj[name] = value?.value;
+    }
+
+    return obj;
+  }
+
+  /**
    * Returns an iterator over the cookies.
    *
-   * @param skipDeleted Whether if to include the deleted cookies, defaults to `true`.
+   * @param skipDeleted Whether if to skip the deleted cookies, defaults to `true`.
    */
   *entries(skipDeleted = true): Generator<[string, DeepFreezed<Cookie>]> {
     for (const [name, cookie] of this.#cookieMap) {
