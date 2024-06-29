@@ -26,7 +26,7 @@ afterAll(() => {
   app?.server?.close();
 });
 
-describe("Routing", () => {
+describe("Routing with default handler", () => {
   test("Static route: GET /a", async () => {
     const res = await fetch(`${origin}/a`);
     const text = await res.text();
@@ -83,5 +83,71 @@ describe("Routing", () => {
       h: "apple",
       i: "this/is/the/rest",
     });
+  });
+});
+
+describe("Routing with http methods", () => {
+  test("Should call GET handler", async () => {
+    const res = await fetch(`${origin}/x/api_1`);
+    const text = await res.text();
+    expect(text).toStrictEqual("get 1");
+  });
+
+  test("Should call POST handler", async () => {
+    const res = await fetch(`${origin}/x/api_1`, { method: "POST" });
+    const text = await res.text();
+    expect(text).toStrictEqual("post 1");
+  });
+
+  test("Should call PUT handler", async () => {
+    const res = await fetch(`${origin}/x/api_1`, { method: "PUT" });
+    const text = await res.text();
+    expect(text).toStrictEqual("put 1");
+  });
+
+  test("Should call PATCH handler", async () => {
+    const res = await fetch(`${origin}/x/api_1`, { method: "PATCH" });
+    const text = await res.text();
+    expect(text).toStrictEqual("patch 1");
+  });
+
+  test("Should call DELETE handler", async () => {
+    const res = await fetch(`${origin}/x/api_1`, { method: "DELETE" });
+    const text = await res.text();
+    expect(text).toStrictEqual("delete 1");
+  });
+
+  test("Should call HEAD handler", async () => {
+    const res = await fetch(`${origin}/x/api_1`, { method: "HEAD" });
+    expect(res.headers.get("data")).toStrictEqual("head 1");
+  });
+
+  test("Should call OPTIONS handler", async () => {
+    const res = await fetch(`${origin}/x/api_1`, { method: "OPTIONS" });
+    const text = await res.text();
+    expect(text).toStrictEqual("options 1");
+  });
+
+  test("Should return 404 on not existing handler", async () => {
+    const res = await fetch(`${origin}/x/api_2`, { method: "PUT" });
+    expect(res.status).toStrictEqual(404);
+  });
+
+  test("Should call GET instead of default handler", async () => {
+    const res = await fetch(`${origin}/x/api_3`, { method: "GET" });
+    const text = await res.text();
+    expect(text).toStrictEqual("get 3");
+  });
+
+  test("Should call POST instead of default handler", async () => {
+    const res = await fetch(`${origin}/x/api_3`, { method: "POST" });
+    const text = await res.text();
+    expect(text).toStrictEqual("post 3");
+  });
+
+  test("Should call default handler", async () => {
+    const res = await fetch(`${origin}/x/api_3`, { method: "PUT" });
+    const text = await res.text();
+    expect(text).toStrictEqual("Other method: put");
   });
 });
