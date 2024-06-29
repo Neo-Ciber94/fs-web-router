@@ -48,6 +48,14 @@ export class Cookies {
   }
 
   /**
+   * Checks if the cookie exists.
+   * @param name The name of the cookie.
+   */
+  has(name: string) {
+    return this.get(name) !== undefined;
+  }
+
+  /**
    * Sets a cookie with the given name-value.
    * @param name The name of the cookie.
    * @param value The value of the cookie.
@@ -76,21 +84,24 @@ export class Cookies {
       return false;
     }
 
+    // If the cookie is within the current cookies, we need to later
+    // emit a 'set-cookie' to delete it
     if (this.#currentCookies[name]) {
       delete this.#currentCookies[name];
+      const cookie = deepFreeze<CookieEntry>({
+        name,
+        value: "",
+        isDeleted: true,
+        options: {
+          expires: new Date(0),
+        },
+      });
+
+      this.#cookiesMap.set(name, cookie);
+    } else {
+      this.#cookiesMap.delete(name);
     }
 
-    // We need to keep tracking the cookie to later emit a set cookie
-    const cookie = deepFreeze<CookieEntry>({
-      name,
-      value: "",
-      isDeleted: true,
-      options: {
-        expires: new Date(0),
-      },
-    });
-
-    this.#cookiesMap.set(name, cookie);
     return true;
   }
 

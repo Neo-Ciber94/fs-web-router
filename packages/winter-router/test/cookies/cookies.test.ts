@@ -32,6 +32,7 @@ describe("Cookies", () => {
     const cookies = res.headers.getSetCookie();
 
     expect(res.ok).toBeTruthy();
+    expect(cookies).toHaveLength(3);
     expect(cookies).toContain("fruit=apple");
     expect(cookies).toContain("color=purple");
     expect(cookies).toContain("character=Ryuji%20Ayukawa");
@@ -49,5 +50,20 @@ describe("Cookies", () => {
 
     expect(res.ok).toBeTruthy();
     expect(value).toStrictEqual("apple");
+  });
+
+  test("Should get and delete cookies", async () => {
+    const res = await fetch(`${origin}/get_delete_cookie`, {
+      headers: {
+        Cookie: "color=black",
+      },
+    });
+    const cookies = res.headers.getSetCookie();
+
+    expect(res.ok).toBeTruthy();
+    expect(cookies).toHaveLength(3);
+    expect(cookies.some((s) => s.includes("color=;"))).toBeTruthy();
+    expect(cookies).toContain("fruit=orange");
+    expect(cookies).toContain("language=javascript");
   });
 });
