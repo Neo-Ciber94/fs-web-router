@@ -25,9 +25,7 @@ describe("Default pattern matching", () => {
   test("Match optional catch-all segment", () => {
     const matching = nextJsPatternMatching();
 
-    expect(matching.matchOptionalCatchAll("[[...params]]", [])).toStrictEqual(
-      "params"
-    );
+    expect(matching.matchOptionalCatchAll("[[...params]]", [])).toStrictEqual("params");
     expect(matching.matchCatchAll("hello", [])).toBeFalsy();
   });
 });

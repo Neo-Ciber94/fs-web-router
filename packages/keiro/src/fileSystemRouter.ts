@@ -2,10 +2,12 @@ import path from "node:path";
 import { existsSync } from "node:fs";
 import os from "node:os";
 import url from "node:url";
-import createFileSystemRouter from "./createFileSystemRouter";
-import { type MatchingPattern, nextJsPatternMatching } from "./matchingPattern";
-import type { Locals, MaybePromise, Middleware, RequestEvent } from "./types";
-import { createMiddleware, EXTENSIONS } from "./utils";
+import { type MatchingPattern, nextJsPatternMatching } from "./routing/matchingPattern";
+import type { Handler, Locals, MaybePromise, Middleware, RequestEvent } from "./types";
+import type { HttpMethod } from "./utils";
+import { createMiddleware, createRoute, EXTENSIONS } from "./utils";
+import { createRouter } from "radix3";
+import { getRouterMap } from "./routing";
 
 /**
  * File system router options.
@@ -153,7 +155,7 @@ export function initializeFileSystemRouter(options?: FileSystemRouterOptions & I
 
   if (!skipOriginCheck && origin == null) {
     throw new Error(
-      "Unable to determine the origin, set `ORIGIN` environment variable or pass the `origin` in the options of the 'fileSystemRouter'"
+      "Unable to determine the origin, set `ORIGIN` environment variable or pass the `origin` in the options of the 'fileSystemRouter'",
     );
   }
 
@@ -226,6 +228,43 @@ export function initializeFileSystemRouter(options?: FileSystemRouterOptions & I
     getLocals,
     initialOptions,
   };
+}
+
+export interface CreateRouterOptions {
+  cwd: string;
+  routesDirPath: string;
+  ignoreFiles?: string[];
+  ignorePrefix: string;
+  extensions: string[];
+  matchingPattern: MatchingPattern;
+}
+
+type RouteHttpMethodHandler = {
+  [M in HttpMethod]?: Handler;
+};
+
+export type Route = RouteHttpMethodHandler & {
+  default?: Handler;
+};
+
+async function createFileSystemRouter(options: CreateRouterOptions) {
+  const routesMap = getRouterMap(options);
+  const routes: Record<string, Route> = {};
+  const routePromises: Promise<Route>[] = [];
+
+  for (const [key, routeFilePath] of Object.entries(routesMap)) {
+    routePromises.push(
+      createRoute(routeFilePath).then((route) => {
+        routes[key] = route;
+        return route;
+      }),
+    );
+  }
+
+  await Promise.all(routePromises);
+
+  const router = createRouter<Route>({ routes });
+  return router;
 }
 
 function findFile(dir: string, name: string, extensions: readonly string[]) {

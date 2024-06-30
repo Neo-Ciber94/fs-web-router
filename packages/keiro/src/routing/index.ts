@@ -1,52 +1,8 @@
 import { globSync } from "glob";
-import { type MatchingPattern } from "./matchingPattern";
-import { type Handler } from "./types";
-import { createRouter } from "radix3";
 import { posix as path } from "node:path";
 import url from "node:url";
-import { createRoute, type HttpMethod } from "./utils";
-
-type RouteSegment =
-  | { type: "static"; path: string }
-  | { type: "dynamic"; path: string; optional: boolean }
-  | { type: "catch-all"; path: string; optional: boolean };
-
-interface CreateRouterOptions {
-  cwd: string;
-  routesDirPath: string;
-  ignoreFiles?: string[];
-  ignorePrefix: string;
-  extensions: string[];
-  matchingPattern: MatchingPattern;
-}
-
-type RouteHttpMethodHandler = {
-  [M in HttpMethod]?: Handler;
-};
-
-export type Route = RouteHttpMethodHandler & {
-  default?: Handler;
-};
-
-export default async function createFileSystemRouter(options: CreateRouterOptions) {
-  const routesMap = getRouterMap(options);
-  const routes: Record<string, Route> = {};
-  const routePromises: Promise<Route>[] = [];
-
-  for (const [key, routeFilePath] of Object.entries(routesMap)) {
-    routePromises.push(
-      createRoute(routeFilePath).then((route) => {
-        routes[key] = route;
-        return route;
-      })
-    );
-  }
-
-  await Promise.all(routePromises);
-
-  const router = createRouter<Route>({ routes });
-  return router;
-}
+import type { RouteSegment } from "./fileSystemRouteMapper";
+import type { CreateRouterOptions } from "../fileSystemRouter";
 
 /**
  * @internal
@@ -58,7 +14,7 @@ export function getRouterMap(options: CreateRouterOptions) {
     ? routesDirPath.substring(0, routesDirPath.length - 1)
     : routesDirPath;
 
-  const files = scanDirectory(dir, extensions, ignoreFiles);
+  const files = scanFileSystemRoutes(dir, extensions, ignoreFiles);
   const routesMap = new Map<string, RouteSegment[]>();
 
   for (const file of files) {
@@ -111,7 +67,7 @@ export function getRouterMap(options: CreateRouterOptions) {
   return routes;
 }
 
-function scanDirectory(dir: string, extensions: string[], ignoreFiles?: string[]) {
+function scanFileSystemRoutes(dir: string, extensions: string[], ignoreFiles?: string[]) {
   const files = globSync(`${dir}/**`, {
     posix: true,
     nodir: true,
@@ -144,7 +100,7 @@ function createRoutePaths(segments: RouteSegment[]) {
 
   const paths: string[] = [reduceSegments(segments)];
   const optionalIndex = segments.findIndex(
-    (s) => (s.type === "catch-all" || s.type === "dynamic") && s.optional
+    (s) => (s.type === "catch-all" || s.type === "dynamic") && s.optional,
   );
 
   if (optionalIndex >= 0) {

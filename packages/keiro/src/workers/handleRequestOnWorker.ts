@@ -1,5 +1,5 @@
 import { type Worker } from "node:worker_threads";
-import { ResponseParts, RequestParts } from "../worker.mjs";
+import type { ResponseParts, RequestParts } from "../worker.mjs";
 import { headersToObject, objectToHeaders } from "../utils";
 
 export function handleRequestOnWorker(worker: Worker, request: Request) {
@@ -19,7 +19,7 @@ export function handleRequestOnWorker(worker: Worker, request: Request) {
                 status: responseParts.status,
                 statusText: responseParts.statusText,
                 headers: responseHeaders,
-              })
+              }),
             );
 
             worker.off("message", recieveResponseParts);
@@ -35,7 +35,7 @@ export function handleRequestOnWorker(worker: Worker, request: Request) {
                 status: responseParts.status,
                 statusText: responseParts.statusText,
                 headers: responseHeaders,
-              })
+              }),
             );
           }
 
@@ -71,7 +71,7 @@ export function handleRequestOnWorker(worker: Worker, request: Request) {
       const reader = body.getReader();
 
       function drain() {
-        reader.read().then(({ value, done }) => {
+        void reader.read().then(({ value, done }) => {
           if (done) {
             return;
           }

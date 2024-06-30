@@ -3,23 +3,23 @@ import { type FileSystemRouterOptions, initializeFileSystemRouter } from "../fil
 import { createRequest, setResponse } from "../nodeHelpers";
 import type http from "node:http";
 import { posix as path } from "node:path";
-import { getRouterMap } from "../createFileSystemRouter";
 import { EXTENSIONS, getRouteHandler, normalizePath } from "../utils";
-import { WorkerRouterData } from "../worker.mjs";
+import type { WorkerRouterData } from "../worker.mjs";
 import { handleRequestOnWorker } from "../workers/handleRequestOnWorker";
 import { WorkerPool } from "../workers/workerPool";
-import { MaybePromise } from "../types";
+import type { MaybePromise } from "../types";
 import url from "node:url";
 import { createRequestEvent } from "./utils";
 import { invariant } from "../invariant";
 import { applyResponseCookies } from "../cookies";
+import { getRouterMap } from "../routing";
 
 const __dirname = path.dirname(normalizePath(url.fileURLToPath(import.meta.url)));
 
 type RequestHandler = (
   req: http.IncomingMessage,
   res: http.ServerResponse,
-  next: (err?: any) => void
+  next: (err?: any) => void,
 ) => MaybePromise<void>;
 
 /**

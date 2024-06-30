@@ -1,14 +1,14 @@
 import { type FileSystemRouterOptions, initializeFileSystemRouter } from "../fileSystemRouter";
 import { posix as path } from "node:path";
-import { getRouterMap } from "../createFileSystemRouter";
 import { EXTENSIONS, getRouteHandler, normalizePath } from "../utils";
-import { WorkerRouterData } from "../worker.mjs";
+import type { WorkerRouterData } from "../worker.mjs";
 import { handleRequestOnWorker } from "../workers/handleRequestOnWorker";
 import { WorkerPool } from "../workers/workerPool";
 import type { MaybePromise } from "../types";
 import url from "node:url";
 import { createRequestEvent } from "./utils";
 import { applyResponseCookies } from "../cookies";
+import { getRouterMap } from "../routing";
 
 const __dirname = path.dirname(normalizePath(url.fileURLToPath(import.meta.url)));
 

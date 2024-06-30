@@ -52,7 +52,7 @@ function getBody(req: http.IncomingMessage) {
 
   if (req.destroyed) {
     const stream = new ReadableStream();
-    stream.cancel();
+    void stream.cancel();
     return stream;
   }
 
@@ -112,7 +112,7 @@ export function setResponse(response: Response, target: http.ServerResponse) {
   const reader = response.body.getReader();
 
   if (target.destroyed) {
-    reader.cancel();
+    void reader.cancel();
     return;
   }
 
@@ -148,7 +148,7 @@ export function setResponse(response: Response, target: http.ServerResponse) {
   target.on("close", onCancel);
   target.on("error", onCancel);
 
-  reader.closed.finally(() => {
+  void reader.closed.finally(() => {
     target.off("close", onCancel);
     target.off("error", onCancel);
   });

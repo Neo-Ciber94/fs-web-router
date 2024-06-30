@@ -39,7 +39,7 @@ export async function createMiddleware(filePath: string): Promise<Middleware> {
 
   if (!mod || typeof mod.default !== "function") {
     throw new Error(
-      `Unable to get middleware handler in '${filePath}', expected default exported function`
+      `Unable to get middleware handler in '${filePath}', expected default exported function`,
     );
   }
 
@@ -87,14 +87,15 @@ function importModule(specifier: string) {
   return import(specifier);
 }
 
-export type DeepFreezed<T> = T extends Record<string, unknown>
-  ? {
-      readonly [K in keyof T]: DeepFreezed<T[K]>;
-    }
-  : // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  T extends any[]
-  ? ReadonlyArray<DeepFreezed<T[number]>>
-  : T;
+export type DeepFreezed<T> =
+  T extends Record<string, unknown>
+    ? {
+        readonly [K in keyof T]: DeepFreezed<T[K]>;
+      }
+    : // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      T extends any[]
+      ? ReadonlyArray<DeepFreezed<T[number]>>
+      : T;
 
 export function deepFreeze<T>(value: T): DeepFreezed<T> {
   if (value === undefined || value === null) {
