@@ -32,9 +32,9 @@ export function getFileSystemRoutesMap(options: CreateRouterOptions) {
   for (const [filePath, segments] of routeSegmentsMap.entries()) {
     const routePaths = [toRadix3(segments)];
 
+    // radix3 router do not allow optional segments, to support it we add the dynamic segment
+    // and then push the fallback route when the dynamic segment is not available
     {
-      // radix3 router do not allow optional segments, to support it we add the dynamic segment
-      // and then push the fallback route when the dynamic segment is not available
       const optionalIndex = segments.findIndex((s) => {
         return (s.type === "catch-all" || s.type === "dynamic") && s.optional;
       });
