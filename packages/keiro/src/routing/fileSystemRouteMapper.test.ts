@@ -14,13 +14,19 @@ describe("DefaultFileSystemRouteMapper", () => {
     ]);
   });
 
-  test("Should ignore index file", () => {
+  test("Should ignore index file at the end", () => {
     const segments = mapper.toPath("/other/route/index.ts");
 
     expect(segments).toStrictEqual<RouteSegment[]>([
       { type: "static", path: "other" },
       { type: "static", path: "route" },
     ]);
+  });
+
+  test("Should ignore index file at the start", () => {
+    const segments = mapper.toPath("index.ts");
+
+    expect(segments).toStrictEqual<RouteSegment[]>([]);
   });
 
   test("Should ignore route with directory", () => {

@@ -74,8 +74,6 @@ export class DefaultFileSystemRouteMapper extends FileSystemRouteMapper {
     const filePathSegments = filePath
       // Remove the extensions: js, jsx, cjs, mjs, ts, tsx, cts, mts
       .replace(/\.[cm]?(ts|js)x?/, "")
-      // Ignore trailing /index file, we trait it as "/"
-      .replace(/\/index$/, "")
       // Split into segments
       .split("/")
       // Skip empty segments
@@ -84,6 +82,12 @@ export class DefaultFileSystemRouteMapper extends FileSystemRouteMapper {
       .filter((s, idx, arr) => !/\(.+\)/.test(s) && idx < arr.length)
       // Convert segment to a RouteSegment
       .map((p, _, filePathSegments) => this.toRouteSegment(p, filePathSegments));
+
+      // We remove the last index file
+      const lastSegment = filePathSegments.at(-1)
+      if (lastSegment && lastSegment.type === "static" && lastSegment.path === "index") {
+        filePathSegments.pop();
+      }
 
     return filePathSegments;
   }

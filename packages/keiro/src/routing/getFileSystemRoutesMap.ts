@@ -10,12 +10,7 @@ import type { CreateRouterOptions } from "../fileSystemRouter";
 export function getFileSystemRoutesMap(options: CreateRouterOptions) {
   const { cwd, routesDir, extensions, ignoreFiles, routeMapper } = options;
   const routesDirPath = path.join(cwd, routesDir);
-
-  const dir = routesDirPath.endsWith("/")
-    ? routesDirPath.substring(0, routesDirPath.length - 1)
-    : routesDirPath;
-
-  const files = scanFileSystemRoutes(dir, extensions, ignoreFiles);
+  const files = scanFileSystemRoutes(cwd, routesDir, extensions, ignoreFiles);
   const routeSegmentsMap = new Map<string, RouteSegment[]>();
 
   for (const file of files) {
@@ -49,7 +44,7 @@ export function getFileSystemRoutesMap(options: CreateRouterOptions) {
         throw new Error(`Route '${routeId}' already exists`);
       }
 
-      const importPath = url.pathToFileURL(path.join(cwd, filePath)).href;
+      const importPath = url.pathToFileURL(filePath).href;
       routes[routeId] = importPath;
     }
   }
@@ -57,8 +52,14 @@ export function getFileSystemRoutesMap(options: CreateRouterOptions) {
   return routes;
 }
 
-function scanFileSystemRoutes(dir: string, extensions: string[], ignoreFiles?: string[]) {
-  const files = globSync(`${dir}/**`, {
+function scanFileSystemRoutes(
+  cwd: string,
+  routesDir: string,
+  extensions: string[],
+  ignoreFiles?: string[],
+) {
+  const files = globSync(`${routesDir}/**`, {
+    cwd,
     posix: true,
     nodir: true,
     ignore: ignoreFiles,
