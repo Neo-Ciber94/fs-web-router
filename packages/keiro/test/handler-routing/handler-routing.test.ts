@@ -11,7 +11,7 @@ const origin = `http://localhost:${port}`;
 function startServer() {
   return new Promise<Polka>((resolve) => {
     const app = polka();
-    app.use(fileSystemRouter({ origin, routesDir: "test/routing/routes" }));
+    app.use(fileSystemRouter({ origin, routesDir: "test/handler-routing/routes" }));
     app.listen(port, () => {
       resolve(app);
     });

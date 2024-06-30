@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/no-floating-promises */
-import { describe } from "node:test";
 import { DefaultFileSystemRouteMapper, type RouteSegment } from "./fileSystemRouteMapper";
 
 describe("DefaultFileSystemRouteMapper", () => {
