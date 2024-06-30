@@ -16,26 +16,41 @@ export function getFileSystemRoutesMap(options: CreateRouterOptions) {
     : routesDirPath;
 
   const files = scanFileSystemRoutes(dir, extensions, ignoreFiles);
-  const routesMap = new Map<string, RouteSegment[]>();
+  const routeSegmentsMap = new Map<string, RouteSegment[]>();
 
   for (const file of files) {
     const filePath = path.relative(routesDirPath, path.join(cwd, file));
     const segments = routeMapper.toPath(filePath);
 
     if (segments) {
-      routesMap.set(file, segments);
+      routeSegmentsMap.set(file, segments);
     }
   }
 
   const routes: Record<string, string> = {};
 
-  for (const [routePath, segments] of routesMap.entries()) {
-    for (const p of toRadix3(segments)) {
-      if (p in routes) {
-        throw new Error(`Route '${p}' already exists`);
+  for (const [filePath, segments] of routeSegmentsMap.entries()) {
+    const routePaths = [toRadix3(segments)];
+
+    {
+      // radix3 router do not allow optional segments, to support it we add the dynamic segment
+      // and then push the fallback route when the dynamic segment is not available
+      const optionalIndex = segments.findIndex((s) => {
+        return (s.type === "catch-all" || s.type === "dynamic") && s.optional;
+      });
+
+      if (optionalIndex >= 0) {
+        routePaths.push(toRadix3(segments.slice(0, optionalIndex)));
       }
-      const importPath = url.pathToFileURL(path.join(cwd, routePath)).href;
-      routes[p] = importPath;
+    }
+
+    for (const routeId of routePaths) {
+      if (routeId in routes) {
+        throw new Error(`Route '${routeId}' already exists`);
+      }
+
+      const importPath = url.pathToFileURL(path.join(cwd, filePath)).href;
+      routes[routeId] = importPath;
     }
   }
 
@@ -54,33 +69,20 @@ function scanFileSystemRoutes(dir: string, extensions: string[], ignoreFiles?: s
 }
 
 function toRadix3(segments: RouteSegment[]) {
-  function reduceSegments(s: RouteSegment[]) {
-    const routePath = s.reduce((acc, p) => {
-      switch (p.type) {
-        case "static":
-          return `${acc}/${p.path}`;
-        case "dynamic":
-          return `${acc}/:${p.path}`;
-        case "catch-all":
-          return `${acc}/**:${p.path}`;
-      }
-    }, "");
-
-    if (routePath.startsWith("/")) {
-      return routePath;
+  const routePath = segments.reduce((acc, p) => {
+    switch (p.type) {
+      case "static":
+        return `${acc}/${p.path}`;
+      case "dynamic":
+        return `${acc}/:${p.path}`;
+      case "catch-all":
+        return `${acc}/**:${p.path}`;
     }
+  }, "");
 
-    return `/${routePath}`;
+  if (routePath.startsWith("/")) {
+    return routePath;
   }
 
-  const paths: string[] = [reduceSegments(segments)];
-  const optionalIndex = segments.findIndex(
-    (s) => (s.type === "catch-all" || s.type === "dynamic") && s.optional,
-  );
-
-  if (optionalIndex >= 0) {
-    paths.push(reduceSegments(segments.slice(0, optionalIndex)));
-  }
-
-  return paths;
+  return `/${routePath}`;
 }
