@@ -22,11 +22,6 @@ jobs:
       # - name: Install bun
       #   uses: oven-sh/setup-bun@v1
 
-      - name: Install pnpm
-        uses: pnpm/action-setup@v4
-        with:
-          version: 9
-
       - name: Setup monorepo
         run: |
           rm bun.lockb
@@ -34,8 +29,13 @@ jobs:
           cat <<EOT >> pnpm-workspace.yaml
           packages:
             - 'packages/*'
-            - 'examples/**'
+            - 'examples/*'
           EOT
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
 
       - name: Install dependencies
         run: pnpm install -r
