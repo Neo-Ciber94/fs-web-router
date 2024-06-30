@@ -53,6 +53,18 @@ export async function importMiddleware(filePath: string): Promise<Middleware> {
   return mod.default;
 }
 
+export async function importHandler(filePath: string): Promise<Handler> {
+  const mod = await importModule(filePath);
+
+  if (!mod || typeof mod.default !== "function") {
+    throw new Error(
+      `Unable to get 404 handler in '${filePath}', expected default exported function`,
+    );
+  }
+
+  return mod.default;
+}
+
 export function getRouteHandler(request: Request, route: Route) {
   const defaultHandler = route.default;
   const method = request.method.toUpperCase() as HttpMethod;

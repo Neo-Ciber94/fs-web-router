@@ -2,15 +2,14 @@ import path from "node:path";
 import { existsSync } from "node:fs";
 import os from "node:os";
 import url from "node:url";
-import type { Locals, MaybePromise, Middleware, RequestEvent } from "./types";
-import type { Route } from "./utils";
+import type { Locals, MaybePromise, RequestEvent } from "./types";
+import { importHandler, type Route } from "./utils";
 import { importMiddleware, importRoute, EXTENSIONS } from "./utils";
 import { createRouter } from "radix3";
 
 import type { FileSystemRouteMapper } from "./routing/fileSystemRouteMapper";
 import { DefaultFileSystemRouteMapper } from "./routing/fileSystemRouteMapper";
 import { getFileSystemRoutesMap } from "./routing/getFileSystemRoutesMap";
-import { handle404 } from "./handler/utils";
 
 /**
  * File system router options.
@@ -42,13 +41,20 @@ export interface FileSystemRouterOptions {
   routesDir?: string;
 
   /**
-   * The path of the middleware relative to the routesDir.
+   * The name of the file that exports a default function used as middleware, this should be located inside the `routesDir`.
    *
    * Use `false` to disable middleware.
    *
    * @default "middleware"
    */
   middleware?: string | false;
+
+  /**
+   * The name of the file that exports a default function used as 404 handler, this should be located inside the `routesDir`.
+   *
+   * @default "404"
+   */
+  notFound?: string;
 
   /**
    * Controls how to map a file-system path to a route.
@@ -90,14 +96,6 @@ export interface FileSystemRouterOptions {
   getLocals?: (event: RequestEvent) => MaybePromise<Locals>;
 
   /**
-   * Handle a 404 request.
-   *
-   * @conflicts
-   * Cannot be used with `workers`
-   */
-  onNotFound?: (event: RequestEvent) => MaybePromise<Response>;
-
-  /**
    * Use node worker threads for handling the requests.
    *
    * We recommend benchmarking your endpoints to ensure if using multiple threads is beneficial for your app,
@@ -137,9 +135,9 @@ export function initializeFileSystemRouter(options?: FileSystemRouterOptions & I
     routesDir = "src/routes",
     ignoreFiles = [],
     middleware = "middleware",
+    notFound = "404",
     extensions = EXTENSIONS as string[],
     routeMapper = new DefaultFileSystemRouteMapper(),
-    onNotFound = handle404,
     getLocals = initLocals,
     workers,
 
@@ -154,6 +152,11 @@ export function initializeFileSystemRouter(options?: FileSystemRouterOptions & I
   if (middleware) {
     const globExts = EXTENSIONS.join(",");
     ignoreFiles.push(`**/**/${middleware}.{${globExts}}`);
+  }
+
+  if (notFound) {
+    const globExts = EXTENSIONS.join(",");
+    ignoreFiles.push(`**/**/${notFound}.{${globExts}}`);
   }
 
   if (!skipOriginCheck && origin == null) {
@@ -204,16 +207,31 @@ export function initializeFileSystemRouter(options?: FileSystemRouterOptions & I
     };
   }
 
-  let middlewarePromise: Promise<Middleware> | undefined = undefined;
+  const middlewarePromise = (async () => {
+    if (middleware) {
+      const middlewareFile = findFile(routesDirPath, middleware, EXTENSIONS);
 
-  if (middleware) {
-    const middlewareFile = findFile(routesDirPath, middleware, EXTENSIONS);
-
-    if (middlewareFile) {
-      const importPath = url.pathToFileURL(middlewareFile).href;
-      middlewarePromise = importMiddleware(importPath);
+      if (middlewareFile) {
+        const importPath = url.pathToFileURL(middlewareFile).href;
+        return importMiddleware(importPath);
+      }
     }
-  }
+
+    return undefined;
+  })();
+
+  const notFoundPromise = (async () => {
+    if (notFound) {
+      const notFoundFile = findFile(routesDirPath, notFound, EXTENSIONS);
+
+      if (notFoundFile) {
+        const importPath = url.pathToFileURL(notFoundFile).href;
+        return importHandler(importPath);
+      }
+    }
+
+    return undefined;
+  })();
 
   const routerPromise = createFileSystemRouter({
     cwd,
@@ -228,8 +246,8 @@ export function initializeFileSystemRouter(options?: FileSystemRouterOptions & I
     type: "handler" as const,
     routerPromise,
     middlewarePromise,
+    notFoundPromise,
     routeMapper,
-    onNotFound,
     getLocals,
     initialOptions,
   };

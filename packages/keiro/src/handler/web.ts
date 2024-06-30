@@ -4,9 +4,9 @@ import { EXTENSIONS, getRouteHandler, normalizePath } from "../utils";
 import type { WorkerRouterData } from "./worker.mjs";
 import { handleRequestOnWorker } from "../workers/handleRequestOnWorker";
 import { WorkerPool } from "../workers/workerPool";
-import type { MaybePromise } from "../types";
+import type { MaybePromise, Next } from "../types";
 import url from "node:url";
-import { createRequestEvent } from "./utils";
+import { createRequestEvent, handleNotFound } from "./utils";
 import { applyResponseCookies } from "../cookies";
 import { getFileSystemRoutesMap } from "../routing/getFileSystemRoutesMap";
 
@@ -32,25 +32,27 @@ export function fileSystemRouter(options?: FileSystemRouterOptions): RequestHand
     });
   }
 
-  const { onNotFound, getLocals, routerPromise, middlewarePromise } = fsRouterOptions;
+  const { getLocals, routerPromise, middlewarePromise, notFoundPromise } = fsRouterOptions;
 
   return async (request: Request) => {
     const router = await routerPromise;
     const middleware = await middlewarePromise;
+    const handle404 = (await notFoundPromise) ?? handleNotFound;
 
     const url = new URL(request.url);
     const match = router.lookup(url.pathname);
 
     const { params = {}, ...route } = match || {};
-    const handler = getRouteHandler(request, route) || onNotFound;
+    const handler = getRouteHandler(request, route) || handle404;
     const requestEvent = await createRequestEvent({ request, params, getLocals });
 
     let response: Response;
 
     if (middleware) {
-      response = await middleware(requestEvent, handler);
+      const next: Next = (event) => handler(event, handle404);
+      response = await middleware(requestEvent, next);
     } else {
-      response = await handler(requestEvent);
+      response = await handler(requestEvent, handle404);
     }
 
     applyResponseCookies(response, requestEvent.cookies);

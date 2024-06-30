@@ -26,6 +26,6 @@ export function createRequestEvent({
   return { request, params, url, cookies, locals: {} };
 }
 
-export function handle404() {
+export function handleNotFound() {
   return new Response(null, { status: 404 });
 }

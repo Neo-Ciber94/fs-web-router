@@ -7,10 +7,12 @@ import {
   getRouteHandler,
   headersToObject,
   objectToHeaders,
+  importHandler,
 } from "../utils";
 import url from "node:url";
-import { createRequestEvent, handle404 } from "./utils";
+import { createRequestEvent, handleNotFound } from "./utils";
 import { applyResponseCookies } from "../cookies";
+import { type Next } from "../types";
 
 export type RequestParts =
   | {
@@ -46,7 +48,7 @@ export type ResponseParts =
       done: true;
     };
 
-const { router, middleware } = await createWorkerRouter();
+const { router, middleware, handle404 } = await createWorkerRouter();
 
 parentPort!.on("message", handleWorkerRequest);
 
@@ -90,16 +92,17 @@ async function handleWorkerResponse(request: Request) {
   const url = new URL(request.url);
   const match = router.lookup(url.pathname);
   const { params = {}, ...route } = match || {};
-  const handler = getRouteHandler(request, route) || handle404;
+  const handler = getRouteHandler(request, route) || handleNotFound;
 
   const response = await (async () => {
     const requestEvent = await createRequestEvent({ request, params });
     let response: Response;
 
     if (middleware) {
-      response = await middleware(requestEvent, handler);
+      const next: Next = (event) => handler(event, handle404);
+      response = await middleware(requestEvent, next);
     } else {
-      response = await handler(requestEvent);
+      response = await handler(requestEvent, handle404);
     }
 
     applyResponseCookies(response, requestEvent.cookies);
@@ -158,10 +161,11 @@ function isPlainText(headers: Headers) {
 export interface WorkerRouterData {
   routesFilePaths: Record<string, string>;
   middlewareFilePath?: string;
+  notFoundFilePath?: string;
 }
 
 async function createWorkerRouter() {
-  const { middlewareFilePath, routesFilePaths } = workerData as WorkerRouterData;
+  const { middlewareFilePath, notFoundFilePath, routesFilePaths } = workerData as WorkerRouterData;
   const routes: Record<string, Route> = {};
 
   for (const [key, routeFilePath] of Object.entries(routesFilePaths)) {
@@ -173,5 +177,9 @@ async function createWorkerRouter() {
     ? await importMiddleware(url.pathToFileURL(middlewareFilePath).href)
     : undefined;
 
-  return { router, middleware };
+  const handle404 = notFoundFilePath
+    ? await importHandler(url.pathToFileURL(notFoundFilePath).href)
+    : handleNotFound;
+
+  return { router, middleware, handle404 };
 }

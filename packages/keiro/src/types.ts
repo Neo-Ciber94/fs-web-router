@@ -54,9 +54,14 @@ export interface RequestEvent {
 /**
  * A request handler.
  */
-export type Handler = (event: RequestEvent) => MaybePromise<Response>;
+export type Handler = (event: RequestEvent, next: Handler) => MaybePromise<Response>;
 
 /**
- * A middleware handler.
+ * The next handler in a middleware chain.
  */
-export type Middleware = (event: RequestEvent, next: Handler) => MaybePromise<Response>;
+export type Next = (event: RequestEvent) => MaybePromise<Response>;
+
+/**
+ * A request middleware.
+ */
+export type Middleware = (event: RequestEvent, next: Next) => MaybePromise<Response>;

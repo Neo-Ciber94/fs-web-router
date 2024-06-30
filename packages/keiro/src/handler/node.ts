@@ -7,9 +7,9 @@ import { EXTENSIONS, getRouteHandler, normalizePath } from "../utils";
 import type { WorkerRouterData } from "./worker.mjs";
 import { handleRequestOnWorker } from "../workers/handleRequestOnWorker";
 import { WorkerPool } from "../workers/workerPool";
-import type { MaybePromise } from "../types";
+import type { MaybePromise, Next } from "../types";
 import url from "node:url";
-import { createRequestEvent } from "./utils";
+import { createRequestEvent, handleNotFound } from "./utils";
 import { invariant } from "../common/invariant";
 import { applyResponseCookies } from "../cookies";
 import { getFileSystemRoutesMap } from "../routing/getFileSystemRoutesMap";
@@ -38,11 +38,11 @@ export function fileSystemRouter(options?: FileSystemRouterOptions): RequestHand
   }
 
   const {
-    onNotFound,
     getLocals,
     initialOptions: { origin },
     routerPromise,
     middlewarePromise,
+    notFoundPromise,
   } = fsRouterOptions;
 
   invariant(origin, "Origin is not set");
@@ -51,6 +51,7 @@ export function fileSystemRouter(options?: FileSystemRouterOptions): RequestHand
   return async (req: http.IncomingMessage, res: http.ServerResponse, next: (err?: any) => void) => {
     const router = await routerPromise;
     const middleware = await middlewarePromise;
+    const handle404 = (await notFoundPromise) ?? handleNotFound;
 
     const match = req.url ? router.lookup(new URL(req.url, origin).pathname) : null;
     let response: Response;
@@ -59,13 +60,14 @@ export function fileSystemRouter(options?: FileSystemRouterOptions): RequestHand
       const request = await createRequest({ req, baseUrl: origin });
       const { params = {}, ...route } = match || {};
 
-      const handler = getRouteHandler(request, route) || onNotFound;
+      const handler = getRouteHandler(request, route) || handle404;
       const requestEvent = await createRequestEvent({ request, params, getLocals });
 
       if (middleware) {
-        response = await middleware(requestEvent, handler);
+        const next: Next = (event) => handler(event, handle404);
+        response = await middleware(requestEvent, next);
       } else {
-        response = await handler(requestEvent);
+        response = await handler(requestEvent, handle404);
       }
 
       applyResponseCookies(response, requestEvent.cookies);
@@ -77,9 +79,9 @@ export function fileSystemRouter(options?: FileSystemRouterOptions): RequestHand
   };
 }
 
-type WorkerFileSystemRouterOptions = ReturnType<
-  typeof initializeFileSystemRouter
->["initialOptions"] & {
+type InitialOptions = ReturnType<typeof initializeFileSystemRouter>["initialOptions"];
+
+type WorkerFileSystemRouterOptions = InitialOptions & {
   middlewareFilePath: string | null | undefined;
   workerCount: number;
 };
