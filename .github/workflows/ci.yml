@@ -25,12 +25,6 @@ jobs:
       - name: Setup monorepo
         run: |
           rm bun.lockb
-          touch pnpm-workspace.yaml
-          cat <<EOT >> pnpm-workspace.yaml
-          packages:
-            - 'packages/*'
-            - 'examples/*'
-          EOT
 
       - name: Install pnpm
         uses: pnpm/action-setup@v4
