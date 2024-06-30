@@ -1,16 +1,16 @@
 import { createRouter } from "radix3";
 import { parentPort, workerData, threadId } from "node:worker_threads";
+import type { Route } from "../utils";
 import {
-  createMiddleware,
-  createRoute,
+  importMiddleware,
+  importRoute,
   getRouteHandler,
   headersToObject,
   objectToHeaders,
-} from "./utils";
+} from "../utils";
 import url from "node:url";
-import { createRequestEvent } from "./handler/utils";
-import { applyResponseCookies } from "./cookies";
-import { type Route } from "./fileSystemRouter";
+import { createRequestEvent } from "./utils";
+import { applyResponseCookies } from "../cookies";
 
 export type RequestParts =
   | {
@@ -165,12 +165,12 @@ async function createWorkerRouter() {
   const routes: Record<string, Route> = {};
 
   for (const [key, routeFilePath] of Object.entries(routesFilePaths)) {
-    routes[key] = await createRoute(routeFilePath);
+    routes[key] = await importRoute(routeFilePath);
   }
 
   const router = createRouter<Route>({ routes });
   const middleware = middlewareFilePath
-    ? await createMiddleware(url.pathToFileURL(middlewareFilePath).href)
+    ? await importMiddleware(url.pathToFileURL(middlewareFilePath).href)
     : undefined;
 
   return { router, middleware };

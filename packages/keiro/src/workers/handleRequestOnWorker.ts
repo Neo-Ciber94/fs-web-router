@@ -1,5 +1,5 @@
 import { type Worker } from "node:worker_threads";
-import type { ResponseParts, RequestParts } from "../worker.mjs";
+import type { ResponseParts, RequestParts } from "../handler/worker.mjs";
 import { headersToObject, objectToHeaders } from "../utils";
 
 export function handleRequestOnWorker(worker: Worker, request: Request) {

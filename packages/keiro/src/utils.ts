@@ -1,6 +1,5 @@
-import { type Route } from "./fileSystemRouter";
-import { invariant } from "./invariant";
-import type { Middleware } from "./types";
+import { invariant } from "./common/invariant";
+import type { Handler, Middleware } from "./types";
 import path from "node:path";
 
 export const EXTENSIONS = Object.freeze(["js", "jsx", "cjs", "mjs", "ts", "tsx", "cts", "mts"]);
@@ -8,7 +7,15 @@ export const HTTP_METHODS = ["GET", "POST", "PUT", "PATCH", "DELETE", "HEAD", "O
 
 export type HttpMethod = (typeof HTTP_METHODS)[number];
 
-export async function createRoute(filePath: string): Promise<Route> {
+type RouteHttpMethodHandler = {
+  [M in HttpMethod]?: Handler;
+};
+
+export type Route = RouteHttpMethodHandler & {
+  default?: Handler;
+};
+
+export async function importRoute(filePath: string): Promise<Route> {
   const mod = await importModule(filePath);
 
   if (!mod) {
@@ -34,7 +41,7 @@ export async function createRoute(filePath: string): Promise<Route> {
   return route;
 }
 
-export async function createMiddleware(filePath: string): Promise<Middleware> {
+export async function importMiddleware(filePath: string): Promise<Middleware> {
   const mod = await importModule(filePath);
 
   if (!mod || typeof mod.default !== "function") {

@@ -1,18 +1,18 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { type FileSystemRouterOptions, initializeFileSystemRouter } from "../fileSystemRouter";
-import { createRequest, setResponse } from "../nodeHelpers";
+import { createRequest, setResponse } from "../common/nodeHelpers";
 import type http from "node:http";
 import { posix as path } from "node:path";
 import { EXTENSIONS, getRouteHandler, normalizePath } from "../utils";
-import type { WorkerRouterData } from "../worker.mjs";
+import type { WorkerRouterData } from "./worker.mjs";
 import { handleRequestOnWorker } from "../workers/handleRequestOnWorker";
 import { WorkerPool } from "../workers/workerPool";
 import type { MaybePromise } from "../types";
 import url from "node:url";
 import { createRequestEvent } from "./utils";
-import { invariant } from "../invariant";
+import { invariant } from "../common/invariant";
 import { applyResponseCookies } from "../cookies";
-import { getRouterMap } from "../routing";
+import { getFileSystemRoutesMap } from "../routing/getFileSystemRoutesMap";
 
 const __dirname = path.dirname(normalizePath(url.fileURLToPath(import.meta.url)));
 
@@ -105,7 +105,7 @@ function workerFileSystemRouter(options: WorkerFileSystemRouterOptions) {
     ignoreFiles.push(`**/**/${middleware}.{${globExts}}`);
   }
 
-  const routesFilePaths = getRouterMap({
+  const routesFilePaths = getFileSystemRoutesMap({
     cwd,
     routesDir,
     ignorePrefix,
@@ -114,7 +114,7 @@ function workerFileSystemRouter(options: WorkerFileSystemRouterOptions) {
     extensions,
   });
 
-  const workerFilePath = "file://" + path.join(__dirname, "..", "worker.mjs");
+  const workerFilePath = "file://" + path.join(__dirname, "worker.mjs");
 
   const pool = new WorkerPool(workerCount, workerFilePath, {
     workerData: {

@@ -2,13 +2,14 @@ import path from "node:path";
 import { existsSync } from "node:fs";
 import os from "node:os";
 import url from "node:url";
-import type { Handler, Locals, MaybePromise, Middleware, RequestEvent } from "./types";
-import type { HttpMethod } from "./utils";
-import { createMiddleware, createRoute, EXTENSIONS } from "./utils";
+import type { Locals, MaybePromise, Middleware, RequestEvent } from "./types";
+import type { Route } from "./utils";
+import { importMiddleware, importRoute, EXTENSIONS } from "./utils";
 import { createRouter } from "radix3";
-import { getRouterMap } from "./routing";
+
 import type { FileSystemRouteMapper } from "./routing/fileSystemRouteMapper";
 import { DefaultFileSystemRouteMapper } from "./routing/fileSystemRouteMapper";
+import { getFileSystemRoutesMap } from "./routing/getFileSystemRoutesMap";
 
 /**
  * File system router options.
@@ -209,7 +210,7 @@ export function initializeFileSystemRouter(options?: FileSystemRouterOptions & I
 
     if (middlewareFile) {
       const importPath = url.pathToFileURL(middlewareFile).href;
-      middlewarePromise = createMiddleware(importPath);
+      middlewarePromise = importMiddleware(importPath);
     }
   }
 
@@ -242,22 +243,14 @@ export interface CreateRouterOptions {
   routeMapper: FileSystemRouteMapper;
 }
 
-type RouteHttpMethodHandler = {
-  [M in HttpMethod]?: Handler;
-};
-
-export type Route = RouteHttpMethodHandler & {
-  default?: Handler;
-};
-
 async function createFileSystemRouter(options: CreateRouterOptions) {
-  const routesMap = getRouterMap(options);
+  const routesMap = getFileSystemRoutesMap(options);
   const routes: Record<string, Route> = {};
   const routePromises: Promise<Route>[] = [];
 
   for (const [key, routeFilePath] of Object.entries(routesMap)) {
     routePromises.push(
-      createRoute(routeFilePath).then((route) => {
+      importRoute(routeFilePath).then((route) => {
         routes[key] = route;
         return route;
       }),

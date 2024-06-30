@@ -54,9 +54,9 @@
     "./types": {
       "types": "./dist/types.d.ts"
     },
-    "./matchingPattern": {
-      "import": "./dist/matchingPattern.js",
-      "types": "./dist/matchingPattern.d.ts"
+    "./routing": {
+      "import": "./dist/routing/index.js",
+      "types": "./dist/routing/index.d.ts"
     }
   },
   "files": [

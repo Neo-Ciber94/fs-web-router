@@ -106,7 +106,12 @@ export class DefaultFileSystemRouteMapper extends FileSystemRouteMapper {
   }
 }
 
-function isIgnoredFilePath(filePath: string, ignorePrefix: string) {
+/**
+ * Checks whether if the given file path should be excluded from the file-system routing.
+ * @param filePath The file path.
+ * @param ignorePrefix The ignore prefix.
+ */
+export function isIgnoredFilePath(filePath: string, ignorePrefix: string) {
   return filePath
     .split("/")
     .filter(Boolean)
