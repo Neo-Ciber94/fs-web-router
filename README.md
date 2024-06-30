@@ -14,7 +14,7 @@ A file-system router compatible with [WinterGC](https://wintercg.org/).
 // src/main.ts
 import { fileSystemRouter } from "keiro/web";
 
-const port = Number(process.env.PORT ?? 5022);
+const port = Number(process.env.PORT ?? 5021);
 
 const server = Bun.serve({
   port,
@@ -38,7 +38,7 @@ export default defineHandler(() => {
 import express from "express";
 import { fileSystemRouter } from "keiro/node";
 
-const port = Number(process.env.PORT ?? 5000);
+const port = Number(process.env.PORT ?? 5022);
 const origin = `http://localhost:${port}`;
 
 const app = express();
