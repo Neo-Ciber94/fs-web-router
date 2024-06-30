@@ -1,4 +1,4 @@
-import type { Route } from "./createFileSystemRouter";
+import { type Route } from "./fileSystemRouter";
 import { invariant } from "./invariant";
 import type { Middleware } from "./types";
 import path from "node:path";

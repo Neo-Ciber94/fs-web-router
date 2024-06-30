@@ -58,9 +58,9 @@ export function fileSystemRouter(options?: FileSystemRouterOptions): RequestHand
   };
 }
 
-type WorkerFileSystemRouterOptions = ReturnType<
-  typeof initializeFileSystemRouter
->["initialOptions"] & {
+type InitialOptions = ReturnType<typeof initializeFileSystemRouter>["initialOptions"];
+
+type WorkerFileSystemRouterOptions = InitialOptions & {
   middlewareFilePath: string | null | undefined;
   workerCount: number;
 };
@@ -70,15 +70,13 @@ function workerFileSystemRouter(options: WorkerFileSystemRouterOptions) {
     cwd,
     ignoreFiles,
     ignorePrefix,
-    matchingPattern,
+    routeMapper,
     middleware,
     middlewareFilePath,
     workerCount,
     routesDir,
     extensions,
   } = options;
-
-  const routesDirPath = path.join(cwd, routesDir);
 
   if (middlewareFilePath) {
     const globExts = EXTENSIONS.join(",");
@@ -87,9 +85,9 @@ function workerFileSystemRouter(options: WorkerFileSystemRouterOptions) {
 
   const routesFilePaths = getRouterMap({
     cwd,
+    routesDir,
     ignorePrefix,
-    matchingPattern,
-    routesDirPath,
+    routeMapper,
     ignoreFiles,
     extensions,
   });

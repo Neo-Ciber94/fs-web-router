@@ -89,7 +89,7 @@ function workerFileSystemRouter(options: WorkerFileSystemRouterOptions) {
     cwd,
     ignoreFiles,
     ignorePrefix,
-    matchingPattern,
+    routeMapper,
     middleware,
     middlewareFilePath,
     workerCount,
@@ -100,8 +100,6 @@ function workerFileSystemRouter(options: WorkerFileSystemRouterOptions) {
 
   invariant(origin, "Origin is not set");
 
-  const routesDirPath = path.join(cwd, routesDir);
-
   if (middlewareFilePath) {
     const globExts = EXTENSIONS.join(",");
     ignoreFiles.push(`**/**/${middleware}.{${globExts}}`);
@@ -109,9 +107,9 @@ function workerFileSystemRouter(options: WorkerFileSystemRouterOptions) {
 
   const routesFilePaths = getRouterMap({
     cwd,
+    routesDir,
     ignorePrefix,
-    matchingPattern,
-    routesDirPath,
+    routeMapper,
     ignoreFiles,
     extensions,
   });

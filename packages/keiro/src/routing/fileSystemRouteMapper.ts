@@ -1,4 +1,4 @@
-// import { MatchingPattern, nextJsPatternMatching } from "./matchingPattern";
+import { type MatchingPattern, nextJsPatternMatching } from "./matchingPattern";
 
 /**
  * A part of a route path.
@@ -30,26 +30,66 @@ export abstract class FileSystemRouteMapper {
   abstract toPath(filePath: string): RouteSegment[] | undefined;
 }
 
-// interface DefaultFileSystemRouteMapperOptions {
-//   matching?: MatchingPattern;
-//   ignorePrefix?: string;
-// }
+interface DefaultFileSystemRouteMapperOptions {
+  matching?: MatchingPattern;
+  ignorePrefix?: string;
+}
 
-// export class DefaultFileSystemRouteMapper extends FileSystemRouteMapper {
-//   #matchingPattern: MatchingPattern;
-//   #ignorePrefix: string;
+export class DefaultFileSystemRouteMapper extends FileSystemRouteMapper {
+  #matchingPattern: MatchingPattern;
+  #ignorePrefix: string;
 
-//   constructor(options?: DefaultFileSystemRouteMapperOptions) {
-//     super();
-//     const { matching = nextJsPatternMatching(), ignorePrefix = "_" } = options || {};
+  constructor(options?: DefaultFileSystemRouteMapperOptions) {
+    super();
+    const { matching = nextJsPatternMatching(), ignorePrefix = "_" } = options || {};
 
-//     this.#matchingPattern = matching;
-//     this.#ignorePrefix = ignorePrefix;
-//   }
+    this.#matchingPattern = matching;
+    this.#ignorePrefix = ignorePrefix;
+  }
 
-//   toPath(filePath: string): RouteSegment[] | undefined {
-//     throw new Error("Method not implemented.");
-//   }
+  toPath(filePath: string): RouteSegment[] | undefined {
+    if (isIgnoredFilePath(filePath, this.#ignorePrefix)) {
+      return undefined;
+    }
 
-//   private isIgnored(filePath: string) {}
-// }
+    const filePathSegments = filePath
+      // Remove the extensions: js, jsx, cjs, mjs, ts, tsx, cts, mts
+      .replace(/\.[cm]?(ts|js)x?/, "")
+      // Ignore trailing /index file, we trait it as "/"
+      .replace(/\/index$/, "")
+      // Split into segments
+      .split("/")
+      // Skip empty segments
+      .filter(Boolean)
+      // We ignore folders with this pattern (<name>)
+      .filter((s, idx, arr) => !/\(.+\)/.test(s) && idx < arr.length)
+      // Convert segment to a RouteSegment
+      .map((p, _, filePathSegments) => this.toRouteSegment(p, filePathSegments));
+
+    return filePathSegments;
+  }
+
+  private toRouteSegment(pathSegment: string, filePathSegments: string[]): RouteSegment {
+    const matchingPattern = this.#matchingPattern;
+    let match: string | null | undefined | false = undefined;
+
+    if ((match = matchingPattern.matchOptionalCatchAll(pathSegment, filePathSegments))) {
+      return { path: match, type: "catch-all", optional: true };
+    } else if ((match = matchingPattern.matchOptionalDynamic(pathSegment, filePathSegments))) {
+      return { path: match, type: "dynamic", optional: true };
+    } else if ((match = matchingPattern.matchCatchAll(pathSegment, filePathSegments))) {
+      return { path: match, type: "catch-all" };
+    } else if ((match = matchingPattern.matchDynamic(pathSegment, filePathSegments))) {
+      return { path: match, type: "dynamic" };
+    } else {
+      return { path: pathSegment, type: "static" };
+    }
+  }
+}
+
+function isIgnoredFilePath(filePath: string, ignorePrefix: string) {
+  return filePath
+    .split("/")
+    .filter(Boolean)
+    .some((p) => p.startsWith(ignorePrefix));
+}

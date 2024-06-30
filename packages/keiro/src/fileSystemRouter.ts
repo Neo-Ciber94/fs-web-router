@@ -2,12 +2,13 @@ import path from "node:path";
 import { existsSync } from "node:fs";
 import os from "node:os";
 import url from "node:url";
-import { type MatchingPattern, nextJsPatternMatching } from "./routing/matchingPattern";
 import type { Handler, Locals, MaybePromise, Middleware, RequestEvent } from "./types";
 import type { HttpMethod } from "./utils";
 import { createMiddleware, createRoute, EXTENSIONS } from "./utils";
 import { createRouter } from "radix3";
 import { getRouterMap } from "./routing";
+import type { FileSystemRouteMapper } from "./routing/fileSystemRouteMapper";
+import { DefaultFileSystemRouteMapper } from "./routing/fileSystemRouteMapper";
 
 /**
  * File system router options.
@@ -48,7 +49,7 @@ export interface FileSystemRouterOptions {
   middleware?: string | false;
 
   /**
-   * Defines the matching pattern used for the file system routing.
+   * Controls how to map a file-system path to a route.
    *
    * Defaults to:
    * - dynamic: `[id]`
@@ -56,7 +57,7 @@ export interface FileSystemRouterOptions {
    * - optional dynamic: `[[id]]`
    * - optional catch-all: `[[...params]]`
    */
-  matchingPattern?: MatchingPattern;
+  routeMapper?: FileSystemRouteMapper;
 
   /**
    * Extensions of the files to use as routes.
@@ -135,7 +136,7 @@ export function initializeFileSystemRouter(options?: FileSystemRouterOptions & I
     ignoreFiles = [],
     middleware = "middleware",
     extensions = EXTENSIONS as string[],
-    matchingPattern = nextJsPatternMatching(),
+    routeMapper = new DefaultFileSystemRouteMapper(),
     onNotFound = handle404,
     getLocals = initLocals,
     workers,
@@ -180,8 +181,8 @@ export function initializeFileSystemRouter(options?: FileSystemRouterOptions & I
     routesDir,
     ignoreFiles,
     middleware,
-    matchingPattern,
     extensions,
+    routeMapper,
   };
 
   if (workers) {
@@ -195,6 +196,7 @@ export function initializeFileSystemRouter(options?: FileSystemRouterOptions & I
       type: "worker" as const,
       origin,
       workerCount,
+      routeMapper,
       middlewareFilePath,
       initialOptions,
     };
@@ -213,10 +215,10 @@ export function initializeFileSystemRouter(options?: FileSystemRouterOptions & I
 
   const routerPromise = createFileSystemRouter({
     cwd,
+    routesDir,
     ignorePrefix,
     ignoreFiles,
-    matchingPattern,
-    routesDirPath,
+    routeMapper,
     extensions,
   });
 
@@ -224,6 +226,7 @@ export function initializeFileSystemRouter(options?: FileSystemRouterOptions & I
     type: "handler" as const,
     routerPromise,
     middlewarePromise,
+    routeMapper,
     onNotFound,
     getLocals,
     initialOptions,
@@ -232,11 +235,11 @@ export function initializeFileSystemRouter(options?: FileSystemRouterOptions & I
 
 export interface CreateRouterOptions {
   cwd: string;
-  routesDirPath: string;
+  routesDir: string;
   ignoreFiles?: string[];
   ignorePrefix: string;
   extensions: string[];
-  matchingPattern: MatchingPattern;
+  routeMapper: FileSystemRouteMapper;
 }
 
 type RouteHttpMethodHandler = {

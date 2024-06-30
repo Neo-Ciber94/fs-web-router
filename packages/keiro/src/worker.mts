@@ -1,6 +1,5 @@
 import { createRouter } from "radix3";
 import { parentPort, workerData, threadId } from "node:worker_threads";
-import type { Route } from "./createFileSystemRouter";
 import {
   createMiddleware,
   createRoute,
@@ -11,6 +10,7 @@ import {
 import url from "node:url";
 import { createRequestEvent } from "./handler/utils";
 import { applyResponseCookies } from "./cookies";
+import { type Route } from "./fileSystemRouter";
 
 export type RequestParts =
   | {

@@ -8,7 +8,8 @@ import type { CreateRouterOptions } from "../fileSystemRouter";
  * @internal
  */
 export function getRouterMap(options: CreateRouterOptions) {
-  const { cwd, routesDirPath, extensions, ignoreFiles, ignorePrefix, matchingPattern } = options;
+  const { cwd, routesDir, extensions, ignoreFiles, routeMapper } = options;
+  const routesDirPath = path.join(cwd, routesDir);
 
   const dir = routesDirPath.endsWith("/")
     ? routesDirPath.substring(0, routesDirPath.length - 1)
@@ -18,44 +19,18 @@ export function getRouterMap(options: CreateRouterOptions) {
   const routesMap = new Map<string, RouteSegment[]>();
 
   for (const file of files) {
-    if (isIgnored(file, ignorePrefix)) {
-      continue;
+    const filePath = path.relative(routesDirPath, path.join(cwd, file));
+    const segments = routeMapper.toPath(filePath);
+
+    if (segments) {
+      routesMap.set(file, segments);
     }
-
-    const pathSegments = path
-      .relative(routesDirPath, path.join(cwd, file))
-      .replace(/\.[cm]?(ts|js)x?/, "")
-      .split("/");
-
-    if (pathSegments[pathSegments.length - 1] === "index") {
-      pathSegments.pop();
-    }
-
-    const segments: RouteSegment[] = [];
-
-    for (const pathSegment of pathSegments) {
-      let match: string | null | undefined | false = undefined;
-
-      if ((match = matchingPattern.matchOptionalCatchAll(pathSegment, pathSegments))) {
-        segments.push({ path: match, type: "catch-all", optional: true });
-      } else if ((match = matchingPattern.matchOptionalDynamic(pathSegment, pathSegments))) {
-        segments.push({ path: match, type: "dynamic", optional: true });
-      } else if ((match = matchingPattern.matchCatchAll(pathSegment, pathSegments))) {
-        segments.push({ path: match, type: "catch-all", optional: false });
-      } else if ((match = matchingPattern.matchDynamic(pathSegment, pathSegments))) {
-        segments.push({ path: match, type: "dynamic", optional: false });
-      } else {
-        segments.push({ path: pathSegment, type: "static" });
-      }
-    }
-
-    routesMap.set(file, segments);
   }
 
   const routes: Record<string, string> = {};
 
   for (const [routePath, segments] of routesMap.entries()) {
-    for (const p of createRoutePaths(segments)) {
+    for (const p of toRadix3(segments)) {
       if (p in routes) {
         throw new Error(`Route '${p}' already exists`);
       }
@@ -78,7 +53,7 @@ function scanFileSystemRoutes(dir: string, extensions: string[], ignoreFiles?: s
   return files.filter((file) => dotExtensions.includes(path.extname(file)));
 }
 
-function createRoutePaths(segments: RouteSegment[]) {
+function toRadix3(segments: RouteSegment[]) {
   function reduceSegments(s: RouteSegment[]) {
     const routePath = s.reduce((acc, p) => {
       switch (p.type) {
@@ -110,9 +85,9 @@ function createRoutePaths(segments: RouteSegment[]) {
   return paths;
 }
 
-function isIgnored(filePath: string, ignorePrefix: string) {
-  return filePath
-    .split("/")
-    .filter(Boolean)
-    .some((p) => p.startsWith(ignorePrefix));
-}
+// function isIgnored(filePath: string, ignorePrefix: string) {
+//   return filePath
+//     .split("/")
+//     .filter(Boolean)
+//     .some((p) => p.startsWith(ignorePrefix));
+// }
