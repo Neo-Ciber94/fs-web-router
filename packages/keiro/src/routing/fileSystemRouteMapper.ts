@@ -30,11 +30,30 @@ export abstract class FileSystemRouteMapper {
   abstract toPath(filePath: string): RouteSegment[] | undefined;
 }
 
-interface DefaultFileSystemRouteMapperOptions {
+/**
+ * Options for the default file system route mapper.
+ */
+export interface DefaultFileSystemRouteMapperOptions {
+  /**
+   * Extract params from paths.
+   */
   matching?: MatchingPattern;
+
+  /**
+   * Prefix for ignore routes.
+   */
   ignorePrefix?: string;
 }
 
+/**
+ * The default file system route mapper.
+ *
+ * By default it extracts the values using:
+ * - dynamic: `[id]`
+ * - catch-all: `[...params]`
+ * - optional dynamic: `[[id]]`
+ * - optional catch-all: `[[...params]]`
+ */
 export class DefaultFileSystemRouteMapper extends FileSystemRouteMapper {
   #matchingPattern: MatchingPattern;
   #ignorePrefix: string;
