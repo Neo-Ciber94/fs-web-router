@@ -2,9 +2,9 @@ name: CI
 
 on:
   push:
-    branches: [ "main" ]
+    branches: ["main"]
   pull_request:
-    branches: [ "main" ]
+    branches: ["main"]
 
 jobs:
   tests:
@@ -13,7 +13,7 @@ jobs:
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
-        
+
       - uses: actions/setup-node@v4
         name: Setup node
         with:
@@ -36,13 +36,13 @@ jobs:
             - 'packages/*'
             - 'examples/**'
           EOT
-                    
+
       - name: Install dependencies
         run: pnpm install -r
 
       - name: Build lib
         run: npm run build
- 
+
       - name: Run typecheck
         run: npm run typecheck
 
