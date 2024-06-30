@@ -6,9 +6,17 @@
                 "dist/**"
             ]
         },
-        "typecheck": {},
-        "test": {},
-        "lint": {},
-        "format": {}
+        "test": {
+            "cache": false
+        },
+        "typecheck": {
+            "cache": false
+        },
+        "lint": {
+            "cache": false
+        },
+        "format": {
+            "cache": false
+        }
     }
 }
