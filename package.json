@@ -1,10 +1,6 @@
 {
   "name": "monorepo",
   "private": true,
-  "workspaces": [
-    "packages/*",
-    "examples/*"
-  ],
   "scripts": {
     "build": "turbo run build --filter ./packages/*",
     "typecheck": "turbo run typecheck",
