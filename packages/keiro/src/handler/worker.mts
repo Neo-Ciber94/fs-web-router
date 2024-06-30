@@ -9,7 +9,7 @@ import {
   objectToHeaders,
 } from "../utils";
 import url from "node:url";
-import { createRequestEvent } from "./utils";
+import { createRequestEvent, handle404 } from "./utils";
 import { applyResponseCookies } from "../cookies";
 
 export type RequestParts =
@@ -90,7 +90,7 @@ async function handleWorkerResponse(request: Request) {
   const url = new URL(request.url);
   const match = router.lookup(url.pathname);
   const { params = {}, ...route } = match || {};
-  const handler = getRouteHandler(request, route) || onNotFound;
+  const handler = getRouteHandler(request, route) || handle404;
 
   const response = await (async () => {
     const requestEvent = await createRequestEvent({ request, params });
@@ -174,8 +174,4 @@ async function createWorkerRouter() {
     : undefined;
 
   return { router, middleware };
-}
-
-function onNotFound() {
-  return new Response(null, { status: 404 });
 }

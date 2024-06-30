@@ -25,3 +25,7 @@ export function createRequestEvent({
 
   return { request, params, url, cookies, locals: {} };
 }
+
+export function handle404() {
+  return new Response(null, { status: 404 });
+}

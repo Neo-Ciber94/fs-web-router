@@ -10,6 +10,7 @@ import { createRouter } from "radix3";
 import type { FileSystemRouteMapper } from "./routing/fileSystemRouteMapper";
 import { DefaultFileSystemRouteMapper } from "./routing/fileSystemRouteMapper";
 import { getFileSystemRoutesMap } from "./routing/getFileSystemRoutesMap";
+import { handle404 } from "./handler/utils";
 
 /**
  * File system router options.
@@ -276,8 +277,4 @@ function findFile(dir: string, name: string, extensions: readonly string[]) {
 
 function initLocals() {
   return {};
-}
-
-function handle404() {
-  return new Response(null, { status: 404 });
 }
