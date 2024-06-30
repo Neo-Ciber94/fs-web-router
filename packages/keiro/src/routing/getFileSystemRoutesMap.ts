@@ -22,7 +22,7 @@ export function getFileSystemRoutesMap(options: CreateRouterOptions) {
     const filePath = path.relative(routesDirPath, path.join(cwd, file));
     const segments = routeMapper.toPath(filePath);
 
-    if (segments) {
+    if (segments !== undefined) {
       routeSegmentsMap.set(file, segments);
     }
   }
