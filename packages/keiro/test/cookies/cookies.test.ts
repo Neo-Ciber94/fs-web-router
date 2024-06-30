@@ -1,4 +1,5 @@
-import polka, { Polka } from "polka";
+import type { Polka } from "polka";
+import polka from "polka";
 import { fileSystemRouter } from "../../src/handler/node.js";
 import { findAvailablePort } from "../utils.js";
 
