@@ -79,14 +79,12 @@ export function normalizePath(p: string) {
 export function headersToObject(headers: Headers) {
   const obj: Record<string, string[]> = {};
 
-  for (const [key, value] of headers) {
-    const headerValues = obj[key] || [];
-
-    if (Array.isArray(value)) {
-      headerValues.push(...value);
-    } else {
-      headerValues.push(value);
+  for (const [key, value] of headers.entries()) {
+    if (obj[key] == null) {
+      obj[key] = [];
     }
+
+    obj[key].push(value);
   }
 
   return obj;
