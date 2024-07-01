@@ -5,5 +5,9 @@
     "unstable": [
         "sloppy-imports"
     ],
-    "imports": {}
+    "imports": {
+        "radix3": "npm:radix3",
+        "cookie": "npm:cookie",
+        "glob": "npm:glob"
+    }
 }
