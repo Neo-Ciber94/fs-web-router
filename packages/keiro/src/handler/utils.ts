@@ -1,5 +1,5 @@
 import { Cookies } from "../cookies";
-import type { Locals, MaybePromise, Params } from "../types";
+import type { Handler, Locals, MaybePromise, Next, Params } from "../types";
 import { type RequestEvent } from "../types";
 
 interface CreateRequestEventArgs {
@@ -28,4 +28,19 @@ export function createRequestEvent({
 
 export function handleNotFound() {
   return new Response(null, { status: 404 });
+}
+
+export function chain(...handlers: Handler[]): Next {
+  return (event) => {
+    function handle(index: number): MaybePromise<Response> {
+      const h = handlers[index];
+      if (h) {
+        return h(event, () => handle(index + 1));
+      } else {
+        return handleNotFound();
+      }
+    }
+
+    return handle(0);
+  };
 }

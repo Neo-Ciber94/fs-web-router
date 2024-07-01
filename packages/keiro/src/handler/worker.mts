@@ -10,9 +10,8 @@ import {
   importHandler,
 } from "../utils";
 import url from "node:url";
-import { createRequestEvent, handleNotFound } from "./utils";
+import { chain, createRequestEvent, handleNotFound } from "./utils";
 import { applyResponseCookies } from "../cookies";
-import { type Next } from "../types";
 
 export type RequestParts =
   | {
@@ -93,16 +92,16 @@ async function handleWorkerResponse(request: Request) {
   const match = router.lookup(url.pathname);
   const { params = {}, ...route } = match || {};
   const handler = getRouteHandler(request, route) || handleNotFound;
+  const next = chain(handler, handle404);
 
   const response = await (async () => {
     const requestEvent = await createRequestEvent({ request, params });
     let response: Response;
 
     if (middleware) {
-      const next: Next = (event) => handler(event, handle404);
       response = await middleware(requestEvent, next);
     } else {
-      response = await handler(requestEvent, handle404);
+      response = await handler(requestEvent, next);
     }
 
     applyResponseCookies(response, requestEvent.cookies);

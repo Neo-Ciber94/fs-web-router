@@ -7,9 +7,9 @@ import { EXTENSIONS, getRouteHandler, normalizePath } from "../utils";
 import type { WorkerRouterData } from "./worker.mjs";
 import { handleRequestOnWorker } from "../workers/handleRequestOnWorker";
 import { WorkerPool } from "../workers/workerPool";
-import type { MaybePromise, Next } from "../types";
+import type { MaybePromise } from "../types";
 import url from "node:url";
-import { createRequestEvent, handleNotFound } from "./utils";
+import { chain, createRequestEvent, handleNotFound } from "./utils";
 import { invariant } from "../common/invariant";
 import { applyResponseCookies } from "../cookies";
 import { getFileSystemRoutesMap } from "../routing/getFileSystemRoutesMap";
@@ -62,12 +62,12 @@ export function fileSystemRouter(options?: FileSystemRouterOptions): RequestHand
 
       const handler = getRouteHandler(request, route) || handle404;
       const requestEvent = await createRequestEvent({ request, params, getLocals });
+      const next = chain(handler, handle404);
 
       if (middleware) {
-        const next: Next = (event) => handler(event, handle404);
         response = await middleware(requestEvent, next);
       } else {
-        response = await handler(requestEvent, handle404);
+        response = await handler(requestEvent, next);
       }
 
       applyResponseCookies(response, requestEvent.cookies);
