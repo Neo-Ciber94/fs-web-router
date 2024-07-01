@@ -4,13 +4,24 @@
 
 A file-system router compatible with [WinterGC](https://wintercg.org/).
 
-## Features
+## ⚡ Features
 
 - Middlewares
 - Request Locals
 - Worker Threads
 
-## Node
+## 📦 Examples
+
+```ts
+// src/routes/index.ts
+import { defineHandler } from "keiro";
+
+export default defineHandler(() => {
+  return new Response("Hello World");
+});
+```
+
+### 🐢 Node
 
 ```ts
 // src/main.ts
@@ -26,16 +37,9 @@ app.use(fileSystemRouter({ origin }));
 app.listen(port, () => {
   console.log(`Listening on http://localhost:${port}`);
 });
-
-// src/routes/index.ts
-import { defineHandler } from "keiro";
-
-export default defineHandler(() => {
-  return new Response("Hello World");
-});
 ```
 
-## Web
+### 🌐 Web
 
 ```ts
 // src/main.ts
@@ -49,11 +53,4 @@ const server = Bun.serve({
 });
 
 console.log(`Listening on http://${server.hostname}:${server.port}`);
-
-// src/routes/index.ts
-import { defineHandler } from "keiro";
-
-export default defineHandler(() => {
-  return new Response("Hello World");
-});
 ```
