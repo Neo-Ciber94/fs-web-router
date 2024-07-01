@@ -1,0 +1,18 @@
+{
+  "name": "node-sample",
+  "version": "1.0.0",
+  "type": "module",
+  "license": "MIT",
+  "scripts": {
+    "dev": "tsx watch ./src/main.ts"
+  },
+  "dependencies": {
+    "express": "^4.19.2",
+    "keiro": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/node": "^20.14.9",
+    "tsx": "^4.15.7",
+    "typescript": "^5.5.2"
+  }
+}

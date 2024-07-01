@@ -19,7 +19,7 @@ const __dirname = path.dirname(normalizePath(url.fileURLToPath(import.meta.url))
 type RequestHandler = (
   req: http.IncomingMessage,
   res: http.ServerResponse,
-  next: (err?: any) => void,
+  next?: (err?: any) => void,
 ) => MaybePromise<void>;
 
 /**
@@ -48,7 +48,11 @@ export function fileSystemRouter(options?: FileSystemRouterOptions): RequestHand
   invariant(origin, "Origin is not set");
 
   /* eslint-disable @typescript-eslint/no-explicit-any */
-  return async (req: http.IncomingMessage, res: http.ServerResponse, next: (err?: any) => void) => {
+  return async (
+    req: http.IncomingMessage,
+    res: http.ServerResponse,
+    next?: (err?: any) => void,
+  ) => {
     const router = await routerPromise;
     const middleware = await middlewarePromise;
     const handle404 = (await notFoundPromise) ?? handleNotFound;
@@ -62,19 +66,23 @@ export function fileSystemRouter(options?: FileSystemRouterOptions): RequestHand
 
       const handler = getRouteHandler(request, route) || handle404;
       const requestEvent = await createRequestEvent({ request, params, getLocals });
-      const next = chain(handler, handle404);
+      const nextHandler = chain(handler, handle404);
 
       if (middleware) {
-        response = await middleware(requestEvent, next);
+        response = await middleware(requestEvent, nextHandler);
       } else {
-        response = await handler(requestEvent, next);
+        response = await handler(requestEvent, nextHandler);
       }
 
       applyResponseCookies(response, requestEvent.cookies);
       setResponse(response, res);
     } catch (err) {
       console.error(err);
-      return next(err);
+      if (next) {
+        return next(err);
+      }
+
+      throw err;
     }
   };
 }
@@ -127,7 +135,11 @@ function workerFileSystemRouter(options: WorkerFileSystemRouterOptions) {
     } as WorkerRouterData,
   });
 
-  return async (req: http.IncomingMessage, res: http.ServerResponse, next: (err?: any) => void) => {
+  return async (
+    req: http.IncomingMessage,
+    res: http.ServerResponse,
+    next?: (err?: any) => void,
+  ) => {
     const worker = await pool.take();
 
     try {
@@ -136,7 +148,11 @@ function workerFileSystemRouter(options: WorkerFileSystemRouterOptions) {
       setResponse(response, res);
     } catch (err) {
       console.error(err);
-      return next(err);
+      if (next) {
+        return next(err);
+      }
+
+      throw err;
     } finally {
       pool.return(worker);
     }

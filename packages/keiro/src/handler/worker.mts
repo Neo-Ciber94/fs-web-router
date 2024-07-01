@@ -92,16 +92,16 @@ async function handleWorkerResponse(request: Request) {
   const match = router.lookup(url.pathname);
   const { params = {}, ...route } = match || {};
   const handler = getRouteHandler(request, route) || handleNotFound;
-  const next = chain(handler, handle404);
+  const nextHandler = chain(handler, handle404);
 
   const response = await (async () => {
     const requestEvent = await createRequestEvent({ request, params });
     let response: Response;
 
     if (middleware) {
-      response = await middleware(requestEvent, next);
+      response = await middleware(requestEvent, nextHandler);
     } else {
-      response = await handler(requestEvent, next);
+      response = await handler(requestEvent, nextHandler);
     }
 
     applyResponseCookies(response, requestEvent.cookies);
