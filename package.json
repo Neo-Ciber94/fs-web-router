@@ -5,6 +5,7 @@
   "workspaces": [
     "packages/*",
     "examples/*",
+    "website",
     "!examples/deno-sample"
   ],
   "scripts": {
