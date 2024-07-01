@@ -125,7 +125,6 @@ describe("Routing with workers and http methods", () => {
 
   test("Should call HEAD handler", async () => {
     const res = await fetch(`${origin}/x/api_1`, { method: "HEAD" });
-    console.log(Array.from(res.headers));
     expect(res.headers.get("data")).toStrictEqual("head 1");
   });
 

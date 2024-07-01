@@ -89,6 +89,7 @@ type WorkerFileSystemRouterOptions = InitialOptions & {
 function workerFileSystemRouter(options: WorkerFileSystemRouterOptions) {
   const {
     cwd,
+    prefix,
     ignoreFiles,
     ignorePrefix,
     routeMapper,
@@ -109,6 +110,7 @@ function workerFileSystemRouter(options: WorkerFileSystemRouterOptions) {
 
   const routesFilePaths = getFileSystemRoutesMap({
     cwd,
+    prefix,
     routesDir,
     ignorePrefix,
     routeMapper,

@@ -8,7 +8,7 @@ import type { CreateRouterOptions } from "../fileSystemRouter";
  * @internal
  */
 export function getFileSystemRoutesMap(options: CreateRouterOptions) {
-  const { cwd, routesDir, extensions, ignoreFiles, routeMapper } = options;
+  const { cwd, routesDir, prefix = "", extensions, ignoreFiles, routeMapper } = options;
   const routesDirPath = path.join(cwd, routesDir);
   const files = scanFileSystemRoutes(cwd, routesDir, extensions, ignoreFiles);
   const routeSegmentsMap = new Map<string, RouteSegment[]>();
@@ -39,7 +39,9 @@ export function getFileSystemRoutesMap(options: CreateRouterOptions) {
       }
     }
 
-    for (const routeId of routePaths) {
+    for (const routePath of routePaths) {
+      const routeId = `${prefix}${routePath}`;
+
       if (routeId in routes) {
         throw new Error(`Route '${routeId}' already exists`);
       }

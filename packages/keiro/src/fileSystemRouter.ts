@@ -10,6 +10,7 @@ import { createRouter } from "radix3";
 import type { FileSystemRouteMapper } from "./routing/fileSystemRouteMapper";
 import { DefaultFileSystemRouteMapper } from "./routing/fileSystemRouteMapper";
 import { getFileSystemRoutesMap } from "./routing/getFileSystemRoutesMap";
+import { invariant } from "./common/invariant";
 
 /**
  * File system router options.
@@ -55,6 +56,11 @@ export interface FileSystemRouterOptions {
    * @default "404"
    */
   notFound?: string;
+
+  /**
+   * A prefix to add to all routes.
+   */
+  prefix?: string;
 
   /**
    * Controls how to map a file-system path to a route.
@@ -140,13 +146,14 @@ export function initializeFileSystemRouter(options?: FileSystemRouterOptions & I
     routeMapper = new DefaultFileSystemRouteMapper(),
     getLocals = initLocals,
     workers,
+    prefix,
 
     // internal only
     skipOriginCheck = false,
   } = options || {};
 
-  if (!extensions) {
-    throw new Error("No file extensions specified");
+  if (prefix) {
+    invariant(!prefix.endsWith("/"), `Prefix should not end with "/": '${prefix}'`);
   }
 
   if (middleware) {
@@ -165,9 +172,8 @@ export function initializeFileSystemRouter(options?: FileSystemRouterOptions & I
     );
   }
 
-  if (!path.isAbsolute(cwd)) {
-    throw new Error("cwd must be an absolute path");
-  }
+  invariant(extensions, "No file extensions specified");
+  invariant(path.isAbsolute(cwd), "cwd must be an absolute path");
 
   const routesDirPath = path.posix.join(cwd, routesDir);
 
@@ -182,6 +188,7 @@ export function initializeFileSystemRouter(options?: FileSystemRouterOptions & I
   const initialOptions = {
     cwd,
     origin,
+    prefix,
     ignorePrefix,
     routesDir,
     ignoreFiles,
@@ -236,6 +243,7 @@ export function initializeFileSystemRouter(options?: FileSystemRouterOptions & I
   const routerPromise = createFileSystemRouter({
     cwd,
     routesDir,
+    prefix,
     ignorePrefix,
     ignoreFiles,
     routeMapper,
@@ -256,6 +264,7 @@ export function initializeFileSystemRouter(options?: FileSystemRouterOptions & I
 export interface CreateRouterOptions {
   cwd: string;
   routesDir: string;
+  prefix: string | undefined;
   ignoreFiles?: string[];
   ignorePrefix: string;
   extensions: string[];
