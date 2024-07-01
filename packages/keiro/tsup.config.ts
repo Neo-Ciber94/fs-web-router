@@ -10,6 +10,7 @@ export default defineConfig({
   entry: [...entryFiles],
   outDir: "./dist",
   format: "esm",
+  minify: true,
   clean: true,
   sourcemap: true,
   dts: true,
