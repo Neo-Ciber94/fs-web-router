@@ -1,5 +1,9 @@
 {
     "tasks": {
-        "dev": "deno run --node-modules-dir --watch --allow-read --allow-env --allow-net src/main.ts"
-    }
+        "dev": "deno run --watch --allow-read --allow-env --allow-net src/main.ts"
+    },
+    "unstable": [
+        "sloppy-imports"
+    ],
+    "imports": {}
 }

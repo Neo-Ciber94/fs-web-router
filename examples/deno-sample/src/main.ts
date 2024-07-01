@@ -1,4 +1,4 @@
-import { fileSystemRouter } from "keiro/web";
+import { fileSystemRouter } from "../../../packages/keiro/src/handler/web.ts";
 
 Deno.serve({
   handler: fileSystemRouter(),
