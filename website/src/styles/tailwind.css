@@ -31,6 +31,5 @@ header {
 .page {
   background:
     linear-gradient(210deg, rgba(6, 181, 212, 0.2), transparent 20%),
-    radial-gradient(circle, rgba(6, 181, 212, 0.2), transparent 40%) no-repeat -60vw -40vh / 105vw
-      200vh;
+    radial-gradient(circle, rgba(6, 181, 212, 0.2), transparent 40%) -60vw -40vh / 105vw 200vh;
 }

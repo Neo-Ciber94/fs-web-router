@@ -47,7 +47,7 @@ export default defineHandler(() => {
 ---
 
 <StarlightPage
-  frontmatter={{ title: "Home", template: "splash" }}
+  frontmatter={{ title: "Home", template: "splash", hero: { title: "keiro" } }}
   class:list={["!bg-black"]}
   data-home="1"
 >
@@ -71,7 +71,7 @@ export default defineHandler(() => {
       <TabItem label="Bun" icon="bun">
         <Code code={bunSampleCode} lang="ts" title={"src/main.ts"} class="md:w-[600px] w-full" />
       </TabItem>
-      <TabItem label="Handler" icon="seti:typescript">
+      <TabItem label="API Handler" icon="seti:typescript">
         <Code
           code={handlerCode}
           lang="ts"
@@ -85,17 +85,25 @@ export default defineHandler(() => {
   <div class="flex flex-row gap-2 !mt-10 w-full mx-auto justify-center">
     <a
       href="/guides/example"
-      class="px-4 py-3 rounded-lg !text-white bg-cyan-500 hover:bg-cyan-600 no-underline font-bold flex flex-row gap-2 items-center min-w-56"
+      class="px-4 py-2 rounded-lg !text-white bg-cyan-500 hover:bg-cyan-600 no-underline font-bold flex flex-row gap-2 items-center min-w-56"
     >
       <Icon name="document" color="white" size="1.5rem" />
       Read Docs
     </a>
     <a
       href="https://github.com/Neo-Ciber94/keiro"
-      class="px-4 py-3 rounded-lg !text-white bg-slate-600 hover:bg-slate-700 no-underline font-bold flex flex-row gap-2 items-center min-w-56"
+      class="px-4 py-2 rounded-lg !text-white bg-slate-600 hover:bg-slate-700 no-underline font-bold flex flex-row gap-2 items-center min-w-56"
     >
       <Icon name="github" color="white" size="1.5rem" />
       View on Github
     </a>
   </div>
+
+  <footer
+    class="w-full h-16 fixed bottom-0 bg-black/10 border-t border-teal-400/30 left-0 flex flex-row justify-center items-center"
+  >
+    <span class="text-white">
+      &copy; Copyleft {new Date().getFullYear()}
+    </span>
+  </footer>
 </StarlightPage>
