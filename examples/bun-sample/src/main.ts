@@ -1,9 +1,6 @@
 import { fileSystemRouter } from "keiro/web";
 
-const port = Number(process.env.PORT ?? 5022);
-
 const server = Bun.serve({
-  port,
   fetch: fileSystemRouter(),
 });
 

@@ -1,0 +1,36 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.title-wrapper span {
+  @apply !text-cyan-300;
+}
+
+header {
+  background: rgba(0, 0, 0, 0.3) !important;
+  border-bottom: 1px solid rgba(0, 195, 255, 0.2) !important;
+}
+
+.header .title-wrapper span {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 6px;
+}
+
+.header .title-wrapper span::before {
+  content: "";
+  background: url("/favicon.ico");
+  display: block;
+  width: 26px;
+  height: 26px;
+  background-size: contain;
+  background-repeat: no-repeat;
+}
+
+.page {
+  background:
+    linear-gradient(210deg, rgba(6, 181, 212, 0.2), transparent 20%),
+    radial-gradient(circle, rgba(6, 181, 212, 0.2), transparent 40%) no-repeat -60vw -40vh / 105vw
+      200vh;
+}

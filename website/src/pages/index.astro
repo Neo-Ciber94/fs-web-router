@@ -1,0 +1,101 @@
+---
+import "@/styles/landing.css";
+import StarlightPage from "@astrojs/starlight/components/StarlightPage.astro";
+import { Code, Icon, Tabs, TabItem } from "@astrojs/starlight/components";
+
+const nodeSampleCode = `
+import { fileSystemRouter } from "keiro/node";
+import http from "node:http";
+
+const port = 5000;
+const origin = \`http://localhost:\${port}\`;
+
+const server = http.createServer(fileSystemRouter({ origin }));
+server.listen(port, () => console.log(\`Listening on \${origin}\`));
+`;
+
+const denoSampleCode = `
+import { fileSystemRouter } from "keiro/web";
+
+Deno.serve({
+  handler: fileSystemRouter(),
+  onListen(addr) {
+    console.log(\`Listening on http://\${addr.hostname}:\${addr.port}\`);
+  },
+});
+`;
+
+const bunSampleCode = `
+import { fileSystemRouter } from "keiro/web";
+
+const server = Bun.serve({
+  fetch: fileSystemRouter(),
+});
+
+console.log(\`Listening on http://\${server.hostname}:\${server.port}\`);
+`;
+
+const handlerCode = `
+import { defineHandler } from "keiro";
+
+export default defineHandler(() => {
+    return Response.json({
+        hello: "world"
+    })
+})
+`;
+---
+
+<StarlightPage
+  frontmatter={{ title: "Home", template: "splash" }}
+  class:list={["!bg-black"]}
+  data-home="1"
+>
+  <div class="flex md:flex-row flex-col justify-between w-full gap-4 pt-10 md:pt-20">
+    <div>
+      <h1 class="flex flex-row items-center gap-2">
+        <span class="text-cyan-400 font-bold">keiro</span><br />
+      </h1>
+      <h1>
+        <span>file-system routing middleware</span>
+      </h1>
+      <h4 class="!text-slate-400">A simple file-system routing compatible with node and fetch</h4>
+    </div>
+    <Tabs>
+      <TabItem label="Node" icon="node">
+        <Code code={nodeSampleCode} lang="ts" title={"src/main.ts"} class="md:w-[600px] w-full" />
+      </TabItem>
+      <TabItem label="Deno" icon="deno">
+        <Code code={denoSampleCode} lang="ts" title={"src/main.ts"} class="md:w-[600px] w-full" />
+      </TabItem>
+      <TabItem label="Bun" icon="bun">
+        <Code code={bunSampleCode} lang="ts" title={"src/main.ts"} class="md:w-[600px] w-full" />
+      </TabItem>
+      <TabItem label="Handler" icon="seti:typescript">
+        <Code
+          code={handlerCode}
+          lang="ts"
+          title={"src/routes/index.ts"}
+          class="md:w-[600px] w-full"
+        />
+      </TabItem>
+    </Tabs>
+  </div>
+
+  <div class="flex flex-row gap-2 !mt-10 w-full mx-auto justify-center">
+    <a
+      href="/guides/example"
+      class="px-4 py-3 rounded-lg !text-white bg-cyan-500 hover:bg-cyan-600 no-underline font-bold flex flex-row gap-2 items-center min-w-56"
+    >
+      <Icon name="document" color="white" size="1.5rem" />
+      Read Docs
+    </a>
+    <a
+      href="https://github.com/Neo-Ciber94/keiro"
+      class="px-4 py-3 rounded-lg !text-white bg-slate-600 hover:bg-slate-700 no-underline font-bold flex flex-row gap-2 items-center min-w-56"
+    >
+      <Icon name="github" color="white" size="1.5rem" />
+      View on Github
+    </a>
+  </div>
+</StarlightPage>
