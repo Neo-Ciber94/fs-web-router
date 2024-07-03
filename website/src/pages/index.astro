@@ -2,6 +2,7 @@
 import "@/styles/landing.css";
 import StarlightPage from "@astrojs/starlight/components/StarlightPage.astro";
 import { Code, Icon, Tabs, TabItem } from "@astrojs/starlight/components";
+import Typewriter from "@/components/Typewriter";
 
 const nodeSampleCode = `
 import { fileSystemRouter } from "keiro/node";
@@ -97,6 +98,31 @@ export default defineHandler(() => {
       <Icon name="github" color="white" size="1.5rem" />
       View on Github
     </a>
+  </div>
+
+  <div class={"bg-black/40 rounded-md border border-cyan-400 p-2 !mt-12"}>
+    <Tabs>
+      <TabItem label="npm">
+        <span class="flex flex-row pb-3 px-4 text-white">
+          <Typewriter content="npm add keiro" client:visible />
+        </span>
+      </TabItem>
+      <TabItem label="yarn">
+        <span class="flex flex-row pb-3 px-4 text-white">
+          <Typewriter content="yarn add keiro" client:visible /></span
+        ></TabItem
+      >
+      <TabItem label="pnpm">
+        <span class="flex flex-row pb-3 px-4 text-white">
+          <Typewriter content="pnpm add keiro" client:visible /></span
+        ></TabItem
+      >
+      <TabItem label="bun">
+        <span class="flex flex-row pb-3 px-4 text-white">
+          <Typewriter content="bun add keiro" client:visible /></span
+        ></TabItem
+      >
+    </Tabs>
   </div>
 
   <footer
