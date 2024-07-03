@@ -24,7 +24,6 @@ export default {
       },
       fontFamily: {
         sans: ['"Atkinson Hyperlegible"'],
-        mono: ['"IBM Plex Mono"'],
       },
     },
   },
