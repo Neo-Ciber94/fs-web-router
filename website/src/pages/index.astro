@@ -3,6 +3,9 @@ import "@/styles/landing.css";
 import StarlightPage from "@astrojs/starlight/components/StarlightPage.astro";
 import { Code, Icon, Tabs, TabItem } from "@astrojs/starlight/components";
 import Typewriter from "@/components/Typewriter";
+import CopyText from "@/components/CopyText";
+
+const PACKAGE_MANAGERS = ["npm", "yarn", "pnpm", "bun"];
 
 const nodeSampleCode = `
 import { fileSystemRouter } from "keiro/node";
@@ -102,26 +105,22 @@ export default defineHandler(() => {
 
   <div class={"bg-black/40 rounded-md border border-cyan-400 p-2 !mt-12"}>
     <Tabs>
-      <TabItem label="npm">
-        <span class="flex flex-row pb-3 px-4 text-white">
-          <Typewriter content="npm add keiro" client:visible />
-        </span>
-      </TabItem>
-      <TabItem label="yarn">
-        <span class="flex flex-row pb-3 px-4 text-white">
-          <Typewriter content="yarn add keiro" client:visible /></span
-        ></TabItem
-      >
-      <TabItem label="pnpm">
-        <span class="flex flex-row pb-3 px-4 text-white">
-          <Typewriter content="pnpm add keiro" client:visible /></span
-        ></TabItem
-      >
-      <TabItem label="bun">
-        <span class="flex flex-row pb-3 px-4 text-white">
-          <Typewriter content="bun add keiro" client:visible /></span
-        ></TabItem
-      >
+      {
+        PACKAGE_MANAGERS.map((pkgManager) => {
+          return (
+            <TabItem label={pkgManager}>
+              <span class="flex flex-row pb-3 px-4 text-white relative">
+                <Typewriter content={`${pkgManager} add keiro`} client:visible />
+                <CopyText
+                  text={`${pkgManager} add keiro`}
+                  className={"absolute right-2 !mt-0"}
+                  client:visible
+                />
+              </span>
+            </TabItem>
+          );
+        })
+      }
     </Tabs>
   </div>
 
