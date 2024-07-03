@@ -22,6 +22,10 @@ export default defineConfig({
               label: "Getting Started",
               link: "/guides/getting-started/",
             },
+            {
+              label: "Routing",
+              link: "/guides/routing/",
+            },
           ],
         },
         {

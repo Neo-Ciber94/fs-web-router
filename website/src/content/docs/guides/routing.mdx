@@ -1,0 +1,43 @@
+---
+title: Routing
+description: Adding more routes
+---
+
+`keiro` supports the following types of routes by default similar to `NextJS` routing.
+
+import { Badge, FileTree } from '@astrojs/starlight/components';
+
+<FileTree>
+- src
+  - main.ts
+  - routes
+    - posts
+      - index.ts
+      - [post_id].ts
+      - slug
+        - [...rest].ts
+      - categories
+        - [[category_id]].ts
+      - tags
+        - [[...tags]].ts
+</FileTree>
+
+This file tree ilustrate all the route types in `keiro`:
+
+- `src/routes/posts/index.ts`: static routes
+    - Matches `/posts`
+
+- `src/routes/posts/[post_id].ts`: dynamic routes
+    - Matches `/posts/1`, `/posts/abc`, `/posts/d57cd924-a8fa-4970-bb4f-9a5ba705cc2b`
+
+- `src/routes/posts/slug/[...rest].ts`: catch-all routes
+    - Matches `/posts/slug/a/b/c`, `/posts/slug/one/two`
+
+- `src/routes/posts/categories/[[category_id]].ts`: optional dynamic route
+    - Matches `/posts/categories`, `/posts/categories/food`
+
+- `src/routes/posts/tags/[[...tag]].ts`: optional catch-all route
+    - Matches `/posts/tags`, `/posts/tags/programming/javascript`
+
+This is using the [DefaultFileSystemRouteMapper](https://github.com/Neo-Ciber94/keiro/blob/main/packages/keiro/src/routing/fileSystemRouteMapper.ts), you can create your own route mapper
+and pass it to the `fileSystemRouter` middleware.
