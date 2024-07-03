@@ -26,6 +26,18 @@ export default defineConfig({
               label: "Routing",
               link: "/guides/routing/",
             },
+            {
+              label: "API Handler",
+              link: "/guides/api-handler/",
+            },
+            {
+              label: "Middleware",
+              link: "/guides/middleware/",
+            },
+            {
+              label: "Not Found",
+              link: "/guides/not-found/",
+            },
           ],
         },
         {

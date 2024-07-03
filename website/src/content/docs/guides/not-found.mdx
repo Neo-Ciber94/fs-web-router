@@ -1,0 +1,24 @@
+---
+title: Not Found
+description: Handling 404 responses
+---
+
+`keiro` also supports a `404.ts` file which is called when not route is matched.
+
+import { Code, Aside } from '@astrojs/starlight/components';
+
+<Code 
+lang="ts" 
+title="src/routes/404.ts" 
+code={`
+import { defineHandler } from "keiro";
+
+export default defineHandler(() => {
+    return new Response("Not Found", { status: 404 });
+});
+`}  
+/>
+
+<Aside type="caution" title="Watch out!">
+  Be sure of returning a `404` status code from your `404.ts` handler.
+</Aside>

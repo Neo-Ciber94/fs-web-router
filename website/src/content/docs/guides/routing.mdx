@@ -41,3 +41,10 @@ This file tree ilustrate all the route types in `keiro`:
 
 This is using the [DefaultFileSystemRouteMapper](https://github.com/Neo-Ciber94/keiro/blob/main/packages/keiro/src/routing/fileSystemRouteMapper.ts), you can create your own route mapper
 and pass it to the `fileSystemRouter` middleware.
+
+## Special files
+
+`keiro` also supports `middleware` and `404` files.
+
+- `src/routes/middleware.ts` Called before each route is called
+- `src/routes/404.ts` Used to send a 404 response when not route is matched

@@ -1,0 +1,72 @@
+---
+title: API Handler
+description: Route api handlers
+---
+
+In `keiro` api handlers are functions exported from files under your routes directory,
+we recommend using the helper `defineHandler` for creating routes.
+
+## Handler Type
+
+API handlers have this shape
+
+```ts
+export type Handler = (event: RequestEvent, next: Next) => MaybePromise<Response>;
+```
+
+- **RequestHandler** contains the `request`, `url`, `params`, `cookies` and request `locals`.
+- **Next** is a function that call the next route, on api handlers the next route is always the `404` handler.
+
+## Catch-all methods
+
+If you return a `export default` function it will be called on any http method:
+
+import { Code, Aside } from '@astrojs/starlight/components';
+
+<Code 
+lang="ts" 
+title="src/routes/posts/index.ts" 
+code={`
+import { defineHandler } from "keiro";
+
+export default defineHandler(() => {
+    return new Response("Posts page");
+});
+`}  
+/>
+
+
+## HTTP Method
+
+You can return functions named: `GET`, `POST`, `PUT`, `PATCH`, `DELETE`, `HEAD`, `OPTIONS`, 
+each will be called on that method.
+
+<Code 
+lang="ts" 
+title="src/routes/posts/index.ts" 
+code={`
+import { defineHandler } from "keiro";
+
+export const GET = defineHandler(() => {
+    return new Response("Get posts");
+});
+
+export const POST = defineHandler(() => {
+    return new Response("Create post");
+});
+
+export const PUT = defineHandler(() => {
+    return new Response("Update post");
+});
+
+export const DELETE = defineHandler(() => {
+    return new Response("Delete post");
+});
+
+export default defineHandler(() => {
+    return new Response("Posts");
+});
+`}  
+/>
+
+The named methods have priority over the `export default`, the rest will be handled by it.
