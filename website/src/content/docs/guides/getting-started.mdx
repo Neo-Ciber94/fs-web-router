@@ -1,0 +1,48 @@
+---
+title: Getting Started
+description: Getting started with keiro
+---
+
+## keiro
+
+`keiro` (Kee-Ro) is a routing middleware compatible with `NodeJS` which uses moderm [Web Standards](https://wintercg.org/work).
+
+## Installation
+
+import { Tabs, TabItem, Code, FileTree } from '@astrojs/starlight/components';
+import { NODE_SAMPLE_CODE, API_HANDLER_CODE } from "@/lib/common/code"
+
+<Tabs syncKey="package-manager">
+  <TabItem label="npm" icon="npm">
+  <Code code={"npm add keiro"} lang="bash" />
+  </TabItem>
+  <TabItem label="yarn" icon="yarn">
+  <Code code={"yarn add keiro"} lang="bash" />
+  </TabItem>
+    <TabItem label="pnpm" icon="pnpm">
+  <Code code={"pnpm add keiro"} lang="bash" />
+  </TabItem>
+    <TabItem label="bun" icon="bun">
+  <Code code={"bun add keiro"} lang="bash" />
+  </TabItem>
+</Tabs>
+
+## Setup
+
+<FileTree>
+- src
+  - main.ts
+  - routes ** All the routes are located here **
+    - index.ts
+- package.json
+</FileTree>
+
+For initialize the middleware we import the `fileSystemRouter` from `keiro/node` or `keiro/web`.
+
+<Code code={NODE_SAMPLE_CODE} lang="ts" title="src/main.ts" />
+
+We define the api handlers on the `src/routes/`, this can be changed.
+
+<Code code={API_HANDLER_CODE} lang="ts" title="src/routes/index.ts" />
+
+Then run `main.ts` on `node` you can install [tsx](https://www.npmjs.com/package/tsx) and use `tsx src/main.ts`.

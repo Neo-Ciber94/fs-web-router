@@ -4,50 +4,9 @@ import StarlightPage from "@astrojs/starlight/components/StarlightPage.astro";
 import { Code, Icon, Tabs, TabItem } from "@astrojs/starlight/components";
 import Typewriter from "@/components/Typewriter";
 import CopyText from "@/components/CopyText";
+import { NODE_SAMPLE_CODE, DENO_SAMPLE_CODE, BUN_SAMPLE_CODE, API_HANDLER_CODE } from "@/lib/common/code";
 
 const PACKAGE_MANAGERS = ["npm", "yarn", "pnpm", "bun"];
-
-const nodeSampleCode = `
-import { fileSystemRouter } from "keiro/node";
-import http from "node:http";
-
-const port = 5000;
-const origin = \`http://localhost:\${port}\`;
-
-const server = http.createServer(fileSystemRouter({ origin }));
-server.listen(port, () => console.log(\`Listening on \${origin}\`));
-`;
-
-const denoSampleCode = `
-import { fileSystemRouter } from "keiro/web";
-
-Deno.serve({
-  handler: fileSystemRouter(),
-  onListen(addr) {
-    console.log(\`Listening on http://\${addr.hostname}:\${addr.port}\`);
-  },
-});
-`;
-
-const bunSampleCode = `
-import { fileSystemRouter } from "keiro/web";
-
-const server = Bun.serve({
-  fetch: fileSystemRouter(),
-});
-
-console.log(\`Listening on http://\${server.hostname}:\${server.port}\`);
-`;
-
-const handlerCode = `
-import { defineHandler } from "keiro";
-
-export default defineHandler(() => {
-    return Response.json({
-        hello: "world"
-    })
-})
-`;
 ---
 
 <StarlightPage
@@ -67,17 +26,17 @@ export default defineHandler(() => {
     </div>
     <Tabs>
       <TabItem label="Node" icon="node">
-        <Code code={nodeSampleCode} lang="ts" title={"src/main.ts"} class="lg:w-[600px] w-full" />
+        <Code code={NODE_SAMPLE_CODE} lang="ts" title={"src/main.ts"} class="lg:w-[600px] w-full" />
       </TabItem>
       <TabItem label="Deno" icon="deno">
-        <Code code={denoSampleCode} lang="ts" title={"src/main.ts"} class="lg:w-[600px] w-full" />
+        <Code code={DENO_SAMPLE_CODE} lang="ts" title={"src/main.ts"} class="lg:w-[600px] w-full" />
       </TabItem>
       <TabItem label="Bun" icon="bun">
-        <Code code={bunSampleCode} lang="ts" title={"src/main.ts"} class="lg:w-[600px] w-full" />
+        <Code code={BUN_SAMPLE_CODE} lang="ts" title={"src/main.ts"} class="lg:w-[600px] w-full" />
       </TabItem>
       <TabItem label="API Handler" icon="seti:typescript">
         <Code
-          code={handlerCode}
+          code={API_HANDLER_CODE}
           lang="ts"
           title={"src/routes/index.ts"}
           class="lg:w-[600px] w-full"
@@ -88,7 +47,7 @@ export default defineHandler(() => {
 
   <div class="flex flex-row gap-2 !mt-10 w-full mx-auto justify-center">
     <a
-      href="/guides/example"
+      href="/guides/getting-started"
       class="px-4 py-2 rounded-lg !text-white bg-cyan-500 hover:bg-cyan-600 no-underline font-bold flex flex-row gap-2 items-center min-w-56"
     >
       <Icon name="document" color="white" size="1.5rem" />
