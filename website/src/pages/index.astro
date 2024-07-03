@@ -55,7 +55,7 @@ export default defineHandler(() => {
   class:list={["!bg-black"]}
   data-home="1"
 >
-  <div class="flex md:flex-row flex-col justify-between w-full gap-4 pt-10 md:pt-20">
+  <div class="flex lg:flex-row flex-col justify-between w-full gap-4 pt-10 lg:pt-20">
     <div>
       <h1 class="flex flex-row items-center gap-2">
         <span class="text-cyan-400 font-bold">keiro</span><br />
@@ -67,20 +67,20 @@ export default defineHandler(() => {
     </div>
     <Tabs>
       <TabItem label="Node" icon="node">
-        <Code code={nodeSampleCode} lang="ts" title={"src/main.ts"} class="md:w-[600px] w-full" />
+        <Code code={nodeSampleCode} lang="ts" title={"src/main.ts"} class="lg:w-[600px] w-full" />
       </TabItem>
       <TabItem label="Deno" icon="deno">
-        <Code code={denoSampleCode} lang="ts" title={"src/main.ts"} class="md:w-[600px] w-full" />
+        <Code code={denoSampleCode} lang="ts" title={"src/main.ts"} class="lg:w-[600px] w-full" />
       </TabItem>
       <TabItem label="Bun" icon="bun">
-        <Code code={bunSampleCode} lang="ts" title={"src/main.ts"} class="md:w-[600px] w-full" />
+        <Code code={bunSampleCode} lang="ts" title={"src/main.ts"} class="lg:w-[600px] w-full" />
       </TabItem>
       <TabItem label="API Handler" icon="seti:typescript">
         <Code
           code={handlerCode}
           lang="ts"
           title={"src/routes/index.ts"}
-          class="md:w-[600px] w-full"
+          class="lg:w-[600px] w-full"
         />
       </TabItem>
     </Tabs>
