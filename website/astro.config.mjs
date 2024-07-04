@@ -6,8 +6,8 @@ import tailwind from "@astrojs/tailwind";
 
 // https://astro.build/config
 export default defineConfig({
-  site: "https://Neo-Ciber94.github.io",
-  base: process.env.CI ? "keiro" : undefined,
+  site: "https://Neo-Ciber94.github.io/keiro",
+  //base: process.env.CI ? "keiro" : undefined,
   integrations: [
     starlight({
       title: "keiro",
