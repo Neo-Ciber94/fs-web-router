@@ -8,7 +8,7 @@ on:
   workflow_dispatch:
   
 jobs:
-  checks:
+  - checks:
     name: Checks
     runs-on: ubuntu-latest
     steps:
@@ -40,30 +40,30 @@ jobs:
       - name: Run tests
         run: bun run test
 
-  # docs-build:
-  #   name: Build Docs
-  #   needs: checks
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #       uses: actions/checkout@v4
-  #     - name: Install, build, and upload keiro docs
-  #       uses: withastro/action@v2
-  #       with:
-  #         path: ./website
-  #         package-manager: bun@1.1.17
+  - docs-build:
+    name: Build Docs
+    needs: checks
+    runs-on: ubuntu-latest
+    steps:
+        uses: actions/checkout@v4
+      - name: Install, build, and upload keiro docs
+        uses: withastro/action@v2
+        with:
+          path: ./website
+          package-manager: bun@1.1.17
 
-  # docs-deploy:
-  #   name: Deploy Docs
-  #   needs: build
-  #   runs-on: ubuntu-latest
-  #   permissions:
-  #     contents: read
-  #     pages: write
-  #     id-token: write
-  #   environment:
-  #     name: github-pages
-  #     url: ${{ steps.deployment.outputs.page_url }}
-  #   steps:
-  #     - name: Deploy to GitHub Pages
-  #       id: deployment
-  #       uses: actions/deploy-pages@v4
+  - docs-deploy:
+    name: Deploy Docs
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
