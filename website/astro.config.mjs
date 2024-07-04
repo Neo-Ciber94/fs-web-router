@@ -6,8 +6,8 @@ import tailwind from "@astrojs/tailwind";
 
 // https://astro.build/config
 export default defineConfig({
-  site: "https://Neo-Ciber94.github.io/keiro",
-  //base: process.env.CI ? "keiro" : undefined,
+  site: "https://Neo-Ciber94.github.io",
+  base: "keiro",
   integrations: [
     starlight({
       title: "keiro",
@@ -15,7 +15,7 @@ export default defineConfig({
         github: "https://github.com/Neo-Ciber94/keiro",
       },
       components: {},
-      favicon: "./favicon.ico",
+      favicon: "./keiro/favicon.ico",
       customCss: ["./src/styles/tailwind.css"],
       sidebar: [
         {
@@ -23,27 +23,27 @@ export default defineConfig({
           items: [
             {
               label: "Getting Started",
-              link: "/guides/getting-started/",
+              link: "/keiro/guides/getting-started/",
             },
             {
               label: "Routing",
-              link: "/guides/routing/",
+              link: "/keiro/guides/routing/",
             },
             {
               label: "API Handler",
-              link: "/guides/api-handler/",
+              link: "/keiro/guides/api-handler/",
             },
             {
               label: "Middleware",
-              link: "/guides/middleware/",
+              link: "/keiro/guides/middleware/",
             },
             {
               label: "Not Found",
-              link: "/guides/not-found/",
+              link: "/keiro/guides/not-found/",
             },
             {
               label: "API Reference",
-              link: "/guides/api-reference/",
+              link: "/keiro/guides/api-reference/",
             },
           ],
         },
