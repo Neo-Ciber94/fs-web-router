@@ -6,12 +6,14 @@ import tailwind from "@astrojs/tailwind";
 
 // https://astro.build/config
 export default defineConfig({
+  site: "https://Neo-Ciber94.github.io",
   integrations: [
     starlight({
       title: "keiro",
       social: {
         github: "https://github.com/Neo-Ciber94/keiro",
       },
+      components: {},
       favicon: "./favicon.ico",
       customCss: ["./src/styles/tailwind.css"],
       sidebar: [
