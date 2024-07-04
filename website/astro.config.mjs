@@ -15,7 +15,7 @@ export default defineConfig({
         github: "https://github.com/Neo-Ciber94/keiro",
       },
       components: {},
-      favicon: "./keiro/favicon.ico",
+      favicon: "./favicon.ico",
       customCss: ["./src/styles/tailwind.css"],
       sidebar: [
         {
@@ -23,27 +23,27 @@ export default defineConfig({
           items: [
             {
               label: "Getting Started",
-              link: "/keiro/guides/getting-started/",
+              link: "/guides/getting-started/",
             },
             {
               label: "Routing",
-              link: "/keiro/guides/routing/",
+              link: "/guides/routing/",
             },
             {
               label: "API Handler",
-              link: "/keiro/guides/api-handler/",
+              link: "/guides/api-handler/",
             },
             {
               label: "Middleware",
-              link: "/keiro/guides/middleware/",
+              link: "/guides/middleware/",
             },
             {
               label: "Not Found",
-              link: "/keiro/guides/not-found/",
+              link: "/guides/not-found/",
             },
             {
               label: "API Reference",
-              link: "/keiro/guides/api-reference/",
+              link: "/guides/api-reference/",
             },
           ],
         },
