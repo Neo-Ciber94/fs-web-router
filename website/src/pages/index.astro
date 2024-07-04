@@ -28,25 +28,42 @@ const PACKAGE_MANAGERS = ["npm", "yarn", "pnpm", "bun"];
       </h1>
       <h4 class="!text-slate-400">A simple file-system routing compatible with node and fetch</h4>
     </div>
-    <Tabs>
-      <TabItem label="Node" icon="node">
-        <Code code={NODE_SAMPLE_CODE} lang="ts" title={"src/main.ts"} class="lg:w-[600px] w-full" />
-      </TabItem>
-      <TabItem label="Deno" icon="deno">
-        <Code code={DENO_SAMPLE_CODE} lang="ts" title={"src/main.ts"} class="lg:w-[600px] w-full" />
-      </TabItem>
-      <TabItem label="Bun" icon="bun">
-        <Code code={BUN_SAMPLE_CODE} lang="ts" title={"src/main.ts"} class="lg:w-[600px] w-full" />
-      </TabItem>
-      <TabItem label="API Handler" icon="seti:typescript">
-        <Code
-          code={API_HANDLER_CODE}
-          lang="ts"
-          title={"src/routes/index.ts"}
-          class="lg:w-[600px] w-full"
-        />
-      </TabItem>
-    </Tabs>
+    <div data-framework>
+      <Tabs>
+        <TabItem label="Node" icon="node">
+          <Code
+            code={NODE_SAMPLE_CODE}
+            lang="ts"
+            title={"src/main.ts"}
+            class="lg:w-[600px] w-full"
+          />
+        </TabItem>
+        <TabItem label="Deno" icon="deno">
+          <Code
+            code={DENO_SAMPLE_CODE}
+            lang="ts"
+            title={"src/main.ts"}
+            class="lg:w-[600px] w-full"
+          />
+        </TabItem>
+        <TabItem label="Bun" icon="bun">
+          <Code
+            code={BUN_SAMPLE_CODE}
+            lang="ts"
+            title={"src/main.ts"}
+            class="lg:w-[600px] w-full"
+          />
+        </TabItem>
+        <TabItem label="API Handler" icon="seti:typescript">
+          <Code
+            code={API_HANDLER_CODE}
+            lang="ts"
+            title={"src/routes/index.ts"}
+            class="lg:w-[600px] w-full"
+          />
+        </TabItem>
+      </Tabs>
+    </div>
   </div>
 
   <div class="flex flex-row gap-2 !mt-10 w-full mx-auto justify-center">

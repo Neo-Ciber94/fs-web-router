@@ -17,3 +17,11 @@
 [data-has-hero] .tablist-wrapper ul li a[aria-selected="true"] {
   @apply !text-cyan-200;
 }
+
+[data-theme="light"] [data-framework] .tablist-wrapper ul li a:not([aria-selected="true"]) {
+  @apply !text-cyan-500;
+}
+
+[data-theme="light"] [data-framework] .tablist-wrapper ul li a[aria-selected="true"] {
+  @apply !text-black;
+}
