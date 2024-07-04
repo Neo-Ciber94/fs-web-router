@@ -6,16 +6,52 @@ description: Route api handlers
 In `keiro` api handlers are functions exported from files under your routes directory,
 we recommend using the helper `defineHandler` for creating routes.
 
-## Handler Type
+## API Reference
 
-API handlers have this shape
+API handlers take 2 arguments:
 
-```ts
-export type Handler = (event: RequestEvent, next: Next) => MaybePromise<Response>;
-```
+- **RequestEvent**: Contains the `request`, `url`, `params`, `cookies` and request `locals`.
+- **Next**: A function that call the next route, on api handlers the next route is always the `404` handler.
 
-- **RequestHandler** contains the `request`, `url`, `params`, `cookies` and request `locals`.
-- **Next** is a function that call the next route, on api handlers the next route is always the `404` handler.
+And must return a [Response](https://developer.mozilla.org/es/docs/Web/API/Response) object.
+
+Handlers can be defined in any of these ways:
+
+import { Steps } from '@astrojs/starlight/components';
+
+<Steps>
+
+1. Declaring a function.
+
+    ```ts
+    import type { RequestEvent, Next } from "keiro/types";
+
+    export default function handler(event: RequestEvent, next: Next) {
+        return new Response("Hello there!");
+    }
+    ```
+
+2. Using the `defineHandler` helper.
+
+    ```ts
+    import { defineMiddleware } from "keiro";
+
+    export default defineHandler((event, next) => {
+        return new Response("Hello there!"); 
+    })
+    ```
+
+3. Using the `RequestHandler` type.
+
+    ```ts
+    import type { RequestHandler } from "keiro/types";
+
+    export default ((event, next) => {
+        return new Response("Hello World");
+    }) satisfies RequestHandler;
+    ```
+</Steps>
+
 
 ## Catch-all methods
 

@@ -2,11 +2,18 @@ import { ApplicationError } from "@/lib/error";
 import { defineMiddleware, sequence } from "keiro";
 
 const loggerMiddleware = defineMiddleware(async (event, next) => {
-  const start = Date.now();
-  const { method, url } = event.request;
+  const request = event.request;
+  const now = new Date();
+
+  // Get the response
   const response = await next(event);
-  const duration = Date.now() - start;
-  console.log(`[${new Date().toISOString()}] 🚀 ${method} ${url} 🕜 ${duration}ms`);
+
+  const elapsed = Date.now() - now.getTime();
+  const duration = `${elapsed.toFixed(2)}ms`;
+  const method = request.method;
+  const path = event.url.pathname;
+  const isOk = response.ok ? "✅" : "❌";
+  console.log(`${isOk} [${now.toISOString()}] ${method} ${path} ${duration}`);
   return response;
 });
 

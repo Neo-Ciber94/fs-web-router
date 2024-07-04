@@ -18,3 +18,128 @@ export default defineMiddleware((event, next) => {
 });
 `}  
 />
+
+## API Reference
+
+Middlewares take 2 arguments:
+
+- **RequestEvent**: Contains the `request`, `url`, `params`, `cookies` and request `locals`.
+- **Next**: which represent the next handler in the chain.
+
+And must return a [Response](https://developer.mozilla.org/es/docs/Web/API/Response) object.
+
+Middlewares can be defined in any of these ways:
+
+import { Steps } from '@astrojs/starlight/components';
+
+<Steps>
+
+1. Declaring a function.
+
+    ```ts
+    import type { RequestEvent, Next } from "keiro/types";
+
+    export default function middleware(event: RequestEvent, next: Next) {
+        return next(event);
+    }
+    ```
+
+2. Using the `defineMiddleware` helper.
+
+    ```ts
+    import { defineMiddleware } from "keiro";
+
+    export default defineMiddleware((event, next) => {
+        return next(event);
+    })
+    ```
+
+3. Using the `Middleware` type.
+
+    ```ts
+    import type { Middleware } from "keiro/types";
+
+    export default ((event, next) => {
+        return next(event);
+    }) satisfies Middleware;
+    ```
+</Steps>
+
+## Chaining multiple middlewares
+
+You can use multiple middlewares in a row using the `sequence` helper.
+
+```ts
+import { sequence } from "keiro";
+
+export default sequence(errorHandlerMiddleware(), loggingMiddleware(), authMiddleware()) 
+```
+
+import { Aside } from '@astrojs/starlight/components';
+
+<Aside>
+Middleware are executing in order, in this case we execute the middleware as:
+1. `errorHandlerMiddleware`: Catches any error of any next handler
+2. `loggingMiddleware`: Logs the request
+3. `authMiddleware`: Manages auth
+</Aside>
+
+## Examples
+
+### Logging middleware
+
+```ts
+    import { defineMiddleware } from "keiro";
+
+    export default defineMiddleware(async (event, next) => {
+        const request = event.request;
+        const now = new Date();
+
+        // Get the response
+        const response = await next(event);
+
+        const elapsed = Date.now() - now.getTime();
+        const duration = `${elapsed.toFixed(2)}ms`;
+        const method = request.method;
+        const path = event.url.pathname;
+        const isOk = response.ok ? "✅" : "❌";
+        console.log(`${isOk} [${now.toISOString()}] ${method} ${path} ${duration}`);
+    })
+```
+
+### Error Handler middleware
+
+```ts
+    import { defineMiddleware } from "keiro";
+
+    export default defineMiddleware(async (event, next) => {
+        try {
+            const response = await next(event);
+            return response;
+        }
+        catch (err) {
+            console.error(err);
+            return Response.json(
+                { error: "Internal error"}, 
+                { status: 500 }
+            )
+        }
+    })
+```
+
+### Auth Handler middleware
+
+```ts
+    import { defineMiddleware } from "keiro";
+    import { getSession } from "@/lib/auth";
+
+    export default defineMiddleware(async (event, next) => {
+        const session = await getSession(event.cookies);
+
+        if (!session) {
+            return new Response(null, { status: 401 });
+        }
+
+        return next(event);
+    })
+```
