@@ -6,9 +6,9 @@ on:
   pull_request:
     branches: ["main"]
   workflow_dispatch:
-  
+
 jobs:
-  - checks:
+  checks:
     name: Checks
     runs-on: ubuntu-latest
     steps:
@@ -40,21 +40,23 @@ jobs:
       - name: Run tests
         run: bun run test
 
-  - docs-build:
+  docs-build:
     name: Build Docs
     needs: checks
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout repo
         uses: actions/checkout@v4
+
       - name: Install, build, and upload keiro docs
         uses: withastro/action@v2
         with:
           path: ./website
           package-manager: bun@1.1.17
 
-  - docs-deploy:
+  docs-deploy:
     name: Deploy Docs
-    needs: build
+    needs: docs-build
     runs-on: ubuntu-latest
     permissions:
       contents: read
