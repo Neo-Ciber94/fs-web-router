@@ -11,6 +11,15 @@ header {
   border-bottom: 1px solid rgba(0, 195, 255, 0.2) !important;
 }
 
+[data-theme="light"] header {
+  background: #011627 !important;
+  color: white;
+}
+
+[data-theme="light"] header .right-group *:not(option) {
+  color: white !important;
+}
+
 .header .title-wrapper span {
   display: flex;
   flex-direction: row;
@@ -30,6 +39,6 @@ header {
 
 .page {
   background:
-    linear-gradient(210deg, rgba(6, 181, 212, 0.2), transparent 20%),
+    linear-gradient(210deg, rgba(6, 181, 212, 0.9), transparent 20%),
     radial-gradient(circle, rgba(6, 181, 212, 0.2), transparent 40%) -60vw -40vh / 105vw 200vh;
 }

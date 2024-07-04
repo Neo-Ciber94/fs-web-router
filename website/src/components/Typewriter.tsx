@@ -48,7 +48,14 @@ export default function Typewriter({
       {characters.map((c, i) => {
         const word = findCurrentWord(content, i);
         return (
-          <span key={i} className={cn(word && highLightWords.includes(word) && "text-cyan-300")}>
+          <span
+            key={i}
+            className={cn(
+              word &&
+                highLightWords.includes(word) &&
+                "font-semibold text-cyan-400 dark:text-cyan-300",
+            )}
+          >
             {c}
           </span>
         );

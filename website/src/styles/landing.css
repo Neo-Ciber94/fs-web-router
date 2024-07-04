@@ -9,3 +9,11 @@
 [data-has-hero] .page {
   justify-content: center;
 }
+
+[data-has-hero] .tablist-wrapper ul li a:not([aria-selected="true"]) {
+  @apply !text-white;
+}
+
+[data-has-hero] .tablist-wrapper ul li a[aria-selected="true"] {
+  @apply !text-cyan-200;
+}

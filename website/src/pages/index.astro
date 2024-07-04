@@ -66,7 +66,7 @@ const PACKAGE_MANAGERS = ["npm", "yarn", "pnpm", "bun"];
     </a>
   </div>
 
-  <div class={"bg-black/40 rounded-md border border-cyan-400 p-2 !mt-12"}>
+  <div class={"bg-black  dark:bg-black/40 rounded-md border border-cyan-400 p-2 !mt-12"}>
     <Tabs>
       {
         PACKAGE_MANAGERS.map((pkgManager) => {
@@ -81,7 +81,7 @@ const PACKAGE_MANAGERS = ["npm", "yarn", "pnpm", "bun"];
                 <CopyText
                   client:visible
                   text={`${pkgManager} add keiro`}
-                  className={"absolute right-2 !mt-0"}
+                  className={"absolute right-2 !mt-0 text-white"}
                 />
               </span>
             </TabItem>
@@ -92,7 +92,7 @@ const PACKAGE_MANAGERS = ["npm", "yarn", "pnpm", "bun"];
   </div>
 
   <footer
-    class="w-full h-16 fixed bottom-0 bg-black/10 border-t border-teal-400/30 left-0 flex flex-row justify-center items-center"
+    class="w-full h-16 fixed bottom-0 bg-[#011627] dark:bg-black/10 border-t border-teal-400/30 left-0 flex flex-row justify-center items-center"
   >
     <span class="text-white">
       &copy; Copyleft {new Date().getFullYear()}
