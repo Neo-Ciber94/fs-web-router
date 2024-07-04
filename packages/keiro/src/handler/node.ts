@@ -16,7 +16,7 @@ import { getFileSystemRoutesMap } from "../routing/getFileSystemRoutesMap";
 
 const __dirname = path.dirname(normalizePath(url.fileURLToPath(import.meta.url)));
 
-type RequestHandler = (
+type NodeRequestHandler = (
   req: http.IncomingMessage,
   res: http.ServerResponse,
   next?: (err?: any) => void,
@@ -26,7 +26,7 @@ type RequestHandler = (
  * Creates a file system router node middleware.
  * @param options The file system router options.
  */
-export function fileSystemRouter(options?: FileSystemRouterOptions): RequestHandler {
+export function fileSystemRouter(options?: FileSystemRouterOptions): NodeRequestHandler {
   const fsRouterOptions = initializeFileSystemRouter(options);
 
   if (fsRouterOptions.type === "worker") {

@@ -12,13 +12,13 @@ import { getFileSystemRoutesMap } from "../routing/getFileSystemRoutesMap";
 
 const __dirname = path.dirname(normalizePath(url.fileURLToPath(import.meta.url)));
 
-type RequestHandler = (request: Request) => MaybePromise<Response>;
+type WebRequestHandler = (request: Request) => MaybePromise<Response>;
 
 /**
  * Creates a file system router web middleware.
  * @param options The file system router options.
  */
-export function fileSystemRouter(options?: FileSystemRouterOptions): RequestHandler {
+export function fileSystemRouter(options?: FileSystemRouterOptions): WebRequestHandler {
   const fsRouterOptions = initializeFileSystemRouter({
     ...options,
     skipOriginCheck: true,

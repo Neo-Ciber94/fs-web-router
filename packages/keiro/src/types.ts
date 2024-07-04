@@ -59,7 +59,7 @@ export type Next = (event: RequestEvent) => MaybePromise<Response>;
 /**
  * A request handler.
  */
-export type Handler = (event: RequestEvent, next: Next) => MaybePromise<Response>;
+export type RequestHandler = (event: RequestEvent, next: Next) => MaybePromise<Response>;
 
 /**
  * A request middleware.

@@ -1,9 +1,9 @@
-import type { Handler, Middleware } from "./types";
+import type { RequestHandler, Middleware } from "./types";
 
 /**
  * Creates a request handler.
  */
-export function defineHandler(f: Handler) {
+export function defineHandler(f: RequestHandler) {
   return f;
 }
 
