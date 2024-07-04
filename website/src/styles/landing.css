@@ -25,3 +25,31 @@
 [data-theme="light"] [data-framework] .tablist-wrapper ul li a[aria-selected="true"] {
   @apply !text-black;
 }
+
+[data-has-hero] .page {
+  animation: moveBackground 20s infinite ease-in-out;
+}
+
+@keyframes moveBackground {
+  0% {
+    background-position:
+      0 0,
+      -60vw -40vh;
+  }
+  50% {
+    background-position:
+      0 -50px,
+      -30vw -20vh;
+  }
+  100% {
+    background-position:
+      0 0,
+      -60vw -40vh;
+  }
+}
+
+@media (prefers-reduced-motion) {
+  .page {
+    animation: none;
+  }
+}

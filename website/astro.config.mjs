@@ -14,6 +14,7 @@ export default defineConfig({
       social: {
         github: "https://github.com/Neo-Ciber94/keiro",
       },
+      
       components: {},
       favicon: "./favicon.ico",
       customCss: ["./src/styles/tailwind.css"],
