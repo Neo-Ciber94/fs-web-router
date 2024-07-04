@@ -4,7 +4,12 @@ import StarlightPage from "@astrojs/starlight/components/StarlightPage.astro";
 import { Code, Icon, Tabs, TabItem } from "@astrojs/starlight/components";
 import Typewriter from "@/components/Typewriter";
 import CopyText from "@/components/CopyText";
-import { NODE_SAMPLE_CODE, DENO_SAMPLE_CODE, BUN_SAMPLE_CODE, API_HANDLER_CODE } from "@/lib/common/code";
+import {
+  NODE_SAMPLE_CODE,
+  DENO_SAMPLE_CODE,
+  BUN_SAMPLE_CODE,
+  API_HANDLER_CODE,
+} from "@/lib/common/code";
 
 const PACKAGE_MANAGERS = ["npm", "yarn", "pnpm", "bun"];
 ---
@@ -12,7 +17,6 @@ const PACKAGE_MANAGERS = ["npm", "yarn", "pnpm", "bun"];
 <StarlightPage
   frontmatter={{ title: "Home", template: "splash", hero: { title: "keiro" } }}
   class:list={["!bg-black"]}
-  data-home="1"
 >
   <div class="flex lg:flex-row flex-col justify-between w-full gap-4 pt-10 lg:pt-20">
     <div>
@@ -69,11 +73,15 @@ const PACKAGE_MANAGERS = ["npm", "yarn", "pnpm", "bun"];
           return (
             <TabItem label={pkgManager}>
               <span class="flex flex-row pb-3 px-4 text-white relative">
-                <Typewriter content={`${pkgManager} add keiro`} client:visible />
+                <Typewriter
+                  client:visible
+                  content={`${pkgManager} add keiro`}
+                  highLightWords={[pkgManager]}
+                />
                 <CopyText
+                  client:visible
                   text={`${pkgManager} add keiro`}
                   className={"absolute right-2 !mt-0"}
-                  client:visible
                 />
               </span>
             </TabItem>

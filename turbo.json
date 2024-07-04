@@ -10,7 +10,7 @@
         "test": {
             "cache": false
         },
-        "typecheck": {
+        "check": {
             "cache": false
         },
         "lint": {

@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "build": "tsup && tsc -p tsconfig.build.json --emitDeclarationOnly --declaration",
-    "typecheck": "tsc --noEmit",
+    "check": "tsc --noEmit",
     "format": "prettier --write ./src",
     "lint": "eslint ./src",
     "test": "vitest --run",

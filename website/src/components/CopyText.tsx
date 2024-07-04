@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { MdContentCopy } from "react-icons/md";
 import { FaCheck } from "react-icons/fa6";
+import { cn } from "@/lib/cn";
 type CopyTextProps = {
   text: string;
   className?: string;
@@ -36,8 +37,11 @@ export default function CopyText({ text, className }: CopyTextProps) {
 
   return (
     <button
-      className={`p-2 border border-neutral-500 bg-neutral-300/10 rounded-md flex flex-row justify-center items-center opacity-50 hover:opacity-100 cursor-pointer transition duration-300 
-        ${className} ${wasCopied ? "!bg-cyan-400/60 !opacity-100" : ""}`}
+      className={cn(
+        "p-2 border border-neutral-500 bg-neutral-300/10 rounded-md flex flex-row justify-center items-center opacity-50 hover:opacity-100 cursor-pointer transition duration-300",
+        wasCopied ? "!bg-cyan-400/60 !opacity-100" : "",
+        className,
+      )}
       onClick={() => {
         navigator.clipboard
           .writeText(text)
