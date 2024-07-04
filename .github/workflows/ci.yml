@@ -6,7 +6,7 @@ on:
   pull_request:
     branches: ["main"]
   workflow_dispatch:
-  
+
 jobs:
   checks:
     name: Checks
@@ -40,7 +40,7 @@ jobs:
       - name: Run tests
         run: bun run test
 
-  docs-build:
+  docs_build:
     name: Build Docs
     needs: checks
     runs-on: ubuntu-latest
@@ -52,7 +52,7 @@ jobs:
           path: ./website
           package-manager: bun@1.1.17
 
-  docs-deploy:
+  docs_deploy:
     name: Deploy Docs
     needs: build
     runs-on: ubuntu-latest
