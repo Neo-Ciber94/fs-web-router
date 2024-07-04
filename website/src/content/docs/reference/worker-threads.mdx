@@ -1,0 +1,45 @@
+---
+title: Configuring Worker Threads
+description: Using worker threads
+---
+
+For enable multi-threading you can use `fileSystemRouter({ workers: true })` which creates
+a thread pool up to the number of available logical processors or use specify the number of workers using `fileSystemRouter({ workerCount: 4 })`.
+
+```ts
+// src/main.ts
+import { fileSystemRouter } from "keiro/node";
+import http from "node:http";
+
+http
+  .createServer(
+    fileSystemRouter({
+      workers: { workerCount: 4 },
+    }),
+  )
+  .listen(3000);
+```
+
+## How it works?
+
+Internally we use node [Worker](https://nodejs.org/api/worker_threads.html) API, and create a pool of workers. When a request comes we take an available worker and serialize the request
+and send it to the worker and then deserialize the response of the worker and send it as a response.
+
+Each worker have its own router which is used to handle the request.
+
+import { Aside } from '@astrojs/starlight/components';
+
+<Aside type="caution" title="Workers are isolated!">
+ Workers cannot directly share data between each other, you cannot share global state,
+ so each request should be handle independently.
+</Aside>
+
+## Is not multi-threading always faster?
+
+No. 
+
+We recommend profiling your app before enabling workers, unless you are handling a big number of request
+you may not see any difference when enabling workers, it may be even slighly inneficient to using workers
+for a few number of request per second.
+
+Checkout the [Worker threads example](https://github.com/Neo-Ciber94/keiro/tree/main/examples/workers-threads).
