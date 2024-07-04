@@ -38,6 +38,10 @@ export default defineConfig({
               label: "Not Found",
               link: "/guides/not-found/",
             },
+            {
+              label: "API Reference",
+              link: "/guides/api-reference/",
+            },
           ],
         },
         {

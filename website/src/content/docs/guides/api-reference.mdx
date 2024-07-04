@@ -1,0 +1,224 @@
+---
+title: API Reference
+description: API Reference
+---
+
+## Defining a `fileSystemRouter()`
+
+`keiro` exports 2 `fileSystemRouter` functions both takes the same arguments: `keiro/node` and `keiro/web`:
+
+- `keiro/node`: `fileSystemRouter` returns a `node` specific middleware in the form:
+```ts
+type NodeRequestHandler = (
+  req: http.IncomingMessage,
+  res: http.ServerResponse,
+  next?: (err?: any) => void,
+) => MaybePromise<void>;
+```
+
+- `keiro/web`: `fileSystemRouter` returns a `web` middleware in the form:
+```ts
+type WebRequestHandler = (request: Request) => MaybePromise<Response>;
+```
+
+### `fileSystemRouter` API reference
+
+The `fileSystemRouter` function takes these *optional* arguments:
+
+- `origin`: Origin used for the request, by default uses the `process.env.ORIGIN`,
+on the web version is not needed because the `origin` is determined from the request.
+
+- `cwd`: The absolute path of the working directory, defaults to `process.cwd()`
+
+- `routesDir`: The path the routes are located, relatived to the `cwd`, defaults to `src/routes/`.
+
+- `middleware`: The name of the middleware, defaults to `middleware`.
+
+- `notFound`: The name of the file used for 404 handling, defaults to `404`.
+
+- `prefix`: A prefix used for all the routes.
+
+- `routeMapper`: A class that maps a file-system path to a route, the default uses a `NextJS` like routing.
+
+- `extensions`: Extensions of valid routes, defaults to `["js", "jsx", "cjs", "mjs", "ts", "tsx", "cts", "mts"]`.
+
+- `ignorePrefix`: A prefix used for ignore files or directories, defaults to `_`.
+
+- `ignoreFiles`: A glob of files to ignore.
+
+- `getLocals`: A function to initialize the request locals, this run even before the middleware.
+
+- `workers`: Controls the worker threads, be default this is not enabled.
+
+## The `RequestEvent`
+
+Any handler takes a `RequestEvent` which contains the request information,
+this event contains the following properties:
+
+- `RequestEvent`
+    - `request`: This is the standard [Request](https://developer.mozilla.org/en-US/docs/Web/API/Request) object.
+    - `params`: An `Record<string, string>` object containing the params of a dynamic route.
+    - `url`: The parsed url of the request, this is the standard [URL](https://developer.mozilla.org/en-US/docs/Web/API/URL/URL) object which contains methods for reading the `searchParams` and `pathname`.
+    - `cookies`: An object to set, get and delete cookies.
+    - `locals`: This is an object containing values that can be access by any handling during the current request, the values in the locals is tie to the current request.
+
+### Reading `Params`
+
+The name of the param matches the name of the filesystem file.
+- `/posts/[post_id].ts`: Have the param `post_id`
+
+```ts
+// src/routes/posts/[post_id].ts
+import { defineHandler } fromn "keiro";
+import { db } from "@/lib/database";
+
+export default defineHandler(async (event) => {
+    const postId = event.params.post_id;
+
+    // `post_id` can be undefined
+    if (!postId) {
+        return new Response(null, { status: 400 });
+    }
+
+    const post = await db.posts.get(postId);
+
+    if (!post) {
+        return new Response(null, { status: 404 });
+    }
+
+    return Response.json(post);
+})
+```
+
+### Using `Cookies`
+
+Cookies provide the methods like `Cookies.get`, `Cookies.set`, `Cookies.delete`
+
+```ts
+// src/routes/users/me
+import { defineHandler } fromn "keiro";
+import { db } from "@/lib/database";
+
+export const POST = defineHandler(async (event) => {
+    const sessionCookie = event.cookies.get("auth_session");
+
+    if (!sessionCookie) {
+        return new Response(null, { status: 401 });
+    }
+
+    const session = await db.session.get(sessionCookie);
+    return Response.json(session.user);
+})
+```
+
+```ts
+// src/routes/users/logout
+import { defineHandler } fromn "keiro";
+import { db } from "@/lib/database";
+
+export const POST = defineHandler(async (event) => {
+    const sessionCookie = event.cookies.get("auth_session");
+
+    if (!sessionCookie) {
+        return new Response(null, { status: 401 });
+    }
+
+    event.cookies.delete("auth_session");
+    return new Response(null)
+})
+```
+
+### Using request `Locals`
+
+By default `locals` have the type `Record<string, unknown>`, to type the locals global you need to augment the `Register` type.
+
+```ts
+// src/types.d.ts
+export declare module "keiro/types" {
+  export interface Register {
+    Locals: {
+      session: {
+        userId: number;
+        username: string;
+      }
+    };
+  }
+}
+```
+
+After that the `event.locals` will be typed as:
+
+```ts
+interface Locals {
+    session: {
+        userId: number;
+        username: string;
+    }
+}
+```
+
+And can be set or get in the requests handlers
+
+```ts
+// src/routes/middleware.ts
+import { declareMiddleware } from "keiro";
+import { getSession } from "@/lib/auth";
+
+export default declareMiddleware((event, next) => {
+    // We assign the session
+    const session = await getSession(event.cookies);
+
+    // locals.session will never be null
+    if (!session) {
+        return new Response(null, { status: 401 });
+    }
+
+    event.locals.session = session;
+    return next(event);
+});
+```
+
+```ts
+// src/routes/users/me.ts
+import { defineHandler } from "keiro";
+import { db } from "@/lib/database";
+
+export default defineHandler(async (event) => {
+    const user = await db.get(event.locals.session.userId);
+    return Response.json(user);
+})
+```
+
+#### Initialiting locals with `getLocals`
+
+`fileSystemRouter` takes a `getLocals` functions that is called event
+before middlewares, this function is intended to be used for set values
+that are not suppose to be optional.
+
+The `getLocals` function receives the `RequestEvent` object as well.
+
+```ts
+// src/types.d.ts
+export declare module "keiro/types" {
+  export interface Register {
+    Locals: {
+      time: Date;
+    };
+  }
+}
+```
+
+```ts
+// src/main.ts
+import { fileSystemRouter } from "keiro/node";
+import http from "node:http";
+
+const port = 5000;
+http.createServer(fileSystemRouter({
+    origin: `http://localhost:${port}`,
+    async getLocals() {
+        return { time: new Date() }
+    }
+})).listen(port);
+
+```
