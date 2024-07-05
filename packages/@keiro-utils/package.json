@@ -1,5 +1,6 @@
 {
-  "name": "@keiro/utils",
+  "name": "@keiro-dev/utils",
+  "version": "0.0.1-beta1",
   "description": "Utilities for creating keiro",
   "scripts": {
     "build": "tsup && tsc --emitDeclarationOnly --declaration",
@@ -13,19 +14,9 @@
   },
   "exports": {
     "./package.json": "./package.json",
-    "./createReadableStream": {
-      "node": {
-        "import": "./dist/stream/createReadableStream.node.js",
-        "types": "./dist/stream/createReadableStream.node.d.ts"
-      },
-      "deno": {
-        "import": "./dist/stream/createReadableStream.node.js",
-        "types": "./dist/stream/createReadableStream.node.d.ts"
-      },
-      "bun": {
-        "import": "./dist/stream/createReadableStream.node.js",
-        "types": "./dist/stream/createReadableStream.node.d.ts"
-      }
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
     }
   },
   "files": [
