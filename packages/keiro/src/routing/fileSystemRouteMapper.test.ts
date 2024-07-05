@@ -29,16 +29,6 @@ describe("DefaultFileSystemRouteMapper", () => {
     expect(segments).toStrictEqual<RouteSegment[]>([]);
   });
 
-  test("Should ignore route with directory", () => {
-    const segments = mapper.toPath("/_other/route/index.ts");
-    expect(segments).toBeUndefined();
-  });
-
-  test("Should ignore route with directory", () => {
-    const segments = mapper.toPath("/should/ignore/_route.ts");
-    expect(segments).toBeUndefined();
-  });
-
   test("Should ignore group segments", () => {
     const segments = mapper.toPath("/(group)/some/(ignore)/other.js");
 

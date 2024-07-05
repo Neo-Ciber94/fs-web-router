@@ -143,4 +143,9 @@ describe("Custom Router", () => {
     expect(res3.ok).toBeTruthy();
     await expect(res3.text()).resolves.toStrictEqual("optional catchall route: /e/one/two/three");
   });
+
+  test("Should return 404 on ignored route", async () => {
+    const res = await fetch(`${origin}/_ignore`);
+    expect(res.status).toStrictEqual(404);
+  });
 });

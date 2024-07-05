@@ -8,9 +8,17 @@ import type { CreateRouterOptions } from "../fileSystemRouter";
  * @internal
  */
 export function getFileSystemRoutesMap(options: CreateRouterOptions) {
-  const { cwd, routesDir, prefix = "", extensions, ignoreFiles, routeMapper } = options;
+  const {
+    cwd,
+    routesDir,
+    prefix = "",
+    extensions,
+    ignoreFiles,
+    ignorePrefix,
+    routeMapper,
+  } = options;
   const routesDirPath = path.join(cwd, routesDir);
-  const files = scanFileSystemRoutes(cwd, routesDir, extensions, ignoreFiles);
+  const files = scanFileSystemRoutes(cwd, routesDir, extensions, ignorePrefix, ignoreFiles);
   const routeSegmentsMap = new Map<string, RouteSegment[]>();
 
   for (const file of files) {
@@ -58,6 +66,7 @@ function scanFileSystemRoutes(
   cwd: string,
   routesDir: string,
   extensions: string[],
+  ignorePrefix: string,
   ignoreFiles?: string[],
 ) {
   const files = globSync(`${routesDir}/**`, {
@@ -68,7 +77,9 @@ function scanFileSystemRoutes(
   });
 
   const dotExtensions = extensions.map((ext) => `.${ext}`);
-  return files.filter((file) => dotExtensions.includes(path.extname(file)));
+  return files
+    .filter((file) => dotExtensions.includes(path.extname(file)))
+    .filter((file) => !isIgnoredFilePath(file, ignorePrefix));
 }
 
 function toRadix3(segments: RouteSegment[]) {
@@ -88,4 +99,16 @@ function toRadix3(segments: RouteSegment[]) {
   }
 
   return `/${routePath}`;
+}
+
+/**
+ * Checks whether if the given file path should be excluded from the file-system routing.
+ * @param filePath The file path.
+ * @param ignorePrefix The ignore prefix.
+ */
+function isIgnoredFilePath(filePath: string, ignorePrefix: string) {
+  return filePath
+    .split("/")
+    .filter(Boolean)
+    .some((p) => p.startsWith(ignorePrefix));
 }

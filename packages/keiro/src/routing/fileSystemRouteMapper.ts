@@ -38,11 +38,6 @@ export interface DefaultFileSystemRouteMapperOptions {
    * Extract params from paths.
    */
   matching?: MatchingPattern;
-
-  /**
-   * Prefix for ignore routes.
-   */
-  ignorePrefix?: string;
 }
 
 /**
@@ -56,21 +51,15 @@ export interface DefaultFileSystemRouteMapperOptions {
  */
 export class DefaultFileSystemRouteMapper extends FileSystemRouteMapper {
   #matchingPattern: MatchingPattern;
-  #ignorePrefix: string;
 
   constructor(options?: DefaultFileSystemRouteMapperOptions) {
     super();
-    const { matching = nextJsPatternMatching(), ignorePrefix = "_" } = options || {};
+    const { matching = nextJsPatternMatching() } = options || {};
 
     this.#matchingPattern = matching;
-    this.#ignorePrefix = ignorePrefix;
   }
 
   toPath(filePath: string): RouteSegment[] | undefined {
-    if (isIgnoredFilePath(filePath, this.#ignorePrefix)) {
-      return undefined;
-    }
-
     const filePathSegments = filePath
       // Remove the extensions: js, jsx, cjs, mjs, ts, tsx, cts, mts
       .replace(/(index)?\.[cm]?(ts|js)x?/, "")
@@ -102,16 +91,4 @@ export class DefaultFileSystemRouteMapper extends FileSystemRouteMapper {
       return { path: pathSegment, type: "static" };
     }
   }
-}
-
-/**
- * Checks whether if the given file path should be excluded from the file-system routing.
- * @param filePath The file path.
- * @param ignorePrefix The ignore prefix.
- */
-export function isIgnoredFilePath(filePath: string, ignorePrefix: string) {
-  return filePath
-    .split("/")
-    .filter(Boolean)
-    .some((p) => p.startsWith(ignorePrefix));
 }
