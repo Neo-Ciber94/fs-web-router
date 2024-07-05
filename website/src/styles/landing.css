@@ -53,3 +53,28 @@
     animation: none;
   }
 }
+
+[data-pkg-manager-install] {
+  @apply relative overflow-hidden;
+}
+
+[data-pkg-manager-install]:before {
+  @apply rounded-md absolute w-[200vw] h-[200vh];
+  content: "";
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: -1;
+  background: conic-gradient(transparent 45%, #22d3ee, transparent 60%) rgba(34, 211, 238, 0.15);
+  animation: rotateBackground 10s infinite linear;
+}
+
+@keyframes rotateBackground {
+  0% {
+    transform: translate(-50%, -50%) rotate(0deg);
+  }
+
+  100% {
+    transform: translate(-50%, -50%) rotate(360deg);
+  }
+}
