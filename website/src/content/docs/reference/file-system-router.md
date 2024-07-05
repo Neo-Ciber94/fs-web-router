@@ -120,12 +120,12 @@ http
 ```ts
 import { fileSystemRouter } from "keiro/node";
 import http from "node:http";
-import { SvelteKitRouteMapper } from "./mapper";
+import { CustomRouteMapper } from "./mapper";
 
 http
   .createServer(
     fileSystemRouter({
-      routeMapper: new SvelteKitRouteMapper(),
+      routeMapper: new CustomRouteMapper(),
     }),
   )
   .listen(3000);
