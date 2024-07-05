@@ -66,10 +66,10 @@
   transform: translate(-50%, -50%);
   z-index: -1;
   background: conic-gradient(transparent 45%, #22d3ee, transparent 60%) rgba(34, 211, 238, 0.15);
-  animation: rotateBackground 10s infinite linear;
+  animation: rotateBorderAnimation 10s infinite linear;
 }
 
-@keyframes rotateBackground {
+@keyframes rotateBorderAnimation {
   0% {
     transform: translate(-50%, -50%) rotate(0deg);
   }
