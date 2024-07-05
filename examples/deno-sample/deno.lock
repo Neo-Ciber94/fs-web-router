@@ -2,9 +2,7 @@
   "version": "3",
   "packages": {
     "specifiers": {
-      "npm:cookie": "npm:cookie@0.6.0",
-      "npm:glob": "npm:glob@10.4.2",
-      "npm:radix3": "npm:radix3@1.1.2"
+      "npm:keiro": "npm:keiro@0.0.1-beta2"
     },
     "npm": {
       "@isaacs/cliui@8.0.2": {
@@ -117,8 +115,16 @@
           "@pkgjs/parseargs": "@pkgjs/parseargs@0.11.0"
         }
       },
-      "lru-cache@10.2.2": {
-        "integrity": "sha512-9hp3Vp2/hFQUiIwKo8XCeFVnrg8Pk3TYNPIR7tJADKi5YfcF7vEaK7avFHTlSy3kOKYaJQaalfEo6YuXdceBOQ==",
+      "keiro@0.0.1-beta2": {
+        "integrity": "sha512-mzc4ZJwGTWU0GX0sJQlYGk1F5VQjmLrL+3zdEJM2/wnRknwdlrI99z8NIGtxzSAySW50ywkfP5zLVczeyrW6Qg==",
+        "dependencies": {
+          "cookie": "cookie@0.6.0",
+          "glob": "glob@10.4.2",
+          "radix3": "radix3@1.1.2"
+        }
+      },
+      "lru-cache@10.3.0": {
+        "integrity": "sha512-CQl19J/g+Hbjbv4Y3mFNNXFEL/5t/KCg8POCuUqd4rMKjGG+j1ybER83hxV58zL+dFI1PTkt3GNFSHRt+d8qEQ==",
         "dependencies": {}
       },
       "minimatch@9.0.5": {
@@ -142,7 +148,7 @@
       "path-scurry@1.11.1": {
         "integrity": "sha512-Xa4Nw17FS9ApQFJ9umLiJS4orGjm7ZzwUrwamcGQuHSzDyth9boKDaycYdDcZDuqYATXw4HFXgaqWTctW/v1HA==",
         "dependencies": {
-          "lru-cache": "lru-cache@10.2.2",
+          "lru-cache": "lru-cache@10.3.0",
           "minipass": "minipass@7.1.2"
         }
       },
@@ -219,9 +225,7 @@
   "remote": {},
   "workspace": {
     "dependencies": [
-      "npm:cookie",
-      "npm:glob",
-      "npm:radix3"
+      "npm:keiro"
     ]
   }
 }

@@ -5,9 +5,8 @@
     "unstable": [
         "sloppy-imports"
     ],
+    "nodeModulesDir": true,
     "imports": {
-        "radix3": "npm:radix3",
-        "cookie": "npm:cookie",
-        "glob": "npm:glob"
+        "keiro": "npm:keiro"
     }
 }
