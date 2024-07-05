@@ -2,6 +2,7 @@ import type { Polka } from "polka";
 import polka from "polka";
 import { fileSystemRouter } from "../../src/handler/node.js";
 import { findAvailablePort } from "../utils.js";
+import { WorkerPoolType } from "../../src/fileSystemRouter.js";
 
 let app: Polka | undefined;
 
@@ -14,8 +15,10 @@ function startServer() {
     app.use(
       fileSystemRouter({
         origin,
-        workers: true,
         routesDir: "test/routing/routes",
+        workers: {
+          pool: WorkerPoolType.Dynamic,
+        },
       }),
     );
     app.listen(port, () => {
@@ -32,7 +35,7 @@ afterAll(() => {
   app?.server?.close();
 });
 
-describe("Routing with workers and default handler", () => {
+describe("Routing with dynamic worker pool and default handler", () => {
   test("Static route: GET /a", async () => {
     const res = await fetch(`${origin}/a`);
     const text = await res.text();
@@ -92,7 +95,7 @@ describe("Routing with workers and default handler", () => {
   });
 });
 
-describe("Routing with workers and http methods", () => {
+describe("Routing with dynamic worker pool and http methods", () => {
   test("Should call GET handler", async () => {
     const res = await fetch(`${origin}/x/api_1`);
     const text = await res.text();

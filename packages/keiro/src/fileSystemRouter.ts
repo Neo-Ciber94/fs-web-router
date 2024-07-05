@@ -11,6 +11,9 @@ import type { FileSystemRouteMapper } from "./routing/fileSystemRouteMapper";
 import { DefaultFileSystemRouteMapper } from "./routing/fileSystemRouteMapper";
 import { getFileSystemRoutesMap } from "./routing/getFileSystemRoutesMap";
 import { invariant } from "./common/invariant";
+import { type WorkerPool } from "./workers/workerPool";
+import { type WorkerOptions } from "node:worker_threads";
+import { getWorkerPoolFactory } from "./handler/utils";
 
 /**
  * File system router options.
@@ -124,6 +127,32 @@ export interface WorkersRoutingOptions {
    * Number of logical processors.
    */
   workerCount?: number;
+
+  /**
+   * Worker pool to use.
+   *
+   * @default
+   * WorkerPoolType.Fixed
+   */
+  pool?:
+    | WorkerPoolType
+    | ((workerCount: number, filename: string, options?: WorkerOptions) => WorkerPool);
+}
+
+/**
+ * Type of worker pool to use.
+ */
+export const enum WorkerPoolType {
+  /**
+   * The pool grow and shrink to handle the requests. Creating more workers can be costly.
+   */
+  Dynamic = 1,
+
+  /**
+   * The pool maintain a fixed size, if not workers is available
+   * the next request need to wait until a worker is available.
+   */
+  Fixed = 2,
 }
 
 interface InternalOptions {
@@ -204,12 +233,23 @@ export function initializeFileSystemRouter(options?: FileSystemRouterOptions & I
       ? findFile(routesDirPath, middleware, EXTENSIONS)
       : undefined;
 
+    const poolFactory = (() => {
+      const defaultPoolType = WorkerPoolType.Fixed;
+
+      if (workers === true) {
+        return getWorkerPoolFactory(defaultPoolType);
+      }
+
+      return getWorkerPoolFactory(workers.pool ?? defaultPoolType);
+    })();
+
     return {
       type: "worker" as const,
       origin,
       workerCount,
       routeMapper,
       middlewareFilePath,
+      poolFactory,
       initialOptions,
     };
   }

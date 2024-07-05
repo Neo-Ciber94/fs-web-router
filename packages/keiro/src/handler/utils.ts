@@ -1,6 +1,9 @@
+import type { WorkerOptions } from "node:worker_threads";
 import { Cookies } from "../cookies";
+import { WorkerPoolType, type WorkersRoutingOptions } from "../fileSystemRouter";
 import type { RequestHandler, Locals, MaybePromise, Next, Params } from "../types";
 import { type RequestEvent } from "../types";
+import { DynamicWorkerPool, FixedWorkerPool, type WorkerPool } from "../workers/workerPool";
 
 interface CreateRequestEventArgs {
   request: Request;
@@ -43,4 +46,27 @@ export function chain(...handlers: RequestHandler[]): Next {
 
     return handle(0);
   };
+}
+
+export type WorkerPoolFactory = (
+  workerCount: number,
+  filename: string,
+  options?: WorkerOptions,
+) => WorkerPool;
+
+export function getWorkerPoolFactory(
+  pool: NonNullable<WorkersRoutingOptions["pool"]>,
+): WorkerPoolFactory {
+  if (typeof pool === "function") {
+    return pool;
+  }
+
+  switch (pool) {
+    case WorkerPoolType.Fixed:
+      return (...args) => new FixedWorkerPool(...args);
+    case WorkerPoolType.Dynamic:
+      return (...args) => new DynamicWorkerPool(...args);
+    default:
+      throw new Error("unreachable");
+  }
 }

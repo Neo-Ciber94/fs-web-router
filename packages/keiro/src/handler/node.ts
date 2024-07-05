@@ -2,19 +2,14 @@
 import { type FileSystemRouterOptions, initializeFileSystemRouter } from "../fileSystemRouter";
 import { createRequest, setResponse } from "../common/nodeHelpers";
 import type http from "node:http";
-import { posix as path } from "node:path";
-import { EXTENSIONS, getRouteHandler, normalizePath } from "../utils";
-import type { WorkerRouterData } from "./worker.mjs";
+import { getRouteHandler } from "../utils";
 import { handleRequestOnWorker } from "../workers/handleRequestOnWorker";
-import { WorkerPool } from "../workers/workerPool";
 import type { MaybePromise } from "../types";
-import url from "node:url";
 import { chain, createRequestEvent, handleNotFound } from "./utils";
 import { invariant } from "../common/invariant";
 import { applyResponseCookies } from "../cookies";
-import { getFileSystemRoutesMap } from "../routing/getFileSystemRoutesMap";
-
-const __dirname = path.dirname(normalizePath(url.fileURLToPath(import.meta.url)));
+import type { WorkerFileSystemRouterOptions } from "./getFileSystemWorkerPool";
+import { getFileSystemWorkerPool } from "./getFileSystemWorkerPool";
 
 type NodeRequestHandler = (
   req: http.IncomingMessage,
@@ -27,13 +22,14 @@ type NodeRequestHandler = (
  * @param options The file system router options.
  */
 export function fileSystemRouter(options?: FileSystemRouterOptions): NodeRequestHandler {
-  const fsRouterOptions = initializeFileSystemRouter(options);
+  const options$ = initializeFileSystemRouter(options);
 
-  if (fsRouterOptions.type === "worker") {
+  if (options$.type === "worker") {
     return workerFileSystemRouter({
-      ...fsRouterOptions.initialOptions,
-      workerCount: fsRouterOptions.workerCount,
-      middlewareFilePath: fsRouterOptions.middlewareFilePath,
+      ...options$.initialOptions,
+      poolFactory: options$.poolFactory,
+      workerCount: options$.workerCount,
+      middlewareFilePath: options$.middlewareFilePath,
     });
   }
 
@@ -43,7 +39,7 @@ export function fileSystemRouter(options?: FileSystemRouterOptions): NodeRequest
     routerPromise,
     middlewarePromise,
     notFoundPromise,
-  } = fsRouterOptions;
+  } = options$;
 
   invariant(origin, "Origin is not set");
 
@@ -87,53 +83,11 @@ export function fileSystemRouter(options?: FileSystemRouterOptions): NodeRequest
   };
 }
 
-type InitialOptions = ReturnType<typeof initializeFileSystemRouter>["initialOptions"];
-
-type WorkerFileSystemRouterOptions = InitialOptions & {
-  middlewareFilePath: string | null | undefined;
-  workerCount: number;
-};
-
 function workerFileSystemRouter(options: WorkerFileSystemRouterOptions) {
-  const {
-    cwd,
-    prefix,
-    ignoreFiles,
-    ignorePrefix,
-    routeMapper,
-    middleware,
-    middlewareFilePath,
-    workerCount,
-    extensions,
-    origin,
-    routesDir,
-  } = options;
+  const { origin } = options;
+  const pool = getFileSystemWorkerPool(options);
 
   invariant(origin, "Origin is not set");
-
-  if (middlewareFilePath) {
-    const globExts = EXTENSIONS.join(",");
-    ignoreFiles.push(`**/**/${middleware}.{${globExts}}`);
-  }
-
-  const routesFilePaths = getFileSystemRoutesMap({
-    cwd,
-    prefix,
-    routesDir,
-    ignorePrefix,
-    routeMapper,
-    ignoreFiles,
-    extensions,
-  });
-
-  const workerFilePath = "file://" + path.join(__dirname, "worker.mjs");
-
-  const pool = new WorkerPool(workerCount, workerFilePath, {
-    workerData: {
-      routesFilePaths,
-      middlewareFilePath,
-    } as WorkerRouterData,
-  });
 
   return async (
     req: http.IncomingMessage,

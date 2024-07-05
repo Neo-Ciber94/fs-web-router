@@ -1,16 +1,13 @@
 import { type FileSystemRouterOptions, initializeFileSystemRouter } from "../fileSystemRouter";
-import { posix as path } from "node:path";
-import { EXTENSIONS, getRouteHandler, normalizePath } from "../utils";
-import type { WorkerRouterData } from "./worker.mjs";
+import { getRouteHandler } from "../utils";
 import { handleRequestOnWorker } from "../workers/handleRequestOnWorker";
-import { WorkerPool } from "../workers/workerPool";
 import type { MaybePromise } from "../types";
-import url from "node:url";
 import { chain, createRequestEvent, handleNotFound } from "./utils";
 import { applyResponseCookies } from "../cookies";
-import { getFileSystemRoutesMap } from "../routing/getFileSystemRoutesMap";
-
-const __dirname = path.dirname(normalizePath(url.fileURLToPath(import.meta.url)));
+import {
+  getFileSystemWorkerPool,
+  type WorkerFileSystemRouterOptions,
+} from "./getFileSystemWorkerPool";
 
 type WebRequestHandler = (request: Request) => MaybePromise<Response>;
 
@@ -19,20 +16,21 @@ type WebRequestHandler = (request: Request) => MaybePromise<Response>;
  * @param options The file system router options.
  */
 export function fileSystemRouter(options?: FileSystemRouterOptions): WebRequestHandler {
-  const fsRouterOptions = initializeFileSystemRouter({
+  const options$ = initializeFileSystemRouter({
     ...options,
     skipOriginCheck: true,
   });
 
-  if (fsRouterOptions.type === "worker") {
+  if (options$.type === "worker") {
     return workerFileSystemRouter({
-      ...fsRouterOptions.initialOptions,
-      workerCount: fsRouterOptions.workerCount,
-      middlewareFilePath: fsRouterOptions.middlewareFilePath,
+      ...options$.initialOptions,
+      poolFactory: options$.poolFactory,
+      workerCount: options$.workerCount,
+      middlewareFilePath: options$.middlewareFilePath,
     });
   }
 
-  const { getLocals, routerPromise, middlewarePromise, notFoundPromise } = fsRouterOptions;
+  const { getLocals, routerPromise, middlewarePromise, notFoundPromise } = options$;
 
   return async (request: Request) => {
     const router = await routerPromise;
@@ -60,50 +58,8 @@ export function fileSystemRouter(options?: FileSystemRouterOptions): WebRequestH
   };
 }
 
-type InitialOptions = ReturnType<typeof initializeFileSystemRouter>["initialOptions"];
-
-type WorkerFileSystemRouterOptions = InitialOptions & {
-  middlewareFilePath: string | null | undefined;
-  workerCount: number;
-};
-
 function workerFileSystemRouter(options: WorkerFileSystemRouterOptions) {
-  const {
-    cwd,
-    prefix,
-    ignoreFiles,
-    ignorePrefix,
-    routeMapper,
-    middleware,
-    middlewareFilePath,
-    workerCount,
-    routesDir,
-    extensions,
-  } = options;
-
-  if (middlewareFilePath) {
-    const globExts = EXTENSIONS.join(",");
-    ignoreFiles.push(`**/**/${middleware}.{${globExts}}`);
-  }
-
-  const routesFilePaths = getFileSystemRoutesMap({
-    cwd,
-    prefix,
-    routesDir,
-    ignorePrefix,
-    routeMapper,
-    ignoreFiles,
-    extensions,
-  });
-
-  const workerFilePath = "file://" + path.join(__dirname, "worker.mjs");
-
-  const pool = new WorkerPool(workerCount, workerFilePath, {
-    workerData: {
-      routesFilePaths,
-      middlewareFilePath,
-    } as WorkerRouterData,
-  });
+  const pool = getFileSystemWorkerPool(options);
 
   return async (request: Request) => {
     const worker = await pool.take();
