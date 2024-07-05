@@ -20,6 +20,22 @@ http
   .listen(3000);
 ```
 
+## Worker pool
+
+The workers are spawn inside a `WorkerPool`, you can specify the worker using the `pool` option:
+
+```ts
+const enum WorkerPoolType {
+  Dynamic = 1,
+  Fixed = 2,
+}
+```
+
+By default it uses the `WorkerPoolType.Fixed` pool, you can also pass function that returns a WorkerPool:
+```ts
+(workerCount: number, filename: string, options?: WorkerOptions) => WorkerPool
+```
+
 ## How it works?
 
 Internally we use node [Worker](https://nodejs.org/api/worker_threads.html) API, and create a pool of workers. When a request comes we take an available worker and serialize the request
