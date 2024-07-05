@@ -83,12 +83,6 @@ export class DefaultFileSystemRouteMapper extends FileSystemRouteMapper {
       // Convert segment to a RouteSegment
       .map((p, _, filePathSegments) => this.toRouteSegment(p, filePathSegments));
 
-    // We remove the last index file
-    // const lastSegment = filePathSegments.at(-1);
-    // if (lastSegment && lastSegment.type === "static" && lastSegment.path === "index") {
-    //   filePathSegments.pop();
-    // }
-
     return filePathSegments;
   }
 

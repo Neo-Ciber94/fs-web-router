@@ -37,19 +37,19 @@ type MatchPatternFunction = (segment: string, pathSegments: string[]) => string 
 export function nextJsPatternMatching(): MatchingPattern {
   return {
     matchDynamic(segment) {
-      const matches = /\[(?<param>\w+)\]/.exec(segment);
+      const matches = /^\[(?<param>\w+)\]/.exec(segment);
       return matches && matches.groups?.param;
     },
     matchCatchAll(segment) {
-      const matches = /\[\.\.\.(?<param>\w+)\]/.exec(segment);
+      const matches = /^\[\.\.\.(?<param>\w+)\]/.exec(segment);
       return matches && matches.groups?.param;
     },
     matchOptionalDynamic(segment) {
-      const matches = /\[\[(?<param>\w+)\]\]/.exec(segment);
+      const matches = /^\[\[(?<param>\w+)\]\]/.exec(segment);
       return matches && matches.groups?.param;
     },
     matchOptionalCatchAll(segment) {
-      const matches = /\[\[\.\.\.(?<param>\w+)\]\]/.exec(segment);
+      const matches = /^\[\[\.\.\.(?<param>\w+)\]\]/.exec(segment);
       return matches && matches.groups?.param;
     },
   };
