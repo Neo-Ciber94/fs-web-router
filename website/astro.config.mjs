@@ -43,8 +43,8 @@ export default defineConfig({
               link: "/guides/not-found/",
             },
             {
-              label: "API Reference",
-              link: "/guides/api-reference/",
+              label: "FileSystemRouter API",
+              link: "/guides/file-system-router-api/",
             },
           ],
         },
