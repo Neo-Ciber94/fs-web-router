@@ -10,6 +10,8 @@ A file-system router compatible with [WinterGC](https://wintercg.org/).
 - Request Locals
 - Worker Threads
 
+## 📖 Check out the [Docs](neo-ciber94.github.io/keiro/) 
+
 ## 📦 Examples
 
 ```ts
