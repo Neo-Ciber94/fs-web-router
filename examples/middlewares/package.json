@@ -1,0 +1,19 @@
+{
+  "name": "middlewares-sample",
+  "version": "1.0.0",
+  "type": "module",
+  "license": "MIT",
+  "scripts": {
+    "dev": "tsx watch ./src/main.ts"
+  },
+  "dependencies": {
+    "keiro": "workspace:*",
+    "polka": "^0.5.2"
+  },
+  "devDependencies": {
+    "@types/node": "^20.14.9",
+    "@types/polka": "^0.5.7",
+    "tsx": "^4.15.7",
+    "typescript": "^5.5.2"
+  }
+}

@@ -1,0 +1,12 @@
+### Not found
+GET http://localhost:6000/api/not-existing-route
+
+### Throw error
+GET http://localhost:6000/api/error
+
+### Timeout error
+GET http://localhost:6000/api/slow
+
+### Too many requests
+GET http://localhost:6000/api/hello
+X-Forwarded-For: 127.0.0.1
