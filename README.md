@@ -1,6 +1,8 @@
 # keiro
 
 [![CI](https://github.com/Neo-Ciber94/keiro/actions/workflows/ci.yml/badge.svg)](https://github.com/Neo-Ciber94/keiro/actions/workflows/ci.yml)
+[![npm version](https://badge.fury.io/js/keiro.svg)](https://badge.fury.io/js/keiro)
+[![Bundle size](https://pkg-size.dev/badge/bundle/243)](https://pkg-size.dev/keiro)
 
 A file-system router compatible with [WinterGC](https://wintercg.org/).
 
@@ -10,7 +12,7 @@ A file-system router compatible with [WinterGC](https://wintercg.org/).
 - Request Locals
 - Worker Threads
 
-## 📖 Check out the [Docs](https://neo-ciber94.github.io/keiro/) 
+## 📖 Check out the [Docs](https://neo-ciber94.github.io/keiro/)
 
 ## 📦 Examples
 
