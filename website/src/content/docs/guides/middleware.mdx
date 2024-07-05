@@ -72,16 +72,16 @@ You can use multiple middlewares in a row using the `sequence` helper.
 ```ts
 import { sequence } from "keiro";
 
-export default sequence(errorHandlerMiddleware(), loggingMiddleware(), authMiddleware()) 
+export default sequence(errorHandler(), logging(), auth()) 
 ```
 
 import { Aside } from '@astrojs/starlight/components';
 
 <Aside>
 Middleware are executing in order, in this case we execute the middleware as:
-1. `errorHandlerMiddleware`: Catches any error of any next handler
-2. `loggingMiddleware`: Logs the request
-3. `authMiddleware`: Manages auth
+1. `errorHandler`: Catches any error of any next handler
+2. `logging`: Logs the request
+3. `auth`: Manages auth
 </Aside>
 
 ## Examples
@@ -89,57 +89,89 @@ Middleware are executing in order, in this case we execute the middleware as:
 ### Logging middleware
 
 ```ts
-    import { defineMiddleware } from "keiro";
+// src/lib/middlewares/logging.ts
+import { defineMiddleware } from "keiro";
 
-    export default defineMiddleware(async (event, next) => {
-        const request = event.request;
-        const now = new Date();
+export const logging = defineMiddleware(async (event, next) => {
+    const request = event.request;
+    const now = new Date();
 
-        // Get the response
-        const response = await next(event);
+    // Get the response
+    const response = await next(event);
 
-        const elapsed = Date.now() - now.getTime();
-        const duration = `${elapsed.toFixed(2)}ms`;
-        const method = request.method;
-        const path = event.url.pathname;
-        const isOk = response.ok ? "✅" : "❌";
-        console.log(`${isOk} [${now.toISOString()}] ${method} ${path} ${duration}`);
-    })
+    const elapsed = Date.now() - now.getTime();
+    const duration = `${elapsed.toFixed(2)}ms`;
+    const method = request.method;
+    const path = event.url.pathname;
+    const isOk = response.ok ? "✅" : "❌";
+    console.log(`${isOk} [${now.toISOString()}] ${method} ${path} ${duration}`);
+})
 ```
 
 ### Error Handler middleware
 
 ```ts
-    import { defineMiddleware } from "keiro";
+// src/lib/middlewares/error_handler.ts
+import { defineMiddleware } from "keiro";
 
-    export default defineMiddleware(async (event, next) => {
-        try {
-            const response = await next(event);
-            return response;
-        }
-        catch (err) {
-            console.error(err);
-            return Response.json(
-                { error: "Internal error"}, 
-                { status: 500 }
-            )
-        }
-    })
+export const errorHandler = defineMiddleware(async (event, next) => {
+    try {
+        const response = await next(event);
+        return response;
+    }
+    catch (err) {
+        console.error(err);
+        return Response.json(
+            { error: "Internal error"}, 
+            { status: 500 }
+        )
+    }
+})
+```
+
+### Timeout middleware
+
+```ts
+// src/lib/middlewares/timeout.ts
+import type { Middleware } from "keiro/types";
+
+const delay = (ms: number) => new Promise<void>((r) => setTimeout(r, ms));
+
+class TimeoutError extends Error {}
+
+export const timeout = (ms: number): Middleware => {
+  return async (event, next) => {
+    try {
+      const responsePromise = next(event);
+      const errorPromise = delay(ms).then(() => Promise.reject(new TimeoutError()));
+      const response = await Promise.race([responsePromise, errorPromise]);
+      return response;
+    } catch (err) {
+      if (err instanceof TimeoutError) {
+        return Response.json({ error: "Timeout" }, { status: 408 });
+      }
+
+      throw err;
+    }
+  };
+};
+
 ```
 
 ### Auth middleware
 
 ```ts
-    import { defineMiddleware } from "keiro";
-    import { getSession } from "@/lib/auth";
+// src/lib/middlewares/auth.ts
+import { defineMiddleware } from "keiro";
+import { getSession } from "@/lib/auth";
 
-    export default defineMiddleware(async (event, next) => {
-        const session = await getSession(event.cookies);
+export const auth = defineMiddleware(async (event, next) => {
+    const session = await getSession(event.cookies);
 
-        if (!session) {
-            return new Response(null, { status: 401 });
-        }
+    if (!session) {
+        return new Response(null, { status: 401 });
+    }
 
-        return next(event);
-    })
+    return next(event);
+})
 ```
