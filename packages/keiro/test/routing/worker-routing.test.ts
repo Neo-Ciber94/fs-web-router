@@ -11,7 +11,13 @@ const origin = `http://localhost:${port}`;
 function startServer() {
   return new Promise<Polka>((resolve) => {
     const app = polka();
-    app.use(fileSystemRouter({ origin, routesDir: "test/handler-routing/routes" }));
+    app.use(
+      fileSystemRouter({
+        origin,
+        workers: true,
+        routesDir: "test/routing/routes",
+      }),
+    );
     app.listen(port, () => {
       resolve(app);
     });
@@ -26,7 +32,7 @@ afterAll(() => {
   app?.server?.close();
 });
 
-describe("Routing with default handler", () => {
+describe("Routing with workers and default handler", () => {
   test("Static route: GET /a", async () => {
     const res = await fetch(`${origin}/a`);
     const text = await res.text();
@@ -86,7 +92,7 @@ describe("Routing with default handler", () => {
   });
 });
 
-describe("Routing with http methods", () => {
+describe("Routing with workers and http methods", () => {
   test("Should call GET handler", async () => {
     const res = await fetch(`${origin}/x/api_1`);
     const text = await res.text();

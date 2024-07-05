@@ -11,7 +11,7 @@ describe("Routing with prefix on server", async () => {
   function startServer() {
     return new Promise<Polka>((resolve) => {
       const app = polka();
-      app.use("/api", fileSystemRouter({ origin, routesDir: "test/handler-routing/routes" }));
+      app.use("/api", fileSystemRouter({ origin, routesDir: "test/routing/routes" }));
       app.listen(port, () => {
         resolve(app);
       });
@@ -46,7 +46,7 @@ describe("Routing with prefix on fileSystemRouter", async () => {
         fileSystemRouter({
           origin,
           prefix: "/api",
-          routesDir: "test/handler-routing/routes",
+          routesDir: "test/routing/routes",
         }),
       );
       app.listen(port, () => {
