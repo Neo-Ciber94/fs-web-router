@@ -110,10 +110,6 @@ button.button__danger {
   border-top: 1px solid rgba(177, 177, 177, 0.2);
 }
 
-.todo__item:hover {
-  background-color: rgba(255, 0, 170, 0.1);
-}
-
 .todo__item input[type="checkbox"] {
   accent-color: var(--primary-color);
   width: 40px;
@@ -123,6 +119,11 @@ button.button__danger {
 
 .todo__item__description {
   width: 100%;
+  background: transparent;
+  font-size: 16px;
+  padding: 10px 5px;
+  border: none;
+  outline: none;
 }
 
 .todo__item:has(input[type="checkbox"]:checked) .todo__item__description {

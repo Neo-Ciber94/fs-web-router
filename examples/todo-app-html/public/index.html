@@ -32,13 +32,12 @@
       <li>
         <div class="todo__item">
           <input type="checkbox" name="done" />
-          <div class="todo__item__description">
-            Lorem, ipsum dolor sit amet consectetur adipisicing elit. Impedit facere debitis quae
-            odio error sunt vitae id molestias aut incidunt asperiores illum recusandae odit, esse
-            velit quibusdam voluptatem aspernatur fugit?
-          </div>
+          <input
+            class="todo__item__description"
+            name="description"
+            value="Lorem, ipsum dolor sit amet consectetur adipisicing elit."
+          />
           <div class="todo__item__actions">
-            <button data-action="edit" class="button__primary">Edit</button>
             <button data-action="delete" class="button__danger">Delete</button>
           </div>
         </div>
@@ -46,7 +45,7 @@
     </template>
 
     <script type="module">
-      async function fetchTodos() {
+      async function fetchTodos({ updateDOM = true } = {}) {
         try {
           const res = await fetch("/api/todos");
 
@@ -59,7 +58,9 @@
             throw new Error("Expected JSON array of todos");
           }
 
-          insertTodosInDOM(todos);
+          if (updateDOM) {
+            insertTodosInDOM(todos);
+          }
         } catch (err) {
           console.error(err);
           alert("Failed to fetch todos");
@@ -115,21 +116,27 @@
         const content = todoListItemTemplate.content.cloneNode(true);
 
         const doneInput = content.querySelector("input[type=checkbox]");
-        const descriptionEl = content.querySelector(".todo__item__description");
+        const descriptionInput = content.querySelector("input.todo__item__description");
         const deleteBtn = content.querySelector("button[data-action=delete]");
         const editBtn = content.querySelector("button[data-action=edit]");
 
         doneInput.checked = todo.done;
-        descriptionEl.textContent = todo.description;
+        descriptionInput.value = todo.description;
         todoListEl.appendChild(content);
 
+        const debouncedToggleTodo = debounced((event) => {
+          const done = event.target.checked;
+          updateTodo({ ...todo, done });
+        }, 500);
+
+        const debouncedUpdateTodo = debounced((event) => {
+          const description = event.target.value;
+          updateTodo({ ...todo, description });
+        }, 500);
+
         deleteBtn.addEventListener("click", () => deleteTodo(todo.id));
-        doneInput.addEventListener("change", () =>
-          updateTodo({
-            ...todo,
-            done: doneInput.checked,
-          }),
-        );
+        doneInput.addEventListener("input", debouncedToggleTodo);
+        descriptionInput.addEventListener("input", debouncedUpdateTodo);
       }
 
       async function updateTodo(todo) {
@@ -148,7 +155,7 @@
             throw new Error("Error updating todo");
           }
 
-          await fetchTodos();
+          await fetchTodos({ updateDOM: false });
         } catch (err) {
           console.log(err);
           alert("Failed to update todo");
@@ -174,6 +181,18 @@
           console.log(err);
           alert("Failed to delete todo");
         }
+      }
+
+      function debounced(fn, ms) {
+        let timeout;
+
+        return (...args) => {
+          if (timeout) {
+            clearTimeout(timeout);
+          }
+
+          timeout = setTimeout(fn.bind(null, ...args), ms);
+        };
       }
 
       window.addEventListener("load", fetchTodos);
