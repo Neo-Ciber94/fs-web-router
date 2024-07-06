@@ -18,6 +18,13 @@ export function redirect(location: string, status: TemporaryRedirectStatus, init
  */
 export type PermanentRedirectStatus = 302 | 303 | 307;
 
+/**
+ *
+ * Creates a permanent redirect response.
+ * @param location The location to redirect to.
+ * @param status The redirection status code.
+ * @param init The response init.
+ */
 export function redirectPermanent(
   location: string,
   status: PermanentRedirectStatus,

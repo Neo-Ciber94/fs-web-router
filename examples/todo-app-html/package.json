@@ -8,7 +8,7 @@
   },
   "dependencies": {
     "keiro": "workspace:*",
-    "@keiro-dev/utils": "workspace:*"
+    "@keiro-dev/web": "workspace:*"
   },
   "devDependencies": {
     "@types/node": "^20.14.9",

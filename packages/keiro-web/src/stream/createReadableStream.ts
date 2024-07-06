@@ -6,7 +6,7 @@ const encoder = new TextEncoder();
  * Creates stream from the given file path.
  * @param filepath The file path.
  */
-export async function createReadableStream(filepath: string): Promise<ReadableStream<Uint8Array>> {
+export function createReadableStream(filepath: string): ReadableStream<Uint8Array> {
   const nodeReadstream = fs.createReadStream(filepath);
 
   return new ReadableStream({

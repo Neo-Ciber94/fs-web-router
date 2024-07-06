@@ -1,6 +1,6 @@
 import fs from "node:fs";
 import path from "node:path";
-import { createReadableStream } from "@keiro-dev/utils";
+import { createReadableStream } from "@keiro-dev/web";
 import { type Middleware } from "keiro/types";
 
 type ServeStaticOptions = {
@@ -27,7 +27,7 @@ export const serveStatic = (options: ServeStaticOptions): Middleware => {
     }
 
     const { filePath, pathname } = resolvedPath;
-    const stream = await createReadableStream(filePath);
+    const fileStream = createReadableStream(filePath);
     const mimeType = getMimeType(filePath);
     console.log(`📦 GET ${pathname}: ${mimeType} `);
 
@@ -40,7 +40,7 @@ export const serveStatic = (options: ServeStaticOptions): Middleware => {
 
       if (encodingFormat) {
         // https://developer.mozilla.org/en-US/docs/Web/API/CompressionStream
-        const compressedStream = stream.pipeThrough(new CompressionStream(encodingFormat));
+        const compressedStream = fileStream.pipeThrough(new CompressionStream(encodingFormat));
 
         return new Response(compressedStream, {
           headers: {
@@ -52,7 +52,7 @@ export const serveStatic = (options: ServeStaticOptions): Middleware => {
       }
     }
 
-    return new Response(stream, {
+    return new Response(fileStream, {
       headers: {
         "content-type": mimeType,
         "cache-control": "public, max-age=31536000",

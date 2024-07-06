@@ -9,7 +9,7 @@
     "!examples/deno-sample"
   ],
   "scripts": {
-    "build": "turbo run build --filter=./packages/keiro --filter=./packages/@keiro-dev-utils",
+    "build": "turbo run build --filter=./packages/keiro --filter=./packages/keiro-web",
     "website": "cd website && bun run start",
     "check": "turbo run check",
     "test": "turbo run test",
