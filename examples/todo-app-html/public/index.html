@@ -8,39 +8,40 @@
   </head>
 
   <body>
-    <h1>Todo App</h1>
+    <div class="todo__container">
+      <h1>Todo</h1>
+      <form class="todo__card todo__form">
+        <input type="text" name="description" placeholder="What you would like to do?" required />
+        <button class="button__primary">Create</button>
+      </form>
 
-    <form action="/api/todos" method="post" class="todo__form">
-      <textarea required name="description" placeholder="Todo description..." rows="10"></textarea>
-      <button type="submit">Create</button>
-    </form>
-
-    <section class="todo__list__container">
-      <h2>Todos</h2>
-      <ul class="todo__list">
-        <li><h4 class="todo__list__loading">Loading...</h4></li>
+      <ul class="todo__card todo__list">
+        <li>
+          <p class="todo__list__loading">🕒 Loading...</p>
+        </li>
       </ul>
-    </section>
+    </div>
 
-    <template id="todo-list-item">
+    <template id="todo-list-empty">
       <li>
-        <form class="todo__item">
-          <input required type="text" name="description" placeholder="Description..." />
-          <label>
-            <input name="done" type="checkbox" />
-            <small>Done</small>
-          </label>
-          <div class="todo__item__actions">
-            <button class="todo__item__update" [data-update] type="button">Edit</button>
-            <button class="todo__item__delete" [data-delete] type="button">Delete</button>
-          </div>
-        </form>
+        <p class="todo__list__empty">No Todos Found</p>
       </li>
     </template>
 
-    <template id="todo-list-empty">
-      <li class="todo__list__empty">
-        <h2>--- No todos ---</h2>
+    <template id="todo-list-item">
+      <li>
+        <div class="todo__item">
+          <input type="checkbox" name="done" />
+          <div class="todo__item__description">
+            Lorem, ipsum dolor sit amet consectetur adipisicing elit. Impedit facere debitis quae
+            odio error sunt vitae id molestias aut incidunt asperiores illum recusandae odit, esse
+            velit quibusdam voluptatem aspernatur fugit?
+          </div>
+          <div class="todo__item__actions">
+            <button class="button__primary">Edit</button>
+            <button class="button__danger">Delete</button>
+          </div>
+        </div>
       </li>
     </template>
 
@@ -50,148 +51,22 @@
           const res = await fetch("/api/todos");
 
           if (!res.ok) {
-            alert("Failed to load todos");
-            return;
+            throw new Error("Recieve error from server");
           }
 
-          /**
-           * @type {{ id: string, description: string, done: boolean }[]}
-           */
           const todos = await res.json();
-
           if (!Array.isArray(todos)) {
-            throw new Error("todos is not an array");
+            throw new Error("Expected JSON array of todos");
           }
 
           insertTodosInDOM(todos);
         } catch (err) {
           console.error(err);
-          alert("Failed to display todos");
+          alert("Failed to fetch todos");
         }
       }
 
-      function insertTodosInDOM(todos) {
-        const todosListEl = document.querySelector(".todo__list");
-
-        if (todos.length === 0) {
-          const emptyTodosTemplate = document.querySelector("#todo-list-empty");
-          const contentEl = emptyTodosTemplate.content.cloneNode(true);
-          todosListEl.replaceChildren(contentEl);
-        } else {
-          const todoItemTemplate = document.querySelector("#todo-list-item");
-          todosListEl.replaceChildren();
-
-          for (const todo of todos) {
-            const contentEl = todoItemTemplate.content.cloneNode(true);
-            const todoItemForm = contentEl.querySelector("form");
-
-            const descriptionInput = contentEl.querySelector("input[name=description]");
-            const doneInput = contentEl.querySelector("input[name=done]");
-
-            descriptionInput.value = todo.description;
-            doneInput.checked = todo.done;
-
-            const updateButton = contentEl.querySelector("button.todo__item__update");
-            const deleteButton = contentEl.querySelector("button.todo__item__delete");
-
-            doneInput.addEventListener("change", async () => {
-              await updateTodo(todo.id, todoItemForm);
-            });
-
-            updateButton.addEventListener("click", (event) => {
-              event.preventDefault();
-              updateTodo(todo.id, todoItemForm, true);
-            });
-
-            deleteButton.addEventListener("click", (event) => {
-              event.preventDefault();
-              if (confirm("Delete todo?")) {
-                deleteTodo(todo.id);
-              }
-            });
-
-            todosListEl.append(contentEl);
-          }
-        }
-      }
-
-      function handleSubmitTodo() {
-        const form = document.querySelector(".todo__form");
-        form.addEventListener("submit", async (event) => {
-          event.preventDefault();
-
-          const formData = new FormData(event.target);
-
-          try {
-            const res = await fetch("/api/todos", {
-              method: "POST",
-              body: formData,
-            });
-
-            if (res.ok) {
-              form.reset();
-              await fetchTodos();
-            } else {
-              alert("Failed to add todo");
-            }
-          } catch (err) {
-            console.error(err);
-            alert("Failed to add todo");
-          }
-        });
-      }
-
-      async function updateTodo(todoId, form, notifyUpdate = false) {
-        const description = form.querySelector("input[name=description]").value;
-        const done = form.querySelector("input[name=done]").checked;
-
-        try {
-          const formData = new FormData();
-          formData.set("description", description);
-          formData.set("done", done);
-
-          const res = await fetch(`/api/todos/${todoId}`, {
-            method: "PUT",
-            body: formData,
-          });
-
-          if (!res.ok) {
-            alert("Failed to update todo");
-            return;
-          }
-
-          if (notifyUpdate) {
-            alert("Todo updated successfully!");
-          }
-
-          await fetchTodos();
-        } catch (err) {
-          console.error(err);
-          alert("Failed to update todo");
-        }
-      }
-
-      async function deleteTodo(todoId) {
-        try {
-          const res = await fetch(`/api/todos/${todoId}`, {
-            method: "DELETE",
-          });
-
-          if (!res.ok) {
-            alert("Failed to delete todo");
-            return;
-          }
-
-          alert("Todo deleted successfully");
-          await fetchTodos();
-        } catch (err) {
-          console.error(err);
-          alert("Failed to delete todo");
-        }
-      }
-
-      window.addEventListener("load", fetchTodos);
-      window.addEventListener("load", handleSubmitTodo);
+      function insertTodosInDOM(todos) {}
     </script>
   </body>
 </html>

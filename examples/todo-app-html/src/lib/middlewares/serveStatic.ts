@@ -6,11 +6,12 @@ import { type Middleware } from "keiro/types";
 type ServeStaticOptions = {
   cwd?: string;
   dir: string;
+  cache?: boolean;
   compress?: boolean;
 };
 
 export const serveStatic = (options: ServeStaticOptions): Middleware => {
-  const { dir, compress = true, cwd = process.cwd() } = options;
+  const { dir, compress = true, cache = true, cwd = process.cwd() } = options;
   const dirPath = path.join(cwd, dir);
 
   if (!fs.existsSync(dirPath)) {
@@ -31,6 +32,11 @@ export const serveStatic = (options: ServeStaticOptions): Middleware => {
     const mimeType = getMimeType(filePath);
     console.log(`📦 GET ${pathname}: ${mimeType} `);
 
+    const headers = {
+      "Content-type": mimeType,
+      ...(cache ? { "Cache-Control": "public, max-age=31536000" } : {}),
+    };
+
     if (compress) {
       const encodings = getAcceptedEncodings(event.request.headers);
       const anyEncoding = encodings.includes("*");
@@ -44,8 +50,7 @@ export const serveStatic = (options: ServeStaticOptions): Middleware => {
 
         return new Response(compressedStream, {
           headers: {
-            "Content-type": mimeType,
-            "Cache-Control": "public, max-age=31536000",
+            ...headers,
             "Content-Encoding": encodingFormat,
           },
         });
@@ -54,8 +59,7 @@ export const serveStatic = (options: ServeStaticOptions): Middleware => {
 
     return new Response(fileStream, {
       headers: {
-        "content-type": mimeType,
-        "cache-control": "public, max-age=31536000",
+        ...headers,
       },
     });
   };
