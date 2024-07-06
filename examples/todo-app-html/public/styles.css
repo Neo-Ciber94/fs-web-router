@@ -1,0 +1,60 @@
+:root {
+  color-scheme: light dark;
+  font-family: sans-serif;
+}
+
+body {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  align-items: center;
+  justify-content: center;
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.todos__form {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  gap: 10px;
+}
+
+.todos__form textarea {
+  padding: 10px;
+}
+
+.todos__form button {
+  padding: 10px;
+}
+
+.todos__list__container {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  align-items: center;
+  width: 100%;
+}
+
+.todos__list {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  width: 100%;
+}
+
+.todos__list__loading {
+  display: flex;
+  flex-direction: row;
+  justify-items: center;
+  opacity: 80%;
+}
+
+.todos__item {
+  padding: 10px;
+  border: 1px solid gray;
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}

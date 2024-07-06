@@ -8,28 +8,19 @@ const encoder = new TextEncoder();
  */
 export async function createReadableStream(filepath: string): Promise<ReadableStream<Uint8Array>> {
   const nodeReadstream = fs.createReadStream(filepath);
-  let streamController: ReadableStreamDefaultController<Uint8Array> | undefined = undefined;
 
   return new ReadableStream({
-    start(controller) {
-      streamController = controller;
-      nodeReadstream.on("data", (buffer) => {
-        const data = typeof buffer === "string" ? encoder.encode(buffer) : (buffer as Uint8Array);
-        controller.enqueue(data);
-      });
-
-      nodeReadstream.on("error", (err) => {
+    async start(controller) {
+      try {
+        for await (const chunk of nodeReadstream) {
+          const data = typeof chunk === "string" ? encoder.encode(chunk) : (chunk as Uint8Array);
+          controller.enqueue(data);
+        }
+      } catch (err) {
         controller.error(err);
-      });
-
-      nodeReadstream.on("close", () => {
-        controller.close();
-      });
-    },
-    cancel() {
-      if (streamController) {
-        streamController.close();
       }
+
+      controller.close();
     },
   });
 }

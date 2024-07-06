@@ -2,6 +2,8 @@
   "name": "@keiro-dev/utils",
   "version": "0.0.1-beta1",
   "description": "Utilities for creating keiro",
+  "main": "dist/index.mjs",
+  "types": "dist/index.d.ts",
   "scripts": {
     "build": "tsup && tsc --emitDeclarationOnly --declaration",
     "check": "tsc --noEmit"
@@ -15,7 +17,7 @@
   "exports": {
     "./package.json": "./package.json",
     ".": {
-      "import": "./dist/index.js",
+      "import": "./dist/index.mjs",
       "types": "./dist/index.d.ts"
     }
   },
