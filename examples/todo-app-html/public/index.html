@@ -90,7 +90,9 @@
 
               deleteButton.addEventListener("click", (event) => {
                 event.preventDefault();
-                deleteTodo(todo.id);
+                if (confirm("Delete todo?")) {
+                  deleteTodo(todo.id);
+                }
               });
 
               todosListEl.append(content);
