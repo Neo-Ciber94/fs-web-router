@@ -10,27 +10,27 @@
   <body>
     <h1>Todo App</h1>
 
-    <form action="/api/todos" method="post" class="todos__form">
+    <form action="/api/todos" method="post" class="todo__form">
       <textarea required name="description" placeholder="Todo description..." rows="10"></textarea>
       <button type="submit">Create</button>
     </form>
 
-    <section class="todos__list__container">
+    <section class="todo__list__container">
       <h2>Todos</h2>
-      <ul class="todos__list">
-        <li><p class="todos__list__loading">Loading...</p></li>
+      <ul class="todo__list">
+        <li><h4 class="todo__list__loading">Loading...</h4></li>
       </ul>
     </section>
 
-    <template id="todo-item">
+    <template id="todo-list-item">
       <li>
-        <form class="todos__item">
+        <form class="todo__item">
           <input required type="text" name="description" placeholder="Description..." />
           <label>
             <input name="done" type="checkbox" />
             <small>Done</small>
           </label>
-          <div class="todos__item__actions">
+          <div class="todo__item__actions">
             <button class="todo__item__update" [data-update] type="button">Update</button>
             <button class="todo__item__delete" [data-delete] type="button">Delete</button>
           </div>
@@ -38,9 +38,9 @@
       </li>
     </template>
 
-    <template id="todo-empty">
-      <li>
-        <h4>No todos</h4>
+    <template id="todo-list-empty">
+      <li class="todo__list__empty">
+        <h2>--- No todos ---</h2>
       </li>
     </template>
 
@@ -54,53 +54,60 @@
             return;
           }
 
+          /**
+           * @type {{ id: string, description: string, done: boolean }[]}
+           */
           const todos = await res.json();
 
           if (!Array.isArray(todos)) {
             throw new Error("todos is not an array");
           }
 
-          const todosListEl = document.querySelector(".todos__list");
-
-          if (todos.length === 0) {
-            const emptyTodosTemplate = document.querySelector("#todo-empty");
-            const content = emptyTodosTemplate.content.cloneNode(true);
-            todosListEl.replaceChildren(content);
-          } else {
-            const todoItemTemplate = document.querySelector("#todo-item");
-            todosListEl.replaceChildren();
-
-            for (const todo of todos) {
-              const content = todoItemTemplate.content.cloneNode(true);
-              const todoItemForm = content.querySelector("form");
-
-              const descriptionInput = content.querySelector("input[name=description]");
-              const doneInput = content.querySelector("input[name=done]");
-
-              descriptionInput.value = todo.description;
-              doneInput.checked = todo.done;
-
-              const updateButton = content.querySelector("button.todo__item__update");
-              const deleteButton = content.querySelector("button.todo__item__delete");
-
-              updateButton.addEventListener("click", (event) => {
-                event.preventDefault();
-                updateTodo(todo.id, todoItemForm);
-              });
-
-              deleteButton.addEventListener("click", (event) => {
-                event.preventDefault();
-                if (confirm("Delete todo?")) {
-                  deleteTodo(todo.id);
-                }
-              });
-
-              todosListEl.append(content);
-            }
-          }
+          insertTodosInDOM(todos);
         } catch (err) {
           console.error(err);
           alert("Failed to display todos");
+        }
+      }
+
+      function insertTodosInDOM(todos) {
+        const todosListEl = document.querySelector(".todo__list");
+
+        if (todos.length === 0) {
+          const emptyTodosTemplate = document.querySelector("#todo-list-empty");
+          const contentEl = emptyTodosTemplate.content.cloneNode(true);
+          todosListEl.replaceChildren(contentEl);
+        } else {
+          const todoItemTemplate = document.querySelector("#todo-list-item");
+          todosListEl.replaceChildren();
+
+          for (const todo of todos) {
+            const contentEl = todoItemTemplate.content.cloneNode(true);
+            const todoItemForm = contentEl.querySelector("form");
+
+            const descriptionInput = contentEl.querySelector("input[name=description]");
+            const doneInput = contentEl.querySelector("input[name=done]");
+
+            descriptionInput.value = todo.description;
+            doneInput.checked = todo.done;
+
+            const updateButton = contentEl.querySelector("button.todo__item__update");
+            const deleteButton = contentEl.querySelector("button.todo__item__delete");
+
+            updateButton.addEventListener("click", (event) => {
+              event.preventDefault();
+              updateTodo(todo.id, todoItemForm);
+            });
+
+            deleteButton.addEventListener("click", (event) => {
+              event.preventDefault();
+              if (confirm("Delete todo?")) {
+                deleteTodo(todo.id);
+              }
+            });
+
+            todosListEl.append(contentEl);
+          }
         }
       }
 

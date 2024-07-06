@@ -31,7 +31,7 @@ h2 {
   color: var(--text-color);
 }
 
-.todos__form {
+.todo__form {
   display: flex;
   flex-direction: column;
   width: 100%;
@@ -42,7 +42,7 @@ h2 {
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
 }
 
-.todos__form textarea {
+.todo__form textarea {
   padding: 10px;
   background-color: var(--bg-color);
   color: var(--text-color);
@@ -50,7 +50,7 @@ h2 {
   border-radius: 5px;
 }
 
-.todos__form button {
+.todo__form button {
   padding: 10px;
   background-color: var(--primary-color);
   color: var(--button-text-color);
@@ -60,11 +60,11 @@ h2 {
   transition: background-color 0.3s ease;
 }
 
-.todos__form button:hover {
+.todo__form button:hover {
   background-color: var(--primary-hover-color);
 }
 
-.todos__list__container {
+.todo__list__container {
   display: flex;
   flex-direction: column;
   gap: 10px;
@@ -72,7 +72,7 @@ h2 {
   width: 100%;
 }
 
-.todos__list {
+.todo__list {
   display: flex;
   flex-direction: column;
   gap: 10px;
@@ -81,14 +81,14 @@ h2 {
   list-style: none;
 }
 
-.todos__list__loading {
+.todo__list__loading {
   display: flex;
   justify-content: center;
   opacity: 80%;
   color: var(--text-color);
 }
 
-.todos__item {
+.todo__item {
   padding: 20px;
   border: 1px solid var(--border-color);
   border-radius: 10px;
@@ -99,7 +99,7 @@ h2 {
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
 }
 
-.todos__item input[type="text"] {
+.todo__item input[type="text"] {
   padding: 10px;
   background-color: var(--bg-color);
   color: var(--text-color);
@@ -107,17 +107,22 @@ h2 {
   border-radius: 5px;
 }
 
-.todos__item input[type="checkbox"] {
+.todo__list__empty h2 {
+  text-align: center;
+  opacity: 80%;
+}
+
+.todo__item input[type="checkbox"] {
   margin-right: 5px;
 }
 
-.todos__item__actions {
+.todo__item__actions {
   display: flex;
   flex-direction: row;
   gap: 2px;
 }
 
-.todos__item__actions button {
+.todo__item__actions button {
   padding: 10px 20px;
   border: none;
   border-radius: 5px;

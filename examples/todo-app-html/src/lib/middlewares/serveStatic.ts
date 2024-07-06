@@ -17,7 +17,7 @@ export const serveStatic = (options: ServeStaticOptions): Middleware => {
     throw new Error(`${dirPath} don't exists`);
   }
 
-  console.log(`✅ Serving files from ${dirPath}`);
+  console.log(`✅ Serving files from '${dir}'`);
 
   return async (event, next) => {
     const resolvedPath = resolveFilePath(dirPath, event.url.pathname);
