@@ -111,6 +111,32 @@
         }
       }
 
+      function handleSubmitTodo() {
+        const form = document.querySelector(".todo__form");
+        form.addEventListener("submit", async (event) => {
+          event.preventDefault();
+
+          const formData = new FormData(event.target);
+
+          try {
+            const res = await fetch("/api/todos", {
+              method: "POST",
+              body: formData,
+            });
+
+            if (res.ok) {
+              form.reset();
+              await fetchTodos();
+            } else {
+              alert("Failed to add todo");
+            }
+          } catch (err) {
+            console.error(err);
+            alert("Failed to add todo");
+          }
+        });
+      }
+
       async function updateTodo(todoId, form) {
         const description = form.querySelector("input[name=description]").value;
         const done = form.querySelector("input[name=done]").checked;
@@ -130,7 +156,8 @@
             return;
           }
 
-          location.reload();
+          await fetchTodos();
+          alert("Todo updated successfully");
         } catch (err) {
           console.error(err);
           alert("Failed to update todo");
@@ -149,7 +176,7 @@
           }
 
           alert("Todo deleted successfully");
-          location.reload();
+          await fetchTodos();
         } catch (err) {
           console.error(err);
           alert("Failed to delete todo");
@@ -157,6 +184,7 @@
       }
 
       window.addEventListener("load", fetchTodos);
+      window.addEventListener("load", handleSubmitTodo);
     </script>
   </body>
 </html>

@@ -2,7 +2,7 @@ import type { RequestHandler } from "keiro/types";
 import { type Todo, DB } from "@/lib/todos";
 
 export const GET: RequestHandler = () => {
-  const items = Array.from(DB.values());
+  const items = Array.from(DB.values()).reverse();
   return Response.json(items);
 };
 
