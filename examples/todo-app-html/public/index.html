@@ -17,14 +17,14 @@
 
       <ul class="todo__card todo__list">
         <li>
-          <p class="todo__list__loading">🕒 Loading...</p>
+          <p class="todo__list__label">🕒 Loading...</p>
         </li>
       </ul>
     </div>
 
     <template id="todo-list-empty">
       <li>
-        <p class="todo__list__empty">No Todos Found</p>
+        <p class="todo__list__label">No Todos Found</p>
       </li>
     </template>
 
@@ -38,8 +38,8 @@
             velit quibusdam voluptatem aspernatur fugit?
           </div>
           <div class="todo__item__actions">
-            <button class="button__primary">Edit</button>
-            <button class="button__danger">Delete</button>
+            <button data-action="edit" class="button__primary">Edit</button>
+            <button data-action="delete" class="button__danger">Delete</button>
           </div>
         </div>
       </li>
@@ -66,7 +66,118 @@
         }
       }
 
-      function insertTodosInDOM(todos) {}
+      function handleAddTodo() {
+        const formEl = document.querySelector(".todo__form");
+        formEl.addEventListener("submit", async (event) => {
+          event.preventDefault();
+
+          const formData = new FormData(event.target);
+
+          try {
+            const res = await fetch("/api/todos", {
+              method: "POST",
+              body: formData,
+            });
+
+            if (!res.ok) {
+              throw new Error("Failed create todo");
+            }
+
+            const todo = await res.json();
+            appendTodoInTodoList(todo);
+            formEl.reset();
+          } catch (err) {
+            console.error(err);
+            alert("Failed to add todo");
+          }
+        });
+      }
+
+      function insertTodosInDOM(todos) {
+        const todoListEl = document.querySelector(".todo__list");
+
+        if (todos.length === 0) {
+          const todoListEmptyTemplate = document.querySelector("#todo-list-empty");
+          const content = todoListEmptyTemplate.content.cloneNode(true);
+          todoListEl.replaceChildren(content);
+        } else {
+          todoListEl.replaceChildren();
+
+          for (const todo of todos) {
+            appendTodoInTodoList(todo);
+          }
+        }
+      }
+
+      function appendTodoInTodoList(todo) {
+        const todoListEl = document.querySelector(".todo__list");
+        const todoListItemTemplate = document.querySelector("#todo-list-item");
+        const content = todoListItemTemplate.content.cloneNode(true);
+
+        const doneInput = content.querySelector("input[type=checkbox]");
+        const descriptionEl = content.querySelector(".todo__item__description");
+        const deleteBtn = content.querySelector("button[data-action=delete]");
+        const editBtn = content.querySelector("button[data-action=edit]");
+
+        doneInput.checked = todo.done;
+        descriptionEl.textContent = todo.description;
+        todoListEl.appendChild(content);
+
+        deleteBtn.addEventListener("click", () => deleteTodo(todo.id));
+        doneInput.addEventListener("change", () =>
+          updateTodo({
+            ...todo,
+            done: doneInput.checked,
+          }),
+        );
+      }
+
+      async function updateTodo(todo) {
+        try {
+          const formData = new FormData();
+          formData.set("id", todo.id);
+          formData.set("description", todo.description);
+          formData.set("done", todo.done);
+
+          const res = await fetch(`/api/todos/${todo.id}`, {
+            method: "PUT",
+            body: formData,
+          });
+
+          if (!res.ok) {
+            throw new Error("Error updating todo");
+          }
+
+          await fetchTodos();
+        } catch (err) {
+          console.log(err);
+          alert("Failed to update todo");
+        }
+      }
+
+      async function deleteTodo(todoId) {
+        if (!confirm("Are you sure you want to delete this todo?")) {
+          return;
+        }
+
+        try {
+          const res = await fetch(`/api/todos/${todoId}`, {
+            method: "DELETE",
+          });
+
+          if (!res.ok) {
+            throw new Error("Error deleting todo");
+          }
+
+          await fetchTodos();
+        } catch (err) {
+          console.log(err);
+          alert("Failed to delete todo");
+        }
+      }
+
+      window.addEventListener("load", fetchTodos);
+      window.addEventListener("load", handleAddTodo);
     </script>
   </body>
 </html>

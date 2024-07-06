@@ -23,10 +23,7 @@ export const POST: RequestHandler = async (event) => {
 
   DB.set(todo.id, todo);
 
-  return new Response(null, {
-    status: 303,
-    headers: {
-      location: "/",
-    },
+  return Response.json(todo, {
+    status: 201,
   });
 };

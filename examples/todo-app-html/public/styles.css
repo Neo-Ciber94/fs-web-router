@@ -106,8 +106,8 @@ button.button__danger {
   cursor: pointer;
 }
 
-.todo__list .todo__item:not(:first-child) {
-  border-top: 1px solid rgb(177, 177, 177, 0.2);
+.todo__list li:not(:first-child) .todo__item {
+  border-top: 1px solid rgba(177, 177, 177, 0.2);
 }
 
 .todo__item:hover {
@@ -121,6 +121,10 @@ button.button__danger {
   margin: 0 10px;
 }
 
+.todo__item__description {
+  width: 100%;
+}
+
 .todo__item:has(input[type="checkbox"]:checked) .todo__item__description {
   text-decoration: line-through;
   opacity: 50%;
@@ -132,7 +136,7 @@ button.button__danger {
   gap: 5px;
 }
 
-.todo__list__empty {
+.todo__list__label {
   text-align: center;
   font-size: 18px;
   color: var(--primary-color);
@@ -140,16 +144,11 @@ button.button__danger {
   opacity: 50%;
   padding: 5px;
   cursor: pointer;
-}
-
-.todo__list__loading {
-  text-align: center;
-  font-size: 18px;
-  color: var(--primary-color);
-  font-weight: bold;
-  opacity: 50%;
-  padding: 5px;
-  cursor: pointer;
+  height: 40px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
 }
 
 /* .todo__item {
