@@ -31,7 +31,7 @@
             <small>Done</small>
           </label>
           <div class="todo__item__actions">
-            <button class="todo__item__update" [data-update] type="button">Update</button>
+            <button class="todo__item__update" [data-update] type="button">Edit</button>
             <button class="todo__item__delete" [data-delete] type="button">Delete</button>
           </div>
         </form>
@@ -94,9 +94,13 @@
             const updateButton = contentEl.querySelector("button.todo__item__update");
             const deleteButton = contentEl.querySelector("button.todo__item__delete");
 
+            doneInput.addEventListener("change", async () => {
+              await updateTodo(todo.id, todoItemForm);
+            });
+
             updateButton.addEventListener("click", (event) => {
               event.preventDefault();
-              updateTodo(todo.id, todoItemForm);
+              updateTodo(todo.id, todoItemForm, true);
             });
 
             deleteButton.addEventListener("click", (event) => {
@@ -137,7 +141,7 @@
         });
       }
 
-      async function updateTodo(todoId, form) {
+      async function updateTodo(todoId, form, notifyUpdate = false) {
         const description = form.querySelector("input[name=description]").value;
         const done = form.querySelector("input[name=done]").checked;
 
@@ -156,8 +160,11 @@
             return;
           }
 
+          if (notifyUpdate) {
+            alert("Todo updated successfully!");
+          }
+
           await fetchTodos();
-          alert("Todo updated successfully");
         } catch (err) {
           console.error(err);
           alert("Failed to update todo");
