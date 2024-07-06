@@ -11,7 +11,7 @@
     <h1>Todo App</h1>
 
     <form action="/api/todos" method="post" class="todos__form">
-      <textarea name="description" placeholder="Description..." rows="10"></textarea>
+      <textarea required name="description" placeholder="Todo description..." rows="10"></textarea>
       <button type="submit">Create</button>
     </form>
 
@@ -25,7 +25,7 @@
     <template id="todo-item">
       <li>
         <form class="todos__item">
-          <input name="description" />
+          <input required type="text" name="description" placeholder="Description..." />
           <label>
             <input name="done" type="checkbox" />
             <small>Done</small>

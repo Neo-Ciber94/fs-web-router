@@ -1,16 +1,34 @@
 :root {
-  color-scheme: light dark;
-  font-family: sans-serif;
+  color-scheme: dark;
+  font-family: "Arial", sans-serif;
+  --bg-color: #121212;
+  --text-color: #e0e0e0;
+  --form-bg-color: #1f1f1f;
+  --button-bg-color: #333;
+  --button-text-color: #fff;
+  --border-color: #444;
+  --primary-color: #6200ea;
+  --primary-hover-color: #3700b3;
+  --delete-color: #b00020;
+  --delete-hover-color: #ff5252;
 }
 
 body {
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 16px;
   align-items: center;
   justify-content: center;
-  max-width: 1000px;
+  max-width: 800px;
   margin: 0 auto;
+  background-color: var(--bg-color);
+  color: var(--text-color);
+  padding: 20px;
+}
+
+h1,
+h2 {
+  color: var(--text-color);
 }
 
 .todos__form {
@@ -18,20 +36,38 @@ body {
   flex-direction: column;
   width: 100%;
   gap: 10px;
+  background-color: var(--form-bg-color);
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
 }
 
 .todos__form textarea {
   padding: 10px;
+  background-color: var(--bg-color);
+  color: var(--text-color);
+  border: 1px solid var(--border-color);
+  border-radius: 5px;
 }
 
 .todos__form button {
   padding: 10px;
+  background-color: var(--primary-color);
+  color: var(--button-text-color);
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.todos__form button:hover {
+  background-color: var(--primary-hover-color);
 }
 
 .todos__list__container {
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 10px;
   align-items: center;
   width: 100%;
 }
@@ -39,22 +75,71 @@ body {
 .todos__list {
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 10px;
   width: 100%;
+  padding: 0;
+  list-style: none;
 }
 
 .todos__list__loading {
   display: flex;
-  flex-direction: row;
-  justify-items: center;
+  justify-content: center;
   opacity: 80%;
+  color: var(--text-color);
 }
 
 .todos__item {
-  padding: 10px;
-  border: 1px solid gray;
+  padding: 20px;
+  border: 1px solid var(--border-color);
   border-radius: 10px;
   display: flex;
   flex-direction: column;
   gap: 10px;
+  background-color: var(--form-bg-color);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.todos__item input[type="text"] {
+  padding: 10px;
+  background-color: var(--bg-color);
+  color: var(--text-color);
+  border: 1px solid var(--border-color);
+  border-radius: 5px;
+}
+
+.todos__item input[type="checkbox"] {
+  margin-right: 5px;
+}
+
+.todos__item__actions {
+  display: flex;
+  flex-direction: row;
+  gap: 2px;
+}
+
+.todos__item__actions button {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.todo__item__update {
+  background-color: var(--primary-color);
+  color: var(--button-text-color);
+  margin-right: 10px;
+}
+
+.todo__item__update:hover {
+  background-color: var(--primary-hover-color);
+}
+
+.todo__item__delete {
+  background-color: var(--delete-color);
+  color: var(--button-text-color);
+}
+
+.todo__item__delete:hover {
+  background-color: var(--delete-hover-color);
 }
