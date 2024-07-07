@@ -5,7 +5,8 @@
         "declarationMap": true,
         "outDir": "./dist",
         "module": "ESNext",
-        "moduleResolution": "Bundler"
+        "moduleResolution": "Bundler",
+        "stripInternal": true
     },
     "include": [
         "src/",

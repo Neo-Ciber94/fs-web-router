@@ -3,11 +3,12 @@ import path from "node:path";
 import { type Middleware } from "keiro/types";
 import mimeTypes from "mime-types";
 import { createReadableStream } from "../stream/createReadableStream";
+import { compressResponse } from "./compress";
 
 /**
  * Options for serving static files.
  */
-export type ServeStaticOptions = {
+export interface ServeStaticOptions {
   /**
    * Current working directory to serve static files.
    *
@@ -40,7 +41,7 @@ export type ServeStaticOptions = {
    * @default false
    */
   dev?: boolean;
-};
+}
 
 const CACHE_ONE_YEAR = "public, max-age=31536000";
 
@@ -90,49 +91,22 @@ export const serveStatic = (options: ServeStaticOptions): Middleware => {
       ...(cacheHeaders ? { "Cache-Control": cacheHeaders } : {}),
     };
 
-    if (compress) {
-      const encodings = getAcceptedEncodings(event.request.headers);
-      const anyEncoding = encodings.includes("*");
-      const gzip = encodings.includes("gzip");
-      const deflate = encodings.includes("deflate");
-      const encodingFormat = anyEncoding || gzip ? "gzip" : deflate ? "deflate" : null;
-
-      if (encodingFormat) {
-        // brotli is not supported currently: https://github.com/whatwg/compression/issues/34
-        // https://developer.mozilla.org/en-US/docs/Web/API/CompressionStream
-        const compressedStream = fileStream.pipeThrough(new CompressionStream(encodingFormat));
-
-        return new Response(compressedStream, {
-          headers: {
-            ...headers,
-            "Content-Encoding": encodingFormat,
-          },
-        });
-      }
-    }
-
-    return new Response(fileStream, {
+    const response = new Response(fileStream, {
       headers: {
         ...headers,
       },
     });
+
+    if (compress) {
+      return compressResponse({
+        requestHeaders: event.request.headers,
+        response: response,
+      });
+    }
+
+    return response;
   };
 };
-
-// https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Accept-Encoding
-function getAcceptedEncodings(headers: Headers) {
-  const acceptEncoding = headers.get("Accept-Encoding");
-
-  if (!acceptEncoding) {
-    return [];
-  }
-
-  return acceptEncoding
-    .split(",")
-    .map((s) => s.trim())
-    .map((s) => s.split(";")[0])
-    .filter(Boolean);
-}
 
 function fileExists(filePath: string) {
   try {
