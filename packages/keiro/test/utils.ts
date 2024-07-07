@@ -12,12 +12,13 @@ export async function findAvailablePort(startPort: number) {
     const server = net.createServer();
     server.unref();
 
-    return new Promise<boolean>((resolve, reject) => {
+    return new Promise<boolean>((resolve) => {
       server.once("error", (err: NodeJS.ErrnoException) => {
         if (err?.code === "EADDRINUSE") {
           resolve(false);
         } else {
-          reject(err);
+          console.error(err);
+          resolve(false);
         }
       });
 
