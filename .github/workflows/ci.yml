@@ -29,16 +29,16 @@ jobs:
         run: bun install
 
       - name: Build lib
-        run: bun run build
+        run: npm run build
 
       - name: Run typecheck
-        run: bun run check
+        run: npm run check
 
       - name: Run lint
-        run: bun run lint
+        run: npm run lint
 
       - name: Run tests
-        run: bun run test
+        run: npm run test
 
   docs-build:
     name: Build Docs
