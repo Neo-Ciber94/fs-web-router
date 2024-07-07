@@ -6,12 +6,38 @@ type GetOriginFunction = (
   event: RequestEvent,
 ) => string | undefined | null | Promise<string | undefined | null>;
 
+/**
+ * Options for the cors middleware.
+ */
 export interface CorsOptions {
+  /**
+   * The value set on the `Access-Control-Allow-Origin`, this can be a string, an array or a function that return the valid origin.
+   */
   origin: string | string[] | GetOriginFunction;
+
+  /**
+   * Http methods to set on `Access-Control-Allow-Methods`.
+   */
   allowMethods?: string[];
+
+  /**
+   * Allowed headers to set on `Access-Control-Allow-Headers`.
+   */
   allowHeaders?: string[];
+
+  /**
+   * Value to set on `Access-Control-Max-Age`.
+   */
   maxAge?: number;
+
+  /**
+   * Whether if set the `Access-Control-Allow-Credentials` header.
+   */
   credentials?: boolean;
+
+  /**
+   * Headers to expose with `Access-Control-Expose-Headers`.
+   */
   exposeHeaders?: string[];
 }
 
