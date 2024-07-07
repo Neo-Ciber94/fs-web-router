@@ -1,24 +1,64 @@
 import fs from "node:fs";
 import path from "node:path";
-import { createReadableStream } from "@keiro-dev/web";
 import { type Middleware } from "keiro/types";
+import mimeTypes from "mime-types";
+import { createReadableStream } from "../stream/createReadableStream";
 
-type ServeStaticOptions = {
+/**
+ * Options for serving static files.
+ */
+export type ServeStaticOptions = {
+  /**
+   * Current working directory to serve static files.
+   *
+   * @default process.cwd();
+   */
   cwd?: string;
+
+  /**
+   * Directory to serve the static files relative to the current working directory.
+   */
   dir: string;
-  cache?: boolean;
+
+  /**
+   * Cache-Control headers to apply to the static files. Use `false` to disable caching.
+   *
+   * @default "public, max-age=31536000"
+   */
+  cacheControl?: boolean | string;
+
+  /**
+   * Whether if compress the files. `gzip` and `deflate` are supported
+   *
+   * @default true
+   */
   compress?: boolean;
+
+  /**
+   * Enable dev logs.
+   *
+   * @default false
+   */
+  dev?: boolean;
 };
 
+const CACHE_ONE_YEAR = "public, max-age=31536000";
+
+/**
+ * A middleware to serve static files.
+ * @param options The middleware options.
+ */
 export const serveStatic = (options: ServeStaticOptions): Middleware => {
-  const { dir, compress = true, cache = true, cwd = process.cwd() } = options;
+  const { dir, compress = true, dev = false, cacheControl, cwd = process.cwd() } = options;
   const dirPath = path.join(cwd, dir);
 
   if (!fs.existsSync(dirPath)) {
     throw new Error(`${dirPath} don't exists`);
   }
 
-  console.log(`✅ Serving files from '${dir}'`);
+  if (dev) {
+    console.log(`✅ Serving files from '${dir}'`);
+  }
 
   return async (event, next) => {
     const resolvedPath = resolveFilePath(dirPath, event.url.pathname);
@@ -29,12 +69,25 @@ export const serveStatic = (options: ServeStaticOptions): Middleware => {
 
     const { filePath, pathname } = resolvedPath;
     const fileStream = createReadableStream(filePath);
-    const mimeType = getMimeType(filePath);
-    console.log(`📦 GET ${pathname}: ${mimeType} `);
+    const mimeType = mimeTypes.lookup(filePath) || "binary/octet-stream";
+
+    if (dev) {
+      console.log(`📦 GET ${pathname}: ${mimeType} `);
+    }
+
+    function getCacheControlHeader() {
+      if (cacheControl === false) {
+        return undefined;
+      }
+
+      return typeof cacheControl === "string" ? cacheControl : CACHE_ONE_YEAR;
+    }
+
+    const cacheHeaders = getCacheControlHeader();
 
     const headers = {
       "Content-type": mimeType,
-      ...(cache ? { "Cache-Control": "public, max-age=31536000" } : {}),
+      ...(cacheHeaders ? { "Cache-Control": cacheHeaders } : {}),
     };
 
     if (compress) {
@@ -45,6 +98,7 @@ export const serveStatic = (options: ServeStaticOptions): Middleware => {
       const encodingFormat = anyEncoding || gzip ? "gzip" : deflate ? "deflate" : null;
 
       if (encodingFormat) {
+        // brotli is not supported currently: https://github.com/whatwg/compression/issues/34
         // https://developer.mozilla.org/en-US/docs/Web/API/CompressionStream
         const compressedStream = fileStream.pipeThrough(new CompressionStream(encodingFormat));
 
@@ -64,27 +118,6 @@ export const serveStatic = (options: ServeStaticOptions): Middleware => {
     });
   };
 };
-
-const MIME_TYPES: { [key: string]: string } = {
-  ".txt": "text/plain",
-  ".html": "text/html",
-  ".css": "text/css",
-  ".js": "application/javascript",
-  ".json": "application/json",
-  ".png": "image/png",
-  ".jpg": "image/jpeg",
-  ".jpeg": "image/jpeg",
-  ".webp": "image/webp",
-  ".ico": "image/x-icon",
-  ".gif": "image/gif",
-  ".svg": "image/svg+xml",
-  ".pdf": "application/pdf",
-};
-
-function getMimeType(fileName: string) {
-  const ext = path.extname(fileName);
-  return MIME_TYPES[ext] ?? "binary/octet-stream";
-}
 
 // https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Accept-Encoding
 function getAcceptedEncodings(headers: Headers) {
