@@ -64,6 +64,7 @@ export const serveStatic = (options: ServeStaticOptions): Middleware => {
   return async (event, next) => {
     const resolvedPath = resolveFilePath(dirPath, event.url.pathname);
 
+    // File not found
     if (resolvedPath == null) {
       return next(event);
     }
