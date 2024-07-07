@@ -1,0 +1,34 @@
+{
+  "name": "todo-app-react",
+  "version": "1.0.0",
+  "type": "module",
+  "license": "MIT",
+  "scripts": {
+    "dev": "concurrently \"npm:dev:*\"",
+    "dev:server": "tsx watch ./server/main.ts",
+    "dev:client": "vite dev",
+    "build": "concurrently \"npm:build:*\"",
+    "build:client": "vite build",
+    "build:server": "tsup",
+    "start": "node build/server/main.js",
+    "prod": "npm run build && npm run start"
+  },
+  "dependencies": {
+    "@keiro-dev/web": "workspace:*",
+    "keiro": "workspace:*",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  },
+  "devDependencies": {
+    "@types/node": "^20.14.9",
+    "@types/react": "^18.3.3",
+    "@types/react-dom": "^18.3.0",
+    "@vitejs/plugin-react": "^4.3.1",
+    "concurrently": "^8.2.2",
+    "tsup": "^8.1.0",
+    "tsx": "^4.15.7",
+    "typescript": "^5.5.2",
+    "vite": "^5.3.3",
+    "vite-tsconfig-paths": "^4.3.2"
+  }
+}

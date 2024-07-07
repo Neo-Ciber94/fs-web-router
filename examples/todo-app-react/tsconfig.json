@@ -1,0 +1,18 @@
+{
+    "extends": "../../tsconfig.root.json",
+    "compilerOptions": {
+        "jsx": "react-jsx",
+        "paths": {
+            "@server/*": [
+                "./server/*"
+            ],
+            "@client/*": [
+                "./client/*"
+            ]
+        }
+    },
+    "include": [
+        "client/",
+        "server/"
+    ],
+}
