@@ -1,5 +1,5 @@
 import type { RequestHandler } from "keiro/types";
-import { DB } from "@/lib/todos";
+import { DB } from "@server/lib/todos";
 
 export const PUT: RequestHandler = async (event) => {
   const todoId = event.params.todo_id;
@@ -13,17 +13,17 @@ export const PUT: RequestHandler = async (event) => {
   const done = formData.get("done") === "true";
 
   const todo = DB.get(todoId);
-  if (!todo) {
-    return Response.json(null, { status: 404 });
-  }
-
-  const newTodo = { id: todo.id, description, done };
 
   if (todo) {
-    DB.set(todo.id, newTodo);
+    DB.set(todo.id, { id: todo.id, description, done });
   }
 
-  return Response.json(newTodo);
+  return new Response(null, {
+    status: 303,
+    headers: {
+      location: "/",
+    },
+  });
 };
 
 export const DELETE: RequestHandler = async (event) => {
@@ -33,9 +33,14 @@ export const DELETE: RequestHandler = async (event) => {
     return Response.json(null, { status: 404 });
   }
 
-  if (DB.delete(todoId)) {
-    return new Response(null, { status: 204 });
+  if (DB.has(todoId)) {
+    DB.delete(todoId);
   }
 
-  return Response.json(null, { status: 404 });
+  return new Response(null, {
+    status: 303,
+    headers: {
+      location: "/",
+    },
+  });
 };

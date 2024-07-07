@@ -36,11 +36,11 @@ export interface ServeStaticOptions {
   compress?: boolean;
 
   /**
-   * Enable dev logs.
+   * Enable debug logs.
    *
    * @default false
    */
-  dev?: boolean;
+  debug?: boolean;
 }
 
 const CACHE_ONE_YEAR = "public, max-age=31536000";
@@ -50,14 +50,14 @@ const CACHE_ONE_YEAR = "public, max-age=31536000";
  * @param options The middleware options.
  */
 export const serveStatic = (options: ServeStaticOptions): Middleware => {
-  const { dir, compress = true, dev = false, cacheControl, cwd = process.cwd() } = options;
+  const { dir, compress = true, debug = false, cacheControl, cwd = process.cwd() } = options;
   const dirPath = path.join(cwd, dir);
 
   if (!fs.existsSync(dirPath)) {
     throw new Error(`${dirPath} don't exists`);
   }
 
-  if (dev) {
+  if (debug) {
     console.log(`✅ Serving files from '${dir}'`);
   }
 
@@ -73,7 +73,7 @@ export const serveStatic = (options: ServeStaticOptions): Middleware => {
     const fileStream = createReadableStream(filePath);
     const mimeType = mimeTypes.lookup(filePath) || "binary/octet-stream";
 
-    if (dev) {
+    if (debug) {
       console.log(`📦 GET ${pathname}: ${mimeType} `);
     }
 

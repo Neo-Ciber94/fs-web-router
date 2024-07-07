@@ -15,6 +15,7 @@
   },
   "dependencies": {
     "@keiro-dev/web": "workspace:*",
+    "@tanstack/react-query": "^5.50.1",
     "keiro": "workspace:*",
     "react": "^18.3.1",
     "react-dom": "^18.3.1"
