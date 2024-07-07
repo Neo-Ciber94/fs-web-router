@@ -4,9 +4,12 @@
         "build": {
             "outputs": [
                 "dist/**"
-            ],
+            ]
+        },
+        "keiro#build": {},
+        "@keiro-dev/web#build": {
             "dependsOn": [
-                "^build"
+                "keiro#build"
             ]
         },
         "website": {},
