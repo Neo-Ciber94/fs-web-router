@@ -60,6 +60,7 @@ export function compressResponse(opts: CompressResponseOptions): Response {
 
   const compressionStream = new CompressionStream(format);
   const stream = response.body?.pipeThrough(compressionStream);
+  response.headers.set("Content-Encoding", format);
   return new Response(stream, response);
 }
 
