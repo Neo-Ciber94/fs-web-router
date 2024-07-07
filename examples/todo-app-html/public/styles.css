@@ -6,8 +6,9 @@
 
 :root {
   font-family: "Arial", sans-serif;
-  --primary-color: rgb(66, 14, 255);
-  --danger-color: rgb(185, 6, 6);
+  --primary-color: #4338ca;
+  --secondary-color: #312e81;
+  --danger-color: #991b1b;
 }
 
 body {
@@ -17,7 +18,7 @@ body {
 
 body:before {
   position: absolute;
-  background: linear-gradient(to bottom, rgb(56, 12, 214), rgb(74, 29, 240));
+  background: linear-gradient(to bottom, var(--primary-color), var(--secondary-color));
   content: "";
   width: 98%;
   height: 400px;
