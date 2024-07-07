@@ -45,16 +45,14 @@ function TodoListItem({ todo }: { todo: Todo }) {
     }
   };
 
-  const handleUpdateTodo = async (updatedTodo: Omit<Partial<Todo>, "id">) => {
-    const newTodo = { ...todo, updatedTodo };
-
+  const handleUpdateTodo = async (input: Todo) => {
     const formData = new FormData();
-    formData.set("id", newTodo.id);
-    formData.set("description", newTodo.description);
-    formData.set("done", newTodo.done.toString());
+    formData.set("id", input.id);
+    formData.set("description", input.description);
+    formData.set("done", input.done.toString());
 
     try {
-      await fetchJSON(`/api/todos/${todo.id}`, {
+      await fetchJSON(`/api/todos/${input.id}`, {
         method: "PUT",
         body: formData,
       });
@@ -73,13 +71,13 @@ function TodoListItem({ todo }: { todo: Todo }) {
           type="checkbox"
           name="done"
           defaultChecked={todo.done}
-          onChange={(ev) => handleUpdateTodo({ done: ev.currentTarget.checked })}
+          onChange={(ev) => handleUpdateTodo({ ...todo, done: ev.currentTarget.checked })}
         />
         <input
           className="todo__item__description"
           name="description"
           defaultValue={todo.description}
-          onChange={(ev) => handleUpdateTodo({ description: ev.currentTarget.value })}
+          onChange={(ev) => handleUpdateTodo({ ...todo, description: ev.currentTarget.value })}
         />
         <div className="todo__item__actions">
           <button data-action="delete" className="button__danger" onClick={handleDelete}>

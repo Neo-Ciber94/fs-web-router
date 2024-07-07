@@ -13,17 +13,17 @@ export const PUT: RequestHandler = async (event) => {
   const done = formData.get("done") === "true";
 
   const todo = DB.get(todoId);
-
-  if (todo) {
-    DB.set(todo.id, { id: todo.id, description, done });
+  if (!todo) {
+    return Response.json(null, { status: 404 });
   }
 
-  return new Response(null, {
-    status: 303,
-    headers: {
-      location: "/",
-    },
-  });
+  const newTodo = { id: todo.id, description, done };
+
+  if (todo) {
+    DB.set(todo.id, newTodo);
+  }
+
+  return Response.json(newTodo);
 };
 
 export const DELETE: RequestHandler = async (event) => {
@@ -33,14 +33,9 @@ export const DELETE: RequestHandler = async (event) => {
     return Response.json(null, { status: 404 });
   }
 
-  if (DB.has(todoId)) {
-    DB.delete(todoId);
+  if (DB.delete(todoId)) {
+    return Response.json(null, { status: 200 });
   }
 
-  return new Response(null, {
-    status: 303,
-    headers: {
-      location: "/",
-    },
-  });
+  return Response.json(null, { status: 404 });
 };

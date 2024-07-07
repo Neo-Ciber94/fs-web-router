@@ -34,7 +34,7 @@ export const DELETE: RequestHandler = async (event) => {
   }
 
   if (DB.delete(todoId)) {
-    return new Response(null, { status: 204 });
+    return Response.json(null, { status: 200 });
   }
 
   return Response.json(null, { status: 404 });
