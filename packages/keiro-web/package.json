@@ -6,7 +6,8 @@
   "types": "dist/index.d.ts",
   "scripts": {
     "build": "tsup && tsc --emitDeclarationOnly --declaration",
-    "check": "tsc --noEmit"
+    "check": "tsc --noEmit",
+    "prepublishOnly": "npm ru publish"
   },
   "devDependencies": {
     "@deno/shim-deno": "^0.19.2",
