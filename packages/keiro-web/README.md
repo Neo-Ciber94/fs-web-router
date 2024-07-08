@@ -1,3 +1,3 @@
-# @keiro/utils
+# @keiro-dev/web
 
-Utilities for the [keiro](https://www.npmjs.com/package/keiro).
+Web utilities for keiro [keiro](https://www.npmjs.com/package/keiro).
