@@ -19,6 +19,9 @@
   "dependencies": {
     "mime-types": "^2.1.35"
   },
+  "peerDependencies": {
+    "keiro": "workspace:*"
+  },
   "exports": {
     "./package.json": "./package.json",
     ".": {
