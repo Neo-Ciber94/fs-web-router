@@ -4,6 +4,9 @@
   "description": "Web utilities for keiro",
   "main": "dist/index.mjs",
   "types": "dist/index.d.ts",
+  "publishConfig": {
+    "access": "public"
+  },
   "scripts": {
     "build": "tsup && tsc --emitDeclarationOnly --declaration",
     "check": "tsc --noEmit",
