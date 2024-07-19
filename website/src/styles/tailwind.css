@@ -9,6 +9,7 @@
 header {
   background: rgba(0, 0, 0, 0.3) !important;
   border-bottom: 1px solid rgba(0, 195, 255, 0.2) !important;
+  backdrop-filter: blur(3px);
 }
 
 [data-theme="light"] header {
